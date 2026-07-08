@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<!-- build: 2026070801 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F Capstone Lab · Build a Code-Review Agent</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · Exam Prep Lab</p>
+    <h1 class="title">Build a code-review agent,<br>then <em>take the exam</em>.</h1>
+    <p class="standfirst">
+      A single hands-on capstone that walks you through building one production-style
+      agent end to end &mdash; the loop, the tools, the extraction, the review, the
+      escalation. Every stage maps to a domain the Claude Certified Architect &mdash;
+      Foundations exam actually tests.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Finishing this lab does not grant a certificate and is not the CCA-F exam.
+        The exam is booked separately through Anthropic and requires completing
+        Anthropic&rsquo;s four official Skilljar courses first. Treat this as the
+        &ldquo;build something real&rdquo; practice that the exam rewards.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>The build, in seven stages</h2>
+    <p class="sub">One project &mdash; a code-review agent that reads pull requests, flags issues, and knows when to hand off to a human. Work top to bottom; each stage builds on the last.</p>
+    <ol>
+      <li><div class="rm-body"><a href="#s1">Stand up the agent loop</a><small>tool calling, errors, sessions, subagents</small></div><span class="rm-domain">Agentic Arch · 27%</span></li>
+      <li><div class="rm-body"><a href="#s2">Configure Claude Code around the repo</a><small>CLAUDE.md, path rules, skills, MCP</small></div><span class="rm-domain">Claude Code · 20%</span></li>
+      <li><div class="rm-body"><a href="#s3">Design &amp; test the MCP tools</a><small>differentiated descriptions, error categories</small></div><span class="rm-domain">Tool &amp; MCP · 18%</span></li>
+      <li><div class="rm-body"><a href="#s4">Extract findings as structured data</a><small>JSON schema, validation-retry, batch</small></div><span class="rm-domain">Prompt &amp; Output · 20%</span></li>
+      <li><div class="rm-body"><a href="#s5">Add the self-review pass</a><small>few-shot, review criteria, multi-pass</small></div><span class="rm-domain">Prompt &amp; Output · 20%</span></li>
+      <li><div class="rm-body"><a href="#s6">Manage context on long reviews</a><small>fact extraction, scratchpad, delegation</small></div><span class="rm-domain">Context &amp; Reliability · 15%</span></li>
+      <li><div class="rm-body"><a href="#s7">Route low-confidence findings to a human</a><small>escalation triggers, confidence routing</small></div><span class="rm-domain">Context &amp; Reliability · 15%</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>Before you start</h3>
+    <p>You should be comfortable in a terminal and reading code &mdash; this lab assumes the developer experience the exam itself assumes (roughly 6+ months building with Claude). It does not stop to explain package managers or virtual environments.</p>
+    <ul>
+      <li><strong>Node 18+</strong> or <strong>Python 3.10+</strong> &mdash; the Agent SDK ships for both. Examples below are shown in both where it matters.</li>
+      <li>An <strong>Anthropic API key</strong> exported as <code>ANTHROPIC_API_KEY</code>. (The SDK also supports auth through Bedrock or Vertex if that&rsquo;s your setup.)</li>
+      <li>A small <strong>Git repo with a real pull request or diff</strong> to point the agent at. Any repo you know well works; a repo with a deliberately-flawed branch works even better.</li>
+    </ul>
+    <div class="verify">
+      <span class="lbl">Verify before you build</span>
+      The Agent SDK, MCP tooling, and the structured-output API have all moved recently
+      and continue to. Package names and a few flags below carry a real shelf-life. Wherever
+      you see a <em>Verify</em> note, check it against the current docs at
+      <code>code.claude.com/docs</code> and <code>platform.claude.com/docs</code> before relying on it.
+      The <em>shape</em> of each pattern is stable; exact identifiers drift.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ STAGE 1 ============ -->
+  <section class="stage" id="s1">
+    <div class="stage-head">
+      <span class="stage-num">Stage 01</span>
+      <h2>Stand up the agent loop</h2>
+      <span class="domain-tag">Agentic Architecture &amp; Orchestration &middot; 27%</span>
+    </div>
+    <p class="lede">The whole project rests on one thing: a loop that calls the model, runs the tools it asks for, feeds results back, and repeats until the work is done. Build that first, get it resuming across turns, then split off a subagent.</p>
+
+    <div class="scenario">A pull request lands. Your agent needs to read the changed files, reason about them, and produce findings &mdash; possibly over many model turns and tool calls.</div>
+
+    <h3>1a &middot; Install and make one query</h3>
+    <p>The Claude Agent SDK is the renamed successor to the old &ldquo;Claude Code SDK.&rdquo; If a tutorial imports <code>claude-code-sdk</code> or <code>ClaudeCodeOptions</code>, it&rsquo;s stale &mdash; the code won&rsquo;t run.</p>
+
+    <span class="code-label">Install</span>
+    <div class="code"><span class="c"># Python</span>
+<span class="cmd">pip install claude-agent-sdk</span>
+
+<span class="c"># TypeScript (bundles the Claude Code binary — nothing else to install)</span>
+<span class="cmd">npm install @anthropic-ai/claude-agent-sdk</span></div>
+
+    <span class="code-label">A first query (Python)</span>
+    <div class="code"><span class="k">import</span> asyncio
+<span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
+
+<span class="k">async def</span> main():
+    <span class="k">async for</span> message <span class="k">in</span> query(
+        prompt=<span class="s">"Read the diff in ./pr and list the files it touches."</span>,
+        options=ClaudeAgentOptions(
+            allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Grep"</span>, <span class="s">"Glob"</span>],
+            permission_mode=<span class="s">"acceptEdits"</span>,   <span class="c"># or gate with canUseTool</span>
+        ),
+    ):
+        <span class="k">if</span> hasattr(message, <span class="s">"result"</span>):
+            print(message.result)
+
+asyncio.run(main())</div>
+
+    <p>You did not write the loop. <code>query()</code> runs the full model&ndash;tool&ndash;result cycle for you and streams every intermediate message back, ending with a result message. That&rsquo;s the point of the SDK over the raw Messages API &mdash; the <code>stop_reason == "tool_use"</code> plumbing is handled.</p>
+
+    <h3>1b &middot; Handle errors and cap the run</h3>
+    <p>The SDK does <em>not</em> ship default turn limits, budget caps, or retry logic. An unbounded agent can loop and burn tokens with no circuit breaker. Set limits explicitly.</p>
+    <div class="code">options=ClaudeAgentOptions(
+    allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Grep"</span>, <span class="s">"Glob"</span>],
+    max_turns=<span class="s">12</span>,              <span class="c"># circuit breaker: don't run forever</span>
+    <span class="c"># max_budget_usd is an optional cap — set it in production</span>
+)</div>
+    <p>Wrap the loop in your own try/except and inspect the result message&rsquo;s error subtype. Model-call failures surface discriminated codes such as <code>rate_limit</code>, <code>overloaded</code>, <code>authentication_failed</code>, and <code>server_error</code> &mdash; branch your retry logic on those rather than treating every failure the same.</p>
+
+    <h3>1c &middot; Keep context across turns (sessions)</h3>
+    <p>Every <code>query()</code> starts a fresh session with no memory of the last one. To continue &mdash; e.g. review, then answer a follow-up about the same PR &mdash; capture the <code>session_id</code> from the init message and pass <code>resume</code> on the next call.</p>
+    <div class="code"><span class="c"># First call: grab session_id from the init message.</span>
+<span class="c"># Second call: resume it.</span>
+options=ClaudeAgentOptions(resume=session_id)</div>
+
+    <h3>1d &middot; Split off a reviewer subagent</h3>
+    <p>Define a specialized agent in the <code>agents</code> parameter, and include <code>Agent</code> in <code>allowedTools</code> so the parent is allowed to spawn it. The subagent runs in its <em>own</em> context &mdash; it can read fifty files without any of that noise landing in the parent&rsquo;s conversation. Only its final message returns to the parent.</p>
+    <span class="code-label">TypeScript</span>
+    <div class="code"><span class="k">import</span> { query } <span class="k">from</span> <span class="s">'@anthropic-ai/claude-agent-sdk'</span>;
+
+<span class="k">const</span> result = query({
+  prompt: <span class="s">"Review the auth module changes for security issues."</span>,
+  options: {
+    allowedTools: [<span class="s">"Read"</span>, <span class="s">"Grep"</span>, <span class="s">"Agent"</span>],   <span class="c">// Agent = allowed to delegate</span>
+    agents: {
+      <span class="s">'security-reviewer'</span>: {
+        description: <span class="s">'Reviews code for security flaws. Use for auth, secrets, input handling.'</span>,
+        prompt: <span class="s">'You are a security review specialist. Report only exploitable issues, with severity.'</span>,
+        tools: [<span class="s">"Read"</span>, <span class="s">"Grep"</span>],   <span class="c">// read-only: it can analyze, never modify</span>
+      },
+    },
+  },
+});</div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Scenarios here ask <em>when</em> to spawn a subagent versus work in the main context.
+      The right answer is almost always about <strong>context isolation</strong> or
+      <strong>parallelism</strong> &mdash; not &ldquo;subagents are better.&rdquo; For a single sequential
+      read, delegating just adds overhead. &ldquo;Subagent sprawl&rdquo; (spawning too many) is a
+      real failure mode the exam likes to test.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Package names, <code>ClaudeAgentOptions</code> fields, and the exact session-resume shape
+      are current as of mid-2026 but the SDK is pre-1.0 and moving (there&rsquo;s already a
+      V2 session interface alongside the generator pattern). Confirm the import path and
+      options object against <code>code.claude.com/docs/en/agent-sdk</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 1 done when</span>
+      <ul>
+        <li>Your agent reads a real diff and returns findings over multiple turns.</li>
+        <li>A follow-up question resumes the same session with full context.</li>
+        <li>One read-only reviewer subagent runs and returns a summary to the parent.</li>
+        <li><code>max_turns</code> is set, and you handle at least one error subtype deliberately.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 2 ============ -->
+  <section class="stage" id="s2">
+    <div class="stage-head">
+      <span class="stage-num">Stage 02</span>
+      <h2>Configure Claude Code around the repo</h2>
+      <span class="domain-tag">Claude Code Configuration &amp; Workflows &middot; 20%</span>
+    </div>
+    <p class="lede">Your agent is only as good as the project context it reads. Set up the configuration hierarchy so the agent knows your conventions, restrict what it can do in sensitive paths, package a reusable review capability as a skill, and wire in one MCP server.</p>
+
+    <h3>2a &middot; The CLAUDE.md hierarchy</h3>
+    <p>The SDK reads <code>CLAUDE.md</code> from the working directory as persistent project context, the same file Claude Code uses. Precedence runs from broad to specific &mdash; more specific wins:</p>
+    <ul>
+      <li><strong>User</strong> &mdash; <code>~/.claude/CLAUDE.md</code>: your personal defaults across every project.</li>
+      <li><strong>Project</strong> &mdash; <code>./CLAUDE.md</code> at the repo root: shared, committed to version control.</li>
+      <li><strong>Subdirectory</strong> &mdash; a <code>CLAUDE.md</code> deeper in the tree refines the rules for that area.</li>
+    </ul>
+    <p>Add a <code>.claudeignore</code> to keep the agent out of build artifacts, vendored code, and secrets.</p>
+    <span class="code-label">./CLAUDE.md</span>
+    <div class="code"><span class="c"># Code Review Agent — project context</span>
+
+Review Python and TypeScript changes only.
+Flag: unhandled errors, missing input validation, hardcoded secrets.
+Do NOT comment on formatting — a linter handles that.
+Severity scale: blocker &gt; major &gt; minor &gt; nit.</div>
+
+    <h3>2b &middot; Path-specific rules</h3>
+    <p>Put narrower rules in <code>.claude/rules/</code> so behavior can differ by area of the codebase &mdash; e.g. stricter handling under <code>infra/</code> or <code>migrations/</code> than under <code>docs/</code>.</p>
+
+    <h3>2c &middot; Build a review skill</h3>
+    <p>A skill is a folder with a <code>SKILL.md</code> and YAML frontmatter. Two frontmatter options matter for this build:</p>
+    <ul>
+      <li><code>allowed-tools</code> &mdash; restricts what the skill may do (a review skill reads, it doesn&rsquo;t write).</li>
+      <li><code>context: fork</code> &mdash; runs the skill in an isolated subagent so its verbose output doesn&rsquo;t pollute your main session context. This one shows up on the exam by name.</li>
+    </ul>
+    <span class="code-label">.claude/skills/pr-review/SKILL.md</span>
+    <div class="code"><span class="c">---</span>
+<span class="k">name</span>: pr-review
+<span class="k">description</span>: Review a pull request diff and produce categorized findings.
+<span class="k">allowed-tools</span>: Read, Grep, Glob
+<span class="k">context</span>: fork
+<span class="c">---</span>
+
+<span class="c"># PR Review</span>
+Read the diff, group findings by severity, and return
+one line per finding: severity | file:line | what | why.</div>
+
+    <h3>2d &middot; Integrate one MCP server</h3>
+    <p>MCP is how the agent talks to external systems. Config location signals scope: <code>.mcp.json</code> at the project root is shared through version control; <code>~/.claude.json</code> is your personal, experimental config. Wire in at least one server &mdash; a GitHub MCP server to fetch PRs, or the Playwright server if the change touches a UI.</p>
+    <div class="code"><span class="c"># In the SDK, MCP servers are passed inline:</span>
+mcp_servers={
+    <span class="s">"playwright"</span>: {<span class="s">"command"</span>: <span class="s">"npx"</span>, <span class="s">"args"</span>: [<span class="s">"@playwright/mcp@latest"</span>]}
+}</div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Expect questions on <strong>precedence</strong> (which CLAUDE.md wins) and <strong>scope</strong>
+      (<code>.mcp.json</code> shared vs. <code>~/.claude.json</code> personal). And know what
+      <code>context: fork</code> buys you: isolation, so a noisy skill doesn&rsquo;t bloat the
+      caller&rsquo;s context. Distractors will offer plausible-but-wrong frontmatter keys.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Skill frontmatter keys and the MCP config filenames are current, but MCP server
+      packages and the scaffolding CLI change often. Confirm <code>context: fork</code> and
+      <code>allowed-tools</code> spelling, and the server&rsquo;s install command, against the live
+      Claude Code docs before committing them.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 2 done when</span>
+      <ul>
+        <li>A project <code>CLAUDE.md</code> steers the agent&rsquo;s review, and a subdirectory rule overrides it somewhere.</li>
+        <li>Your <code>pr-review</code> skill runs with <code>context: fork</code> and read-only tools.</li>
+        <li>One MCP server is connected and the agent uses it during a review.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 3 ============ -->
+  <section class="stage" id="s3">
+    <div class="stage-head">
+      <span class="stage-num">Stage 03</span>
+      <h2>Design &amp; test the MCP tools</h2>
+      <span class="domain-tag">Tool Design &amp; MCP Integration &middot; 18%</span>
+    </div>
+    <p class="lede">The agent will only pick the right tool if your descriptions make the choice obvious. Two similar tools with vague descriptions is the single most common cause of misrouting. Write them to differentiate, return errors the agent can act on, then deliberately try to confuse it.</p>
+
+    <h3>3a &middot; Differentiate similar tools</h3>
+    <p>Give your review agent two tools that are easy to confuse: <code>fetch_pr_diff</code> and <code>fetch_file_contents</code>. Write descriptions that draw a sharp boundary &mdash; state what each is <em>for</em> and, crucially, when <em>not</em> to use it.</p>
+    <div class="code">{
+  <span class="k">"name"</span>: <span class="s">"fetch_pr_diff"</span>,
+  <span class="k">"description"</span>: <span class="s">"Get ONLY the changed lines in a pull request, as a unified diff. "</span>
+                 <span class="s">"Use to review what a PR changes. Do NOT use to read a whole file — "</span>
+                 <span class="s">"it returns diffs, not full contents."</span>
+}
+{
+  <span class="k">"name"</span>: <span class="s">"fetch_file_contents"</span>,
+  <span class="k">"description"</span>: <span class="s">"Get the COMPLETE current contents of one file at a path. "</span>
+                 <span class="s">"Use when you need surrounding context beyond the diff. "</span>
+                 <span class="s">"Do NOT use to see what changed — use fetch_pr_diff for that."</span>
+}</div>
+
+    <h3>3b &middot; Structured error responses</h3>
+    <p>When a tool fails, return an error the agent can reason about &mdash; a category and a retryable flag &mdash; not a bare string. This is what lets the loop decide whether to retry, fall back, or give up.</p>
+    <div class="code">{
+  <span class="k">"error"</span>: {
+    <span class="k">"category"</span>: <span class="s">"rate_limited"</span>,     <span class="c">// not_found | invalid_input | rate_limited | upstream_down</span>
+    <span class="k">"retryable"</span>: <span class="k">true</span>,
+    <span class="k">"retry_after_s"</span>: <span class="s">30</span>,
+    <span class="k">"message"</span>: <span class="s">"GitHub API rate limit hit. Retry after 30s."</span>
+  }
+}</div>
+    <p>Categories let the agent branch: <code>invalid_input</code> means fix the arguments and retry; <code>not_found</code> means stop and report; <code>rate_limited</code> means wait; <code>upstream_down</code> means fall back or escalate.</p>
+
+    <h3>3c &middot; Test selection under ambiguity</h3>
+    <p>Now try to break it. Feed the agent requests that <em>could</em> route to either tool and see which it picks:</p>
+    <ul>
+      <li>&ldquo;Show me what changed in <code>auth.py</code>&rdquo; &rarr; should pick <code>fetch_pr_diff</code>.</li>
+      <li>&ldquo;I need to see the whole <code>auth.py</code> to understand the change&rdquo; &rarr; should pick <code>fetch_file_contents</code>.</li>
+      <li>&ldquo;Look at <code>auth.py</code>&rdquo; &rarr; genuinely ambiguous. A well-described tool set makes the agent ask or pick defensibly; a poorly-described one coin-flips.</li>
+    </ul>
+    <p>If the agent routes wrong, the fix is almost always the description, not the model. Tighten the &ldquo;do NOT use when&rdquo; clause and re-test.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      This domain is judgment about <strong>tool boundaries</strong>. Questions show two
+      overlapping tools and ask why the model mis-selects, or which description fixes it.
+      The winning answer sharpens the boundary and adds negative guidance
+      (&ldquo;do not use for X&rdquo;). Structured errors with categories and retryable flags are
+      the other reliable theme &mdash; know why a category beats a string.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 3 done when</span>
+      <ul>
+        <li>Your two tools have descriptions with explicit &ldquo;do NOT use when&rdquo; boundaries.</li>
+        <li>Tool errors return a category + retryable flag, and the loop branches on them.</li>
+        <li>You&rsquo;ve run at least three ambiguous requests and logged which tool got picked.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 4 ============ -->
+  <section class="stage" id="s4">
+    <div class="stage-head">
+      <span class="stage-num">Stage 04</span>
+      <h2>Extract findings as structured data</h2>
+      <span class="domain-tag">Prompt Engineering &amp; Structured Output &middot; 20%</span>
+    </div>
+    <p class="lede">Free-form review text is unusable downstream. Turn each finding into a validated JSON object so you can post comments, count blockers, and gate a merge. Then design the schema so it survives messy real-world input, and batch the whole thing for a large PR queue.</p>
+
+    <h3>4a &middot; Constrain output to a schema</h3>
+    <p>Structured outputs are now generally available on the current Claude models via <code>output_config.format</code>, which compiles your JSON Schema into a grammar and constrains generation so the model literally cannot emit non-conforming tokens. Define the shape of a finding:</p>
+    <div class="code">finding_schema = {
+  <span class="k">"type"</span>: <span class="s">"object"</span>,
+  <span class="k">"additionalProperties"</span>: <span class="k">False</span>,
+  <span class="k">"properties"</span>: {
+    <span class="k">"file"</span>:       {<span class="k">"type"</span>: <span class="s">"string"</span>},
+    <span class="k">"line"</span>:       {<span class="k">"type"</span>: [<span class="s">"integer"</span>, <span class="s">"null"</span>]},   <span class="c"># nullable: some findings are file-level</span>
+    <span class="k">"severity"</span>:   {<span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"enum"</span>: [<span class="s">"blocker"</span>,<span class="s">"major"</span>,<span class="s">"minor"</span>,<span class="s">"nit"</span>]},
+    <span class="k">"issue"</span>:      {<span class="k">"type"</span>: <span class="s">"string"</span>},
+    <span class="k">"suggestion"</span>: {<span class="k">"type"</span>: <span class="s">"string"</span>}                 <span class="c"># optional, see 4c</span>
+  },
+  <span class="k">"required"</span>: [<span class="s">"file"</span>, <span class="s">"severity"</span>, <span class="s">"issue"</span>]
+}</div>
+
+    <span class="code-label">Python — the GA path</span>
+    <div class="code">message = client.messages.create(
+    model=<span class="s">"claude-sonnet-4-6"</span>,
+    max_tokens=<span class="s">1024</span>,
+    messages=[{<span class="k">"role"</span>: <span class="s">"user"</span>, <span class="k">"content"</span>: diff_text}],
+    output_config={<span class="k">"format"</span>: {<span class="k">"type"</span>: <span class="s">"json_schema"</span>, <span class="k">"schema"</span>: findings_schema}},
+)</div>
+    <div class="note">
+      An older pattern defines the schema as a <em>tool</em> and forces it with
+      <code>tool_choice</code>. That still works and is still needed for some cases (older
+      models, extended-thinking combinations), so recognize it &mdash; but prefer
+      <code>output_config.format</code> when the model supports it.
+    </div>
+
+    <h3>4b &middot; Validation-retry loop</h3>
+    <p>Constrained decoding guarantees the <em>shape</em>, not the <em>content</em> &mdash; you can still get a perfectly-formatted wrong answer. Validate against your own rules (does the file exist in the diff? is the line in range?) and retry with the validation error fed back in:</p>
+    <div class="code"><span class="k">for</span> attempt <span class="k">in</span> range(<span class="s">3</span>):
+    result = extract(diff_text, prior_error=err)
+    err = validate(result)          <span class="c"># your semantic checks</span>
+    <span class="k">if</span> err <span class="k">is</span> <span class="k">None</span>:
+        <span class="k">break</span>                       <span class="c"># feed err back into the next prompt</span></div>
+
+    <h3>4c &middot; Design for missing data</h3>
+    <p>Real diffs are messy. Make fields the model genuinely can&rsquo;t always fill <strong>optional</strong> (leave them out of <code>required</code>) or <strong>nullable</strong> (<code>["integer","null"]</code>). Forcing a required <code>line</code> on a file-level finding pushes the model to invent one &mdash; the opposite of what you want.</p>
+
+    <h3>4d &middot; Batch a PR queue</h3>
+    <p>For a backlog of PRs, don&rsquo;t call synchronously in a loop. The Message Batches API takes up to 100,000 requests per batch, returns within 24 hours, and costs 50% less on input and output tokens. Tool definitions and structured-output schemas are accepted per-request inside the batch, so each PR gets the same schema-constrained extraction.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Two favorites here: <strong>optional/nullable schema design</strong> (forcing a required
+      field the model can&rsquo;t know invites fabrication) and <strong>when to batch</strong>
+      (async, non-real-time, cost-sensitive bulk &mdash; not interactive review). Also know
+      that structured outputs guarantee format, not correctness &mdash; hence the
+      validation-retry loop still earns its place.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Structured outputs graduated from a beta header (<code>structured-outputs-2025-11-13</code>)
+      to GA <code>output_config.format</code>; which models support the GA path changes as new
+      models ship. Confirm your target model and the exact field name against
+      <code>platform.claude.com/docs/en/build-with-claude/structured-outputs</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 4 done when</span>
+      <ul>
+        <li>Findings come back as schema-valid JSON, with at least one nullable and one optional field used on purpose.</li>
+        <li>A validation-retry loop catches a semantic error and re-prompts.</li>
+        <li>You&rsquo;ve run a small batch of PRs through the Batches API with the same schema.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 5 ============ -->
+  <section class="stage" id="s5">
+    <div class="stage-head">
+      <span class="stage-num">Stage 05</span>
+      <h2>Add the self-review pass</h2>
+      <span class="domain-tag">Prompt Engineering &amp; Structured Output &middot; 20%</span>
+    </div>
+    <p class="lede">A first-pass reviewer over-flags. It calls style preferences &ldquo;blockers&rdquo; and invents problems in code it half-understands. Cut the false positives with worked examples, explicit criteria, and a second pass that reviews the review.</p>
+
+    <h3>5a &middot; Few-shot the ambiguous calls</h3>
+    <p>The hard cases aren&rsquo;t obvious bugs &mdash; they&rsquo;re judgment calls. Show the agent 2&ndash;3 worked examples of borderline findings and the correct severity, so it calibrates instead of guessing.</p>
+    <div class="code"><span class="c"># In the review prompt:</span>
+Example — a broad `except:` in a one-off migration script → severity: minor
+(acceptable in throwaway code; would be major in a request handler).
+
+Example — a hardcoded API key in any committed file → severity: blocker, always.
+
+Example — a variable named `data` → not a finding. Do not report naming taste.</div>
+
+    <h3>5b &middot; Explicit review criteria</h3>
+    <p>Vague instructions (&ldquo;find problems&rdquo;) produce noise. Define what counts as reportable and what explicitly does not, so the agent stops surfacing non-issues:</p>
+    <ul>
+      <li><strong>Report:</strong> anything that can cause incorrect behavior, a security hole, or data loss.</li>
+      <li><strong>Do not report:</strong> style, formatting, naming taste, or anything a linter already catches.</li>
+      <li><strong>When unsure</strong> whether something is exploitable: mark it <code>minor</code> and say what you&rsquo;re unsure about &mdash; don&rsquo;t inflate it to <code>blocker</code>.</li>
+    </ul>
+
+    <h3>5c &middot; Multi-pass architecture for big reviews</h3>
+    <p>A large PR won&rsquo;t review well in one pass. Structure it as stages, each with a narrow job:</p>
+    <ol>
+      <li><strong>Pass 1 &mdash; collect:</strong> each file (or subagent) produces raw findings independently.</li>
+      <li><strong>Pass 2 &mdash; filter:</strong> a reviewer pass drops false positives against the criteria from 5b.</li>
+      <li><strong>Pass 3 &mdash; rank:</strong> surviving findings are deduped and ordered by severity for the human.</li>
+    </ol>
+    <p>This is where the parallel subagents from Stage 1 pay off: run a <code>style-checker</code>, a <code>security-scanner</code>, and a <code>test-coverage</code> reviewer concurrently, then merge. Each keeps its own context, so one file&rsquo;s deep read doesn&rsquo;t crowd out another&rsquo;s.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The through-line is <strong>reducing false positives</strong>. Expect scenarios where an
+      agent over-flags and you choose the fix: few-shot examples for the ambiguous band,
+      explicit exclusion criteria, or a filtering pass. &ldquo;Add more instructions telling it
+      to be careful&rdquo; is the tempting wrong answer; concrete examples and criteria win.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 5 done when</span>
+      <ul>
+        <li>Your prompt carries 2&ndash;3 few-shot examples covering borderline severity calls.</li>
+        <li>Explicit report / do-not-report criteria measurably cut the noise on a real PR.</li>
+        <li>A second pass filters the first pass&rsquo;s output before anything reaches a human.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 6 ============ -->
+  <section class="stage" id="s6">
+    <div class="stage-head">
+      <span class="stage-num">Stage 06</span>
+      <h2>Manage context on long reviews</h2>
+      <span class="domain-tag">Context Management &amp; Reliability &middot; 15%</span>
+    </div>
+    <p class="lede">A big PR, a long thread, verbose tool output &mdash; the context window fills and quality drifts. Keep the working context small and well-organized: extract facts from noise, write a scratchpad, and delegate to keep the parent lean.</p>
+
+    <h3>6a &middot; Extract facts from verbose tool output</h3>
+    <p>A raw diff or test log can be thousands of tokens of mostly-irrelevant text. Don&rsquo;t feed all of it forward. Extract the structured facts the agent actually needs &mdash; changed symbols, failing tests, touched public APIs &mdash; and carry those instead of the raw dump.</p>
+    <div class="code"><span class="c"># Instead of carrying 4,000 tokens of test output, carry:</span>
+{ <span class="k">"failing_tests"</span>: [<span class="s">"test_auth_expiry"</span>], <span class="k">"changed_public_fns"</span>: [<span class="s">"validate_token"</span>] }</div>
+
+    <h3>6b &middot; Scratchpad for long sessions</h3>
+    <p>For a review that spans many turns, write intermediate state to a file rather than holding it all in context. A running <code>findings.md</code> or a task list on disk means the agent &mdash; or a fresh session &mdash; can pick up where it left off without re-reading everything. The pattern generalizes: state lives outside the context window; the window holds only what the current step needs.</p>
+
+    <h3>6c &middot; Delegate to stay under the limit</h3>
+    <p>This is the second reason subagents exist (the first was specialization). A research subagent can read twenty files and return a three-line summary &mdash; the parent pays for the summary, not the twenty files. On a large review, delegating per-file or per-concern is how you keep the orchestrator&rsquo;s context from ballooning.</p>
+    <div class="note">
+      Watch the orchestrator&rsquo;s cost. Every parent turn carries the full conversation
+      plus all subagent descriptions, so long sessions get progressively more expensive.
+      The SDK compacts automatically as the limit approaches and re-reads
+      <code>CLAUDE.md</code> after compaction &mdash; but designing for small context beats relying
+      on compaction.
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Scenarios describe an agent degrading over a long session and ask for the fix. The
+      answers cluster around <strong>fact extraction</strong> (carry the distilled facts, not the
+      raw output), <strong>external state</strong> (scratchpad/files over in-context memory), and
+      <strong>delegation for context isolation</strong>. Know why each shrinks the working context.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 6 done when</span>
+      <ul>
+        <li>Verbose tool output is distilled to structured facts before moving forward.</li>
+        <li>A scratchpad file holds review state across turns / a resumed session.</li>
+        <li>Delegation keeps the parent&rsquo;s context small on a genuinely large review.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 7 ============ -->
+  <section class="stage" id="s7">
+    <div class="stage-head">
+      <span class="stage-num">Stage 07</span>
+      <h2>Route low-confidence findings to a human</h2>
+      <span class="domain-tag">Context Management &amp; Reliability &middot; 15%</span>
+    </div>
+    <p class="lede">The last piece is knowing what <em>not</em> to decide alone. A production review agent resolves what it&rsquo;s sure about and escalates the rest &mdash; on a clear trigger, through a real workflow, routed by confidence.</p>
+
+    <h3>7a &middot; When to escalate vs. resolve</h3>
+    <p>Escalate on a defined trigger, not a vibe. The three that matter here:</p>
+    <ul>
+      <li><strong>Policy gap</strong> &mdash; the change touches something no rule covers (a new dependency&rsquo;s license, a data-handling question). The agent has no basis to decide.</li>
+      <li><strong>Explicit request</strong> &mdash; the PR author or a rule asks for human sign-off (e.g. anything under <code>migrations/</code>).</li>
+      <li><strong>Inability to progress</strong> &mdash; the agent can&rsquo;t reach a confident conclusion after its passes: conflicting signals, or a finding it can&rsquo;t verify is exploitable.</li>
+    </ul>
+    <p>Everything else &mdash; the clear blockers, the obvious nits &mdash; it resolves autonomously.</p>
+
+    <h3>7b &middot; Confidence-based routing</h3>
+    <p>Have the review attach a confidence to each finding, then route on it. A simple, defensible policy:</p>
+    <div class="code"><span class="k">if</span> finding.confidence &gt;= <span class="s">0.85</span>:
+    auto_post(finding)                 <span class="c"># high confidence → post the comment</span>
+<span class="k">elif</span> finding.confidence &gt;= <span class="s">0.5</span>:
+    queue_for_human(finding)           <span class="c"># uncertain → human review queue</span>
+<span class="k">else</span>:
+    drop_or_flag_as_low_signal(finding) <span class="c"># too weak → don't waste a human on it</span></div>
+    <p>The band in the middle is the point: the agent is neither confident enough to act nor confident enough to discard, so a person decides. That&rsquo;s the human-in-the-loop workflow &mdash; not &ldquo;a human checks everything,&rdquo; which defeats the purpose, and not &ldquo;the agent decides everything,&rdquo; which is how bad calls ship.</p>
+
+    <h3>7c &middot; Design the review workflow</h3>
+    <p>Make escalation a real path, not a dead end: a queue the human can see, enough context attached for them to decide fast (the finding, the diff hunk, why the agent was unsure), and a way for their decision to flow back &mdash; ideally captured so tomorrow&rsquo;s policy gap becomes next week&rsquo;s rule.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      This is pure judgment, and it&rsquo;s scenario-heavy. Questions give a situation and ask
+      whether the agent should escalate or resolve. Map to the triggers: <strong>policy gap</strong>,
+      <strong>customer/author request</strong>, <strong>can&rsquo;t progress</strong> &rarr; escalate; clear and
+      within policy &rarr; resolve. Confidence-based routing (auto / human / drop) is the
+      canonical design. Beware answers that route <em>everything</em> to a human or
+      <em>nothing</em> &mdash; both miss the point.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 7 done when</span>
+      <ul>
+        <li>Your agent escalates on at least one real trigger and resolves clear cases itself.</li>
+        <li>Findings carry a confidence score that routes them to auto-post, human, or drop.</li>
+        <li>Escalations land in a queue with enough context for a human to decide quickly.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Wrap-up</span>
+      <h2>What you built, and how it maps</h2>
+    </div>
+    <p>You now have one working agent that exercises all five exam domains: an agent loop with sessions and subagents (27%), a Claude Code configuration around it (20%), differentiated MCP tools with structured errors (18%), a schema-constrained extraction pipeline with a self-review pass (20% + 20%), and context management with confidence-based escalation (15%). That&rsquo;s not coverage by coincidence &mdash; it&rsquo;s the same production system the scenario questions are drawn from.</p>
+    <p>The exam is 60 scenario questions in 120 minutes, and it rewards judgment over recall &mdash; the wrong answers are written to tempt people with partial knowledge. Having actually built each stage is the difference between recognizing the right architectural call and guessing at it.</p>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next step toward the exam.</strong> Complete Anthropic&rsquo;s four official
+        Skilljar courses, request exam access, and take the official practice test before
+        booking. This lab is preparation &mdash; the credential comes from Anthropic&rsquo;s
+        proctored exam, not from here.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA-F Capstone Lab
+  <p class="disclaimer">
+    A recommended preparatory lab for the Anthropic Claude Certified Architect &mdash;
+    Foundations (CCA-F) exam. Not affiliated with or endorsed by Anthropic, and not a
+    substitute for the official exam or its prerequisites. Commands, package names, and API
+    fields reflect the toolchain as of mid-2026 and carry a real shelf-life &mdash; check
+    every <em>Verify</em> note against current documentation before relying on it.
+  </p>
+</footer>
+
+</body>
+</html>
