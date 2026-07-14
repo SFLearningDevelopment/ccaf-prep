@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<!-- build: 2026071401 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F Capstone Lab · Build a Developer Productivity Agent</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · Exam Prep Lab</p>
+    <h1 class="title">Build an agent that<br>works <em>inside a codebase</em>.</h1>
+    <p class="standfirst">
+      A single hands-on capstone: a developer-productivity agent on the Claude Agent SDK. It
+      explores unfamiliar code, explains legacy systems, generates boilerplate, and automates
+      the repetitive work &mdash; using the built-in tools (<code>Read</code>, <code>Write</code>,
+      <code>Bash</code>, <code>Grep</code>, <code>Glob</code>) and reaching into your systems
+      through <strong>MCP servers</strong>. You scope what it can touch, and it does real work.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Finishing this lab does not grant a certificate and is not the CCA-F exam.
+        The exam is booked separately through Anthropic and requires completing
+        Anthropic&rsquo;s four official Skilljar courses first. Treat this as the
+        &ldquo;build something real&rdquo; practice the exam rewards.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>The build, in seven stages</h2>
+    <p class="sub">One project &mdash; a productivity agent you point at a real repo, taken through explore, explain, generate, and automate. Work top to bottom; each stage builds on the last.</p>
+    <ol>
+      <li class="rm-start"><div class="rm-body"><a href="#orient">Orientation &mdash; what you&rsquo;re building</a><small>the agent, the flow diagram, the terms</small></div><span class="rm-domain">start here</span></li>
+      <li><div class="rm-body"><a href="#s1">Stand up a least-privilege agent</a><small>Agent SDK, read-only to start</small></div><span class="rm-domain">Agentic Arch · 27%</span></li>
+      <li><div class="rm-body"><a href="#s2">Explore an unfamiliar codebase</a><small>Glob, Grep, Read, plan mode</small></div><span class="rm-domain">Tool &amp; MCP · 18%</span></li>
+      <li><div class="rm-body"><a href="#s3">Understand a legacy system</a><small>trace, summarize, scratchpad</small></div><span class="rm-domain">Context &amp; Reliability · 15%</span></li>
+      <li><div class="rm-body"><a href="#s4">Generate boilerplate safely</a><small>grant Write/Edit, gate the risk</small></div><span class="rm-domain">Agentic Arch · 27%</span></li>
+      <li><div class="rm-body"><a href="#s5">Automate a repetitive task</a><small>Bash, guardrails, verification</small></div><span class="rm-domain">Tool &amp; MCP · 18%</span></li>
+      <li><div class="rm-body"><a href="#s6">Integrate an MCP server</a><small>reach your systems, scope the tools</small></div><span class="rm-domain">Tool &amp; MCP · 18%</span></li>
+      <li><div class="rm-body"><a href="#s7">Configure it for the team</a><small>settings, project config, reuse</small></div><span class="rm-domain">Claude Code Config · 20%</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>Before you start</h3>
+    <p>You should be comfortable in a terminal and reading code &mdash; this lab assumes the developer experience the exam itself assumes (roughly 6+ months building with Claude). It does not stop to explain async functions or git.</p>
+    <ul>
+      <li><strong>Python 3.10+</strong> or <strong>Node 18+</strong> &mdash; the Agent SDK ships for both. Examples lead in Python; the shape is identical in TypeScript.</li>
+      <li>An <strong>Anthropic API key</strong> exported as <code>ANTHROPIC_API_KEY</code>. Bedrock/Vertex/Foundry auth also works.</li>
+      <li>A <strong>real repo you <em>don&rsquo;t</em> know well</strong> &mdash; an open-source project you&rsquo;ve never read, or a legacy service at work. The point is to let the agent explore something genuinely unfamiliar. Run it in a <strong>container or VM</strong> once you grant write/Bash access.</li>
+    </ul>
+    <div class="verify">
+      <span class="lbl">Verify before you build</span>
+      The Agent SDK, its built-in tool set, permission modes, and MCP config shapes have all
+      moved recently and continue to. Package names, tool names, the <code>allowed_tools</code>
+      semantics, and the MCP server config union carry real shelf-life. Wherever you see a
+      <em>Verify</em> note, check it against the current docs at <code>code.claude.com/docs</code>.
+      The <em>shape</em> of each pattern is stable; exact identifiers drift.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ ORIENTATION ============ -->
+  <section class="stage" id="orient">
+    <div class="stage-head">
+      <span class="stage-num">Orientation</span>
+      <h2>What you&rsquo;re building, before you build it</h2>
+    </div>
+
+    <p class="orient-intro">
+      By the end of this lab you&rsquo;ll have <strong>one working program</strong>: an agent you point
+      at a repository that helps a developer get productive fast &mdash; it explores unfamiliar
+      code and explains how it fits together, generates boilerplate to your conventions,
+      automates a repetitive chore, and reaches into your own systems through an MCP server.
+      Each stage adds one capability, and &mdash; just as important &mdash; widens what the agent is
+      allowed to touch, from read-only to trusted. You are not building seven disconnected
+      exercises; you are building one agent in seven passes.
+    </p>
+
+    <div class="build-card">
+      <h3>The one thing you&rsquo;re building</h3>
+      <p style="margin:0">
+        A <strong>developer-productivity agent</strong> on the Agent SDK. It uses the built-in tools
+        &mdash; <code>Read</code>, <code>Write</code>, <code>Bash</code>, <code>Grep</code>,
+        <code>Glob</code> &mdash; to explore, explain, generate, and automate, and integrates an
+        <strong>MCP server</strong> to reach the systems that live behind your own APIs. You control
+        exactly what it can do at each step.
+      </p>
+      <div class="reads">
+        <span class="chip">input &rarr; a repo + a task</span>
+        <span class="chip">output &rarr; understanding, code, automation</span>
+        <span class="chip">control &rarr; least privilege, widened deliberately</span>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:20px">
+      <strong>Not the same as the Claude Code workflow lab.</strong> That lab was about configuring
+      the Claude Code <em>product</em> (CLAUDE.md, slash commands, plan mode). This lab is about
+      <em>building your own agent with the SDK</em> &mdash; the library underneath Claude Code &mdash; and
+      driving it from your code. Same engine, different seat: there, you&rsquo;re the user; here,
+      you&rsquo;re the author.
+    </div>
+
+    <h3>How the seven stages connect</h3>
+    <p>
+      Read the diagram as one agent whose reach grows stage by stage. It starts <strong>read-only</strong>
+      (Stages 1&ndash;3): explore and understand, touching nothing. Then you grant <strong>write</strong>
+      (Stage 4) to generate, and <strong>Bash</strong> (Stage 5) to automate &mdash; each behind a guard.
+      An <strong>MCP server</strong> (Stage 6) extends its reach to your own systems, and
+      <strong>configuration</strong> (Stage 7) makes the whole thing reusable across the team. The
+      dashed band tracks the widening trust boundary.
+    </p>
+
+    <figure class="flow-wrap">
+      <svg class="flow-svg" viewBox="0 0 820 500" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Diagram of a developer-productivity agent whose permissions widen across stages: read-only exploration with Glob, Grep, Read; then granted Write for boilerplate; then Bash for automation, each behind a guard; an MCP server extends reach to external systems; configuration makes it reusable for the team.">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" class="arrowhead"/>
+          </marker>
+          <marker id="aha" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" class="arrowhead-accent"/>
+          </marker>
+        </defs>
+
+        <!-- repo input -->
+        <rect class="box" x="20" y="220" width="104" height="58" rx="8"/>
+        <text class="lbl" x="72" y="244" text-anchor="middle">A repo</text>
+        <text class="sub" x="72" y="261" text-anchor="middle">+ a task</text>
+        <path class="flowline-accent" d="M124,249 L166,249" marker-end="url(#aha)"/>
+
+        <!-- agent core -->
+        <rect class="box-accent" x="170" y="208" width="150" height="82" rx="10"/>
+        <text class="stg" x="245" y="228" text-anchor="middle">STAGE 1</text>
+        <text class="lbl" x="245" y="248" text-anchor="middle">The agent</text>
+        <text class="sub" x="245" y="266" text-anchor="middle">Agent SDK loop</text>
+        <text class="sub" x="245" y="280" text-anchor="middle">least privilege</text>
+
+        <!-- widening trust band -->
+        <rect x="352" y="120" width="340" height="250" rx="12" fill="none"
+              stroke="var(--amber)" stroke-width="1" stroke-dasharray="5 4" opacity="0.6"/>
+        <text class="zonelbl" x="360" y="138" style="fill:var(--amber)">trust boundary widens down →</text>
+
+        <!-- read-only row -->
+        <rect class="box" x="372" y="150" width="200" height="46" rx="8"/>
+        <text class="lbl" x="472" y="168" text-anchor="middle" style="font-size:12px">Read · Glob · Grep</text>
+        <text class="sub" x="472" y="184" text-anchor="middle">explore &amp; understand · S2–3</text>
+
+        <!-- write row -->
+        <rect class="box" x="372" y="208" width="200" height="46" rx="8"/>
+        <text class="lbl" x="472" y="226" text-anchor="middle" style="font-size:12px">+ Write / Edit</text>
+        <text class="sub" x="472" y="242" text-anchor="middle">generate boilerplate · S4</text>
+
+        <!-- bash row -->
+        <rect class="box" x="372" y="266" width="200" height="46" rx="8"/>
+        <text class="lbl" x="472" y="284" text-anchor="middle" style="font-size:12px">+ Bash</text>
+        <text class="sub" x="472" y="300" text-anchor="middle">automate a task · S5</text>
+
+        <!-- guards note -->
+        <text class="stg" x="472" y="332" text-anchor="middle" style="fill:var(--amber)">each grant sits behind a guard</text>
+
+        <!-- arrows agent → rows -->
+        <path class="flowline-accent" d="M320,238 C344,238 348,173 370,173" marker-end="url(#aha)"/>
+        <path class="flowline" d="M320,249 C344,249 348,231 370,231" marker-end="url(#ah)"/>
+        <path class="flowline" d="M320,260 C344,260 348,289 370,289" marker-end="url(#ah)"/>
+
+        <!-- MCP server -->
+        <rect class="box-accent" x="600" y="392" width="180" height="52" rx="10"/>
+        <text class="stg" x="690" y="412" text-anchor="middle">STAGE 6</text>
+        <text class="lbl" x="690" y="430" text-anchor="middle">MCP server</text>
+        <path class="flowline-accent" d="M472,370 C472,392 560,410 596,414" marker-end="url(#aha)"/>
+        <text class="sub" x="620" y="384" text-anchor="middle" style="fill:var(--ink-soft)">reach your systems</text>
+
+        <!-- team config -->
+        <rect class="box" x="150" y="392" width="200" height="52" rx="10"/>
+        <text class="stg" x="250" y="412" text-anchor="middle">STAGE 7</text>
+        <text class="lbl" x="250" y="430" text-anchor="middle">Configure for the team</text>
+        <path class="flowline" d="M245,290 L250,390" marker-end="url(#ah)" opacity="0.6"/>
+      </svg>
+      <figcaption>One agent, widening reach: read-only first, then write, then Bash, then your systems via MCP — each behind a guard.</figcaption>
+    </figure>
+
+    <div class="note">
+      Don&rsquo;t worry if a box uses a word you don&rsquo;t know yet &mdash; the glossary below defines
+      every term in the diagram, and each stage explains its own box in full when you reach it.
+    </div>
+
+    <h3>The terms this lab uses</h3>
+    <p>These come up across multiple stages. Skim them now; you don&rsquo;t need to memorize them &mdash; they&rsquo;ll make sense as you build.</p>
+
+    <div class="glossary">
+      <dl>
+        <dt>Claude Agent SDK</dt>
+        <dd>The library that runs the agent loop, built-in tools, permissions, and context management for you, from Python or TypeScript &mdash; the same engine that powers Claude Code, driven by <em>your</em> code. <span class="also">Renamed from &ldquo;Claude Code SDK&rdquo;; old names <code>claude-code-sdk</code> / <code>ClaudeCodeOptions</code> are stale.</span></dd>
+
+        <dt>Built-in tools</dt>
+        <dd>Tools the SDK ships with, no implementation needed: <code>Read</code>, <code>Write</code>, <code>Edit</code> (files), <code>Bash</code> (shell), <code>Glob</code> (find files by pattern), <code>Grep</code> (search contents), plus <code>WebSearch</code>/<code>WebFetch</code> and <code>Agent</code> (subagents).</dd>
+
+        <dt>allowed_tools</dt>
+        <dd>The list of tools the agent may use &mdash; and the agent&rsquo;s security boundary. A tool not on the list can&rsquo;t be called. A read-only agent lists only <code>Read</code>, <code>Glob</code>, <code>Grep</code>.</dd>
+
+        <dt>Least privilege</dt>
+        <dd>The governing principle of this lab: start the agent with the minimum tools for the job and grant more only when a stage needs it. A read-only agent can analyze anything and damage nothing.</dd>
+
+        <dt>Glob &amp; Grep</dt>
+        <dd>The two exploration tools. <code>Glob</code> finds files by name pattern (<code>**/*.py</code>); <code>Grep</code> searches file contents by regex. Together they&rsquo;re how the agent navigates a codebase it&rsquo;s never seen.</dd>
+
+        <dt>Plan mode / read-only</dt>
+        <dd>A permission posture where the agent investigates and proposes but changes nothing. Ideal for exploring an unfamiliar or legacy codebase safely before granting any write access.</dd>
+
+        <dt>Permission mode</dt>
+        <dd>How the agent handles actions: default (asks on risk), acceptEdits (auto-approves edits), plan (read-only), plus a runtime <code>can_use_tool</code> callback for custom gating. The lever you widen as trust grows.</dd>
+
+        <dt>Guard <span class="also">(can_use_tool / hook)</span></dt>
+        <dd>A runtime checkpoint before a tool runs &mdash; used here to gate the risky grants (a <code>Bash</code> command, a write outside the working directory). Deny what shouldn&rsquo;t run; allow the rest.</dd>
+
+        <dt>MCP <span class="also">(Model Context Protocol)</span></dt>
+        <dd>The protocol that connects the agent to systems beyond the filesystem &mdash; a database, an issue tracker, an internal API. External servers connect by command or URL; your own domain logic can be an in-process server.</dd>
+
+        <dt>mcp__server__tool</dt>
+        <dd>How MCP tool names are qualified: <code>mcp__&lt;server&gt;__&lt;tool&gt;</code>. That full string is what goes in <code>allowed_tools</code> to permit the tool.</dd>
+
+        <dt>Context (window) / scratchpad</dt>
+        <dd>What the agent holds at once. Exploring a large legacy system can flood it, so distilled findings and an on-disk scratchpad keep the working context lean &mdash; the Stage 3 discipline.</dd>
+
+        <dt>Project configuration</dt>
+        <dd>Filesystem settings (CLAUDE.md, settings) the SDK can load with <code>setting_sources=["project"]</code>, so the agent inherits your team&rsquo;s conventions and everyone gets the same behavior.</dd>
+      </dl>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Before Stage 1</span>
+      <ul>
+        <li>You can state, in one sentence, what the finished agent does end to end.</li>
+        <li>You can trace the widening trust: read-only &rarr; write &rarr; Bash &rarr; your systems via MCP.</li>
+        <li>You can explain how this lab differs from configuring the Claude Code product.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============ STAGE 1 ============ -->
+  <section class="stage" id="s1">
+    <div class="stage-head">
+      <span class="stage-num">Stage 01</span>
+      <h2>Stand up a least-privilege agent</h2>
+      <span class="domain-tag">Agentic Architecture &amp; Orchestration &middot; 27%</span>
+    </div>
+    <p class="lede">Every capability this agent gains, it earns. Start with the safest possible version &mdash; one that can read and search but not change anything &mdash; then widen deliberately in later stages. Least privilege isn&rsquo;t caution for its own sake; it&rsquo;s the design that lets you trust the agent in a real repo.</p>
+
+    <div class="scenario">You point the agent at a service you&rsquo;ve never seen. Before it writes a line or runs a command, you want it to be able to explore and explain &mdash; and to be structurally incapable of breaking anything.</div>
+
+    <h3>1a &middot; Install and make a read-only agent</h3>
+    <p>The Claude Agent SDK is the renamed successor to the old &ldquo;Claude Code SDK.&rdquo; If a tutorial imports <code>claude-code-sdk</code> or <code>ClaudeCodeOptions</code>, it&rsquo;s stale.</p>
+    <span class="code-label">Install</span>
+    <div class="code"><span class="c"># Python 3.10+</span>
+<span class="cmd">pip install claude-agent-sdk</span>
+
+<span class="c"># TypeScript (bundles the Claude Code binary — nothing else to install)</span>
+<span class="cmd">npm install @anthropic-ai/claude-agent-sdk</span></div>
+
+    <span class="code-label">A read-only agent, pointed at a repo (Python)</span>
+    <div class="code"><span class="k">import</span> asyncio
+<span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
+
+<span class="k">async def</span> main():
+    <span class="k">async for</span> message <span class="k">in</span> query(
+        prompt=<span class="s">"Summarize what this service does and how it's structured."</span>,
+        options=ClaudeAgentOptions(
+            cwd=<span class="s">"/path/to/unfamiliar/repo"</span>,   <span class="c"># point it at the codebase</span>
+            allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>],  <span class="c"># read-only: analyze, never modify</span>
+            permission_mode=<span class="s">"plan"</span>,             <span class="c"># extra belt: read-only posture</span>
+            max_turns=<span class="s">30</span>,
+        ),
+    ):
+        <span class="k">if</span> hasattr(message, <span class="s">"result"</span>):
+            print(message.result)
+
+asyncio.run(main())</div>
+    <p>The agent can now read files, glob for patterns, and grep contents &mdash; and nothing else. It literally cannot write or run a command, because those tools aren&rsquo;t on the list.</p>
+
+    <h3>1b &middot; allowed_tools is the security boundary</h3>
+    <p>This is the idea to internalize: <code>allowed_tools</code> isn&rsquo;t just convenience, it&rsquo;s the boundary. A tool not on the list cannot be called, full stop. So you widen it one grant at a time as each stage needs it &mdash; <code>Write</code> in Stage 4, <code>Bash</code> in Stage 5 &mdash; rather than granting everything up front and hoping the agent behaves.</p>
+
+    <h3>1c &middot; Cap the run</h3>
+    <p>Set <code>max_turns</code> as a circuit breaker so exploration can&rsquo;t loop forever, and read token usage from the result to keep an eye on cost. Once you grant write or Bash access in later stages, run the agent in a <strong>container or VM</strong> &mdash; the environment becomes part of the safety boundary.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know that <code>allowed_tools</code> is the <strong>security boundary</strong>, and that
+      <strong>least privilege</strong> is the right default &mdash; start read-only, widen as needed.
+      &ldquo;Give the agent all tools so it&rsquo;s flexible&rdquo; is the wrong instinct the exam probes.
+      Know the built-in tool set by name and which combination makes an agent read-only
+      (<code>Read</code>, <code>Glob</code>, <code>Grep</code>).
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Package name, <code>ClaudeAgentOptions</code> fields, <code>cwd</code>, and
+      <code>permission_mode</code> values are current but the SDK is pre-1.0 and moving. Confirm
+      against <code>code.claude.com/docs/en/agent-sdk</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 1 done when</span>
+      <ul>
+        <li>Your agent runs against a real repo and returns a summary using only read tools.</li>
+        <li>It&rsquo;s structurally read-only &mdash; no <code>Write</code>, <code>Edit</code>, or <code>Bash</code> on the list.</li>
+        <li><code>max_turns</code> is set and you can read token usage from the result.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 2 ============ -->
+  <section class="stage" id="s2">
+    <div class="stage-head">
+      <span class="stage-num">Stage 02</span>
+      <h2>Explore an unfamiliar codebase</h2>
+      <span class="domain-tag">Tool Design &amp; MCP Integration &middot; 18%</span>
+    </div>
+    <p class="lede">The first real job: help a developer get oriented in code they&rsquo;ve never seen. This is what <code>Glob</code> and <code>Grep</code> are for &mdash; the agent navigates by pattern and search, the same way you would, but faster and more thoroughly.</p>
+
+    <h3>2a &middot; The exploration tools, and what each is for</h3>
+    <p>Two tools do the navigating, and knowing which is which matters:</p>
+    <ul>
+      <li><strong><code>Glob</code></strong> finds files by name pattern &mdash; <code>**/*.py</code>, <code>src/**/handlers/*</code>. Use it to map the shape of the project: where the entry points, tests, and config live.</li>
+      <li><strong><code>Grep</code></strong> searches file <em>contents</em> by regex &mdash; where is <code>UserSession</code> defined, every call site of <code>process_payment</code>. Use it to trace how things connect.</li>
+      <li><strong><code>Read</code></strong> pulls a specific file in once Glob/Grep have pointed you at it.</li>
+    </ul>
+    <p>The agent chains them on its own: glob to find, grep to locate, read to understand.</p>
+
+    <h3>2b &middot; Explore in plan mode, safely</h3>
+    <p>Exploration should never risk a change. Keep the agent in the read-only posture from Stage 1 &mdash; <code>permission_mode="plan"</code> plus a read-only tool list &mdash; so it can crawl the whole repo, follow leads, and build understanding without any possibility of a write. Ask it real orientation questions:</p>
+    <div class="code"><span class="c"># Orientation prompts that exercise Glob → Grep → Read:</span>
+<span class="s">"What are the entry points, and what does each do?"</span>
+<span class="s">"Trace how a request flows from the API layer to the database."</span>
+<span class="s">"Where is authentication handled, and what pattern does it use?"</span></div>
+
+    <h3>2c &middot; Return findings, not raw files</h3>
+    <p>A large repo has more content than fits usefully in context. Prompt the agent to return <em>structured findings</em> &mdash; a map of the architecture, the key modules, the entry points &mdash; rather than dumping files back at you. This is the exploration equivalent of a good summary: the conclusion, not the crawl. (Stage 3 leans on this hard for legacy systems.)</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know the <strong>agentic-search tools</strong> and their division of labor: <code>Glob</code> by
+      filename pattern, <code>Grep</code> by content regex, <code>Read</code> for the specific file.
+      Scenarios ask which tool fits a task (&ldquo;find every call site&rdquo; &rarr; Grep; &ldquo;list all
+      test files&rdquo; &rarr; Glob). Exploring read-only before acting is the safe, expected posture.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Tool names and the read-only combination are stable, but <code>permission_mode</code> values
+      and how <code>Glob</code>/<code>Grep</code> accept patterns can shift. Confirm against the
+      SDK tools reference.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 2 done when</span>
+      <ul>
+        <li>The agent maps an unfamiliar repo&rsquo;s structure using Glob, Grep, and Read on its own.</li>
+        <li>It answers a real &ldquo;how does X work here?&rdquo; question by tracing through the code.</li>
+        <li>It returns structured findings, not a pile of raw files.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 3 ============ -->
+  <section class="stage" id="s3">
+    <div class="stage-head">
+      <span class="stage-num">Stage 03</span>
+      <h2>Understand a legacy system</h2>
+      <span class="domain-tag">Context Management &amp; Reliability &middot; 15%</span>
+    </div>
+    <p class="lede">A legacy system is exploration at scale: too much code to hold in context at once, sprawling and interconnected. The challenge stops being &ldquo;can the agent read it&rdquo; and becomes &ldquo;can it stay coherent while reading a lot.&rdquo; That&rsquo;s a context-management problem.</p>
+
+    <div class="scenario">You ask: &ldquo;How is error handling done across this 200-file service, and is it consistent?&rdquo; Reading all 200 files into one context would fill the window and the agent would lose the thread by file 60.</div>
+
+    <h3>3a &middot; Distill facts from a wide read</h3>
+    <p>The answer to &ldquo;too much to hold&rdquo; is to carry the <em>findings</em>, not the files. As the agent traces a pattern across the codebase, have it extract the structured facts &mdash; which modules follow the pattern, which deviate, where the exceptions live &mdash; and carry those forward instead of the raw file contents. The context holds a growing map, not a growing pile.</p>
+
+    <h3>3b &middot; Delegate the crawl to a subagent</h3>
+    <p>The cleaner move for a genuinely wide investigation: delegate it. A subagent reads the fifty relevant files <em>in its own context</em> and returns a concise summary &mdash; so the fifty files never land in your main agent&rsquo;s window. The main agent asks the question and gets the answer, not the crawl. This is the same context-isolation benefit subagents give any multi-agent system, applied to legacy exploration.</p>
+    <div class="code">options = ClaudeAgentOptions(
+    cwd=repo,
+    allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Agent"</span>],   <span class="c"># Agent = can delegate</span>
+    agents={
+      <span class="s">"explorer"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Reads many files to trace one pattern; returns a concise summary."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"Trace the requested pattern across the codebase. Return findings only, not file contents."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>],
+      },
+    },
+)</div>
+
+    <h3>3c &middot; A scratchpad for the map</h3>
+    <p>For a big legacy system, keep the growing understanding on disk &mdash; an architecture note the agent updates as it learns. State lives in the file; the context holds only what the current question needs. A fresh session (or a reset when context stops paying its way) can pick up the map instead of re-deriving it.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The reliable theme: a wide read is a <strong>context problem</strong>, and the fixes are
+      <strong>fact extraction</strong> (carry findings, not files), <strong>delegation</strong> (a subagent
+      isolates the crawl), and <strong>external state</strong> (a scratchpad). Scenarios describe an
+      agent degrading while reading a large system; the fix is never &ldquo;a bigger window,&rdquo; it&rsquo;s
+      one of these three.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Subagent definition shape (the <code>agents</code> object, <code>Agent</code> in
+      <code>allowed_tools</code>) is current but version-sensitive. Confirm against
+      <code>code.claude.com/docs/en/agent-sdk/subagents</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 3 done when</span>
+      <ul>
+        <li>The agent answers a cross-cutting question about a large system without stalling.</li>
+        <li>A subagent handles the wide crawl and returns a summary, keeping the main context lean.</li>
+        <li>A scratchpad file holds the accumulating architectural map.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 4 ============ -->
+  <section class="stage" id="s4">
+    <div class="stage-head">
+      <span class="stage-num">Stage 04</span>
+      <h2>Generate boilerplate safely</h2>
+      <span class="domain-tag">Agentic Architecture &amp; Orchestration &middot; 27%</span>
+    </div>
+    <p class="lede">Now the agent earns write access. Generating boilerplate &mdash; a new module, a test scaffold, a handler that matches the existing ones &mdash; is where a productivity agent pays off. But writing files is the first real risk, so you grant it deliberately and gate what it can touch.</p>
+
+    <div class="scenario">&ldquo;Create a new endpoint following the pattern of the existing ones.&rdquo; The agent should write the new files &mdash; and only the new files, in the right place, matching your conventions &mdash; not reach into unrelated parts of the tree.</div>
+
+    <h3>4a &middot; Grant Write and Edit</h3>
+    <p>Add the write tools to the list, and switch off pure plan mode so the agent can act. <code>acceptEdits</code> lets it write without prompting on every file &mdash; appropriate once you trust the task and are running in a safe environment.</p>
+    <div class="code">options = ClaudeAgentOptions(
+    cwd=repo,
+    allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Write"</span>, <span class="s">"Edit"</span>],
+    permission_mode=<span class="s">"acceptEdits"</span>,   <span class="c"># write without per-file prompts</span>
+    can_use_tool=write_gate,        <span class="c"># but still gate WHERE it writes (4b)</span>
+    max_turns=<span class="s">25</span>,
+)</div>
+
+    <h3>4b &middot; Gate where it writes</h3>
+    <p>Write access without scope is how an agent edits a file it shouldn&rsquo;t. A <code>can_use_tool</code> gate keeps writes inside the intended area &mdash; deny anything outside the target directory, protect generated files or lockfiles, and let the rest through. The grant is broad (&ldquo;can write&rdquo;); the gate makes it precise (&ldquo;can write <em>here</em>&rdquo;).</p>
+    <div class="code"><span class="k">async def</span> write_gate(tool_name, args, context):
+    <span class="k">if</span> tool_name <span class="k">in</span> (<span class="s">"Write"</span>, <span class="s">"Edit"</span>):
+        path = args.get(<span class="s">"path"</span>, <span class="s">""</span>)
+        <span class="k">if not</span> path.startswith(<span class="s">"api/endpoints/"</span>):
+            <span class="k">return</span> PermissionResultDeny(message=<span class="s">"Only write under api/endpoints/ for this task."</span>)
+    <span class="k">return</span> PermissionResultAllow()</div>
+
+    <h3>4c &middot; Match conventions by giving the agent the pattern</h3>
+    <p>Good boilerplate follows the existing code. Because the agent can already read the repo (Stages 1&ndash;2), point it at an exemplar: &ldquo;follow the pattern in <code>api/endpoints/orders.py</code>.&rdquo; It reads the exemplar, matches structure and error handling, and generates the new files consistently &mdash; far better than generating from a blank prompt. Project configuration (Stage 7) makes those conventions automatic.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Two ideas tested here. First, <strong>widen privilege deliberately</strong> &mdash; grant
+      <code>Write</code>/<code>Edit</code> only when the task needs it, not up front. Second, a
+      <strong>grant and a gate are different layers</strong>: <code>allowed_tools</code> says the agent
+      <em>can</em> write; <code>can_use_tool</code> says <em>where</em>. Scenarios that ask &ldquo;how do you
+      let it generate code but not touch production config&rdquo; want the gate, not a prompt.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      <code>PermissionResultAllow</code>/<code>Deny</code>, the <code>can_use_tool</code> signature, and
+      <code>acceptEdits</code> auto-approval scope (in-working-directory rules) are current but
+      version-sensitive. Confirm against <code>code.claude.com/docs/en/agent-sdk/permissions</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 4 done when</span>
+      <ul>
+        <li>The agent generates new boilerplate that matches an existing exemplar&rsquo;s pattern.</li>
+        <li>A gate confines its writes to the intended directory and denies anything outside.</li>
+        <li>You can explain the difference between granting a tool and gating where it acts.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 5 ============ -->
+  <section class="stage" id="s5">
+    <div class="stage-head">
+      <span class="stage-num">Stage 05</span>
+      <h2>Automate a repetitive task</h2>
+      <span class="domain-tag">Tool Design &amp; MCP Integration &middot; 18%</span>
+    </div>
+    <p class="lede">The last built-in capability, and the most powerful: <code>Bash</code>. Running commands is what turns the agent from a code generator into an automator &mdash; run the tests, apply a codemod across the tree, regenerate fixtures. It&rsquo;s also the tool that can do the most damage, so it gets the most careful guard.</p>
+
+    <div class="scenario">&ldquo;Rename this function everywhere and update the imports, then run the test suite to confirm nothing broke.&rdquo; That&rsquo;s a real chore &mdash; and it&rsquo;s exactly the kind of multi-step, verify-as-you-go work Bash unlocks.</div>
+
+    <h3>5a &middot; Grant Bash, in a sandbox</h3>
+    <p>Add <code>Bash</code> to the list &mdash; but this is the point where the <em>environment</em> matters as much as the permission list. Run the agent in a <strong>container or VM</strong>, so even a mistaken command is contained. The sandbox is a safety layer the tool list can&rsquo;t provide on its own.</p>
+    <div class="code">options = ClaudeAgentOptions(
+    cwd=repo,
+    allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Edit"</span>, <span class="s">"Bash"</span>],
+    can_use_tool=bash_gate,   <span class="c"># gate dangerous commands (5b)</span>
+    max_turns=<span class="s">25</span>,
+)</div>
+
+    <h3>5b &middot; Gate dangerous commands</h3>
+    <p>Not every shell command should run unquestioned. A gate can allow the safe, expected commands (the test runner, a formatter, git status) and deny or escalate the dangerous ones (anything that deletes broadly, touches credentials, or reaches the network). Scope the grant to intent, the same way you scoped writes in Stage 4.</p>
+    <div class="code"><span class="c"># Allow the task's expected commands; deny the rest.</span>
+SAFE = (<span class="s">"pytest"</span>, <span class="s">"ruff"</span>, <span class="s">"git status"</span>, <span class="s">"git diff"</span>)
+<span class="k">async def</span> bash_gate(tool_name, args, context):
+    <span class="k">if</span> tool_name == <span class="s">"Bash"</span>:
+        cmd = args.get(<span class="s">"command"</span>, <span class="s">""</span>)
+        <span class="k">if not</span> cmd.startswith(SAFE):
+            <span class="k">return</span> PermissionResultDeny(message=<span class="s">"Command not in the allowed set for this task."</span>)
+    <span class="k">return</span> PermissionResultAllow()</div>
+    <div class="note">
+      For a guarantee that must hold no matter what &mdash; never touch <code>.env</code>, never
+      <code>rm -rf</code> &mdash; a <strong>PreToolUse hook</strong> is stronger than a callback: it runs
+      first in the permission order and its deny holds even in permissive modes. Put
+      hard rules there.
+    </div>
+
+    <h3>5c &middot; Verify the automation worked</h3>
+    <p>Automation you can&rsquo;t verify isn&rsquo;t safe to trust. The strength of an agent with <code>Bash</code> is that it can <em>check its own work</em>: after the rename, it runs the test suite; if tests fail, it reads the failure and fixes it; it re-runs to confirm. Build that verify-as-you-go loop into the task prompt, so &ldquo;done&rdquo; means &ldquo;tests pass,&rdquo; not &ldquo;edits made.&rdquo;</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      <code>Bash</code> is the highest-capability, highest-risk built-in. Know that its safety
+      comes from <strong>two layers</strong>: a gate/hook on <em>which commands</em> run, and a
+      <strong>sandboxed environment</strong> around the whole agent. Know that hard guarantees belong
+      in a <strong>PreToolUse hook</strong> (deny wins), and that verify-as-you-go (run tests, fix,
+      re-run) is what makes automation trustworthy. &ldquo;Trust the agent not to run bad commands&rdquo;
+      is the wrong answer.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Bash gating, hook events (<code>PreToolUse</code>), and sandbox/permission-mode behavior move
+      between versions, and the simple <code>startswith</code> check above is illustrative &mdash; use
+      a robust matcher in practice. Confirm against the permissions and hooks docs.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 5 done when</span>
+      <ul>
+        <li>The agent completes a multi-step chore with Bash &mdash; edit, then run something to verify.</li>
+        <li>A gate (or hook) confines Bash to the task&rsquo;s expected commands and blocks the rest.</li>
+        <li>The agent runs the tests, and &ldquo;done&rdquo; means they passed &mdash; it&rsquo;s running in a sandbox.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 6 ============ -->
+  <section class="stage" id="s6">
+    <div class="stage-head">
+      <span class="stage-num">Stage 06</span>
+      <h2>Integrate an MCP server</h2>
+      <span class="domain-tag">Tool Design &amp; MCP Integration &middot; 18%</span>
+    </div>
+    <p class="lede">The built-in tools cover the filesystem, the shell, and the web. Everything else &mdash; your issue tracker, your database, your internal APIs &mdash; lives behind your own systems, and that&rsquo;s what MCP is for. Connect one server and the agent can reach beyond the repo into the systems developers actually work against.</p>
+
+    <div class="scenario">&ldquo;Look at the open issues tagged <code>bug</code>, find the one about the login timeout, and show me the code responsible.&rdquo; The issues live in a tracker, not the filesystem &mdash; so the agent needs a tool that reaches the tracker.</div>
+
+    <h3>6a &middot; Two kinds of MCP server</h3>
+    <p>There are two ways to give the agent an MCP tool, and the exam expects you to know the difference:</p>
+    <ul>
+      <li><strong>External server</strong> &mdash; an existing server (a GitHub tracker, a database, a browser via Playwright). You connect to it by <code>command</code>/<code>args</code> (stdio) or a <code>URL</code> (HTTP/SSE). The agent connects as a client.</li>
+      <li><strong>In-process server</strong> &mdash; your own domain logic, registered as functions inside your process with <code>create_sdk_mcp_server</code>. No subprocess, no network hop &mdash; for capabilities that live behind <em>your</em> API.</li>
+    </ul>
+
+    <h3>6b &middot; Connect an external server</h3>
+    <p>Pass the server config in <code>mcp_servers</code> and add its tools to <code>allowed_tools</code>. Tool names are fully qualified as <code>mcp__&lt;server&gt;__&lt;tool&gt;</code> &mdash; a common trip-up: that full string is what goes in the allow list.</p>
+    <div class="code">options = ClaudeAgentOptions(
+    cwd=repo,
+    allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"mcp__github__*"</span>],  <span class="c"># qualified names</span>
+    mcp_servers={
+      <span class="s">"github"</span>: {
+        <span class="s">"command"</span>: <span class="s">"npx"</span>,
+        <span class="s">"args"</span>: [<span class="s">"-y"</span>, <span class="s">"@modelcontextprotocol/server-github"</span>],
+        <span class="s">"env"</span>: {<span class="s">"GITHUB_PERSONAL_ACCESS_TOKEN"</span>: os.environ[<span class="s">"GITHUB_TOKEN"</span>]},
+      },
+    },
+)</div>
+    <div class="note">
+      The MCP server config is a discriminated union &mdash; stdio (<code>command</code>/<code>args</code>),
+      HTTP/SSE (<code>url</code>), and the in-process server are all valid shapes. Before relying on
+      a specific one, list the connected server&rsquo;s tools with a quick test so you know exactly
+      what it exposes.
+    </div>
+
+    <h3>6c &middot; Scope the MCP tools too</h3>
+    <p>Least privilege applies to MCP just as it does to built-ins. Don&rsquo;t grant <code>mcp__github__*</code> if the agent only needs to read issues &mdash; list only the specific tools it uses. An MCP server can expose write actions (close an issue, merge a PR); scope the allow list to exactly what the task requires, and gate the risky ones with <code>can_use_tool</code>.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know the <strong>two MCP shapes</strong>: external (connect by command/URL) vs. in-process
+      (your own functions via <code>create_sdk_mcp_server</code>), and when each fits &mdash; in-process
+      for <em>your</em> domain logic, external for existing servers. Know the <code>mcp__server__tool</code>
+      naming goes in <code>allowed_tools</code>. And that <strong>least privilege extends to MCP tools</strong>
+      &mdash; scope them, don&rsquo;t wildcard everything.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      MCP server packages, the config union&rsquo;s exact discriminant fields, and wildcard support
+      in <code>allowed_tools</code> vary by version and server. Confirm the config shape and list
+      the server&rsquo;s tools before relying on specific names.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 6 done when</span>
+      <ul>
+        <li>The agent uses an MCP server to reach a system beyond the filesystem.</li>
+        <li>You can explain when to use an external server vs. an in-process one.</li>
+        <li>The MCP tools are scoped to what the task needs &mdash; no blanket wildcard on write actions.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 7 ============ -->
+  <section class="stage" id="s7">
+    <div class="stage-head">
+      <span class="stage-num">Stage 07</span>
+      <h2>Configure it for the team</h2>
+      <span class="domain-tag">Claude Code Configuration &amp; Workflows &middot; 20%</span>
+    </div>
+    <p class="lede">A productivity agent that only works on your machine helps one developer. The payoff is when the whole team gets the same agent, with the same conventions and the same guardrails. The SDK can load your project&rsquo;s filesystem configuration, so the agent inherits what the team already agreed on.</p>
+
+    <h3>7a &middot; Load project configuration</h3>
+    <p>The SDK doesn&rsquo;t read your project&rsquo;s <code>CLAUDE.md</code> and settings by default &mdash; you opt in. Set <code>setting_sources=["project"]</code> and the agent picks up the committed project context: conventions, build commands, path rules. Now &ldquo;follow our conventions&rdquo; is automatic, not something you re-specify each run.</p>
+    <div class="code">options = ClaudeAgentOptions(
+    cwd=repo,
+    setting_sources=[<span class="s">"project"</span>],   <span class="c"># load committed CLAUDE.md, rules, settings</span>
+    allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Edit"</span>],
+)</div>
+
+    <h3>7b &middot; Encode the guardrails as shared config</h3>
+    <p>The gates and hooks you built in Stages 4&ndash;5 shouldn&rsquo;t live only in your script. Commit them as project settings &mdash; hooks in <code>.claude/settings.json</code>, path rules in <code>.claude/rules/</code> &mdash; so every developer&rsquo;s agent enforces the same guarantees. A guardrail that isn&rsquo;t shared protects one person; committed, it protects the team.</p>
+
+    <h3>7c &middot; Package the agent for reuse</h3>
+    <p>Wrap the whole thing &mdash; the options, the tool scoping, the gates, the loaded config &mdash; as a small CLI or internal tool your team runs. The build-vs-buy line from the SDK docs applies: an agent is worth it for open-ended work where you can&rsquo;t hardcode the steps (explore this unfamiliar system, generate to spec); a plain script is better when the workflow is fixed.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know that the SDK loads filesystem config only when you opt in with
+      <code>setting_sources=["project"]</code> &mdash; a common &ldquo;why isn&rsquo;t my CLAUDE.md loading&rdquo;
+      answer. Know that <strong>shared config (committed) reaches the team</strong> while personal
+      settings don&rsquo;t, and the <strong>agent-vs-script</strong> judgment: agents for open-ended work,
+      scripts for fixed workflows.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      <code>setting_sources</code> (and its TypeScript form <code>settingSources</code>) and which
+      config files it loads are current but evolving. Confirm against the SDK configuration docs.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 7 done when</span>
+      <ul>
+        <li>The agent loads the project&rsquo;s committed config and follows team conventions automatically.</li>
+        <li>Your gates and guardrails are committed as shared settings, not just in your script.</li>
+        <li>The agent is packaged so a teammate can run it &mdash; and you can say why it&rsquo;s an agent, not a script.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Wrap-up</span>
+      <h2>What you built, and how it maps</h2>
+    </div>
+    <p>You now have one working developer-productivity agent that exercises the scenario&rsquo;s three primary domains: built-in tools scoped by least privilege plus MCP integration for reaching your own systems (Tool &amp; MCP, 18%); the agent loop, deliberate privilege-widening, and gated write/Bash grants (Agentic Architecture, 27%); and context management for large legacy systems plus project configuration for team reuse (Context &amp; Reliability, 15%, and Claude Code Config, 20%). Completing it, you should be able to answer any question the scenario raises &mdash; which tool fits which job, why <code>allowed_tools</code> is a security boundary, when to reach for MCP, and how to keep an agent coherent across a sprawling codebase.</p>
+    <p>The exam is 60 scenario questions in 120 minutes, and it rewards judgment over recall &mdash; the wrong answers are written to tempt people with partial knowledge. Having actually scoped the tools, gated the writes, and felt why least privilege is the right default is the difference between recognizing the right architectural call and guessing.</p>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next step toward the exam.</strong> Complete Anthropic&rsquo;s four official
+        Skilljar courses, request exam access, and take the official practice test before
+        booking. This lab is preparation &mdash; the credential comes from Anthropic&rsquo;s
+        proctored exam, not from here.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA-F Capstone Lab &middot; Scenario: Developer Productivity with Claude
+  <p class="disclaimer">
+    A recommended preparatory lab for the Anthropic Claude Certified Architect &mdash;
+    Foundations (CCA-F) exam. Not affiliated with or endorsed by Anthropic, and not a
+    substitute for the official exam or its prerequisites. Commands, package names, tool names,
+    and API fields reflect the toolchain as of mid-2026 and carry a real shelf-life &mdash; check
+    every <em>Verify</em> note against current documentation before relying on it.
+  </p>
+</footer>
+
+</body>
+</html>
