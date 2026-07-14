@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<!-- build: 2026071404 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA Knowledge Track · Module 1 · Agentic Architecture &amp; Orchestration</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* ---- module-specific ---- */
+.antipattern{background:#fbeeee;border:1px solid #e3b7b0;border-left:3px solid #b0432f;border-radius:8px;padding:16px 20px;margin:22px 0;font-size:15px}
+.antipattern .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#b0432f;margin-bottom:8px;font-weight:600}
+.antipattern ul{margin:8px 0 0;padding-left:20px}
+.antipattern li{margin:5px 0}
+.capstone{background:#eaf1ee;border:1px solid #bcd6cb;border-radius:10px;padding:16px 20px;margin:22px 0;display:flex;gap:14px;align-items:flex-start}
+.capstone .icn{color:var(--accent);font-size:20px;line-height:1;flex-shrink:0;margin-top:1px}
+.capstone .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:600}
+.capstone a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(47,111,94,.35)}
+.capstone a:hover{border-bottom-color:var(--accent)}
+.kpoints{margin:16px 0}
+.kpoints .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+.taskref{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+.in-practice{margin:16px 0}
+.in-practice .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · CCA Knowledge Track</p>
+    <h1 class="title">Module 1<br><em>Agentic Architecture</em> &amp; Orchestration</h1>
+    <p class="standfirst">
+      The largest domain on the exam, and the foundation for everything else: how autonomous
+      agents actually run. You&rsquo;ll work through the agentic loop, coordinator&ndash;subagent
+      orchestration, how context passes between agents, workflow enforcement, SDK hooks, task
+      decomposition, and session state &mdash; the seven task statements that make up this domain.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Completing this module does not grant a certificate and is not the CCA exam. The exam is
+        booked separately through Anthropic and has its own prerequisites. This track is the
+        structured-knowledge companion to the hands-on capstone labs &mdash; use both.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>This module, in seven sections</h2>
+    <p class="sub">One per task statement in the Agentic Architecture &amp; Orchestration domain. Each pairs the knowledge the exam tests with the anti-patterns it loves to probe &mdash; and links to the capstone lab where you build it for real.</p>
+    <ol>
+      <li><div class="rm-body"><a href="#s1-1">1.1 · Agentic loops for autonomous execution</a><small>the stop_reason lifecycle, and its anti-patterns</small></div><span class="rm-domain">Task 1.1</span></li>
+      <li><div class="rm-body"><a href="#s1-2">1.2 · Coordinator&ndash;subagent orchestration</a><small>hub-and-spoke, decomposition, iterative refinement</small></div><span class="rm-domain">Task 1.2</span></li>
+      <li><div class="rm-body"><a href="#s1-3">1.3 · Subagent invocation &amp; context passing</a><small>the Task tool, AgentDefinition, parallel spawning</small></div><span class="rm-domain">Task 1.3</span></li>
+      <li><div class="rm-body"><a href="#s1-4">1.4 · Multi-step workflows &amp; enforcement</a><small>prerequisite gates, structured handoffs</small></div><span class="rm-domain">Task 1.4</span></li>
+      <li><div class="rm-body"><a href="#s1-5">1.5 · Agent SDK hooks</a><small>interception, normalization, deterministic rules</small></div><span class="rm-domain">Task 1.5</span></li>
+      <li><div class="rm-body"><a href="#s1-6">1.6 · Task decomposition strategies</a><small>fixed pipelines vs adaptive investigation</small></div><span class="rm-domain">Task 1.6</span></li>
+      <li><div class="rm-body"><a href="#s1-7">1.7 · Session state, resumption &amp; forking</a><small>--resume, fork_session, stale-context judgment</small></div><span class="rm-domain">Task 1.7</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>How to use this module</h3>
+    <p>Each section teaches one task statement in a fixed shape, so you always know where to look: <strong>what &amp; why</strong> (the concept), <strong>knowledge points</strong> (what the exam expects you to know), <strong>in practice</strong> (the concrete skills), <strong>anti-patterns</strong> (the traps), an <strong>exam lens</strong> (the tempting wrong answer), and a <strong>check</strong> you can answer before moving on. Where a capstone lab exercises the same idea, a link points you to it.</p>
+    <div class="note">
+      The CCA exam is <strong>scenario-based</strong> &mdash; it describes a situation and asks for the
+      right architectural call, with wrong answers written to tempt partial knowledge. This module
+      teaches toward that: the anti-patterns and exam-lens boxes are where the real exam points
+      live, so don&rsquo;t skim them.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ 1.1 ============ -->
+  <section class="stage" id="s1-1">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.1</span>
+      <h2>Agentic loops for autonomous task execution</h2>
+      <span class="domain-tag">Task Statement 1.1</span>
+    </div>
+    <p class="lede">An agent isn&rsquo;t a single call &mdash; it&rsquo;s a loop. Claude decides it needs a tool, you run the tool, you feed the result back, and Claude decides what to do next. Getting the loop&rsquo;s control flow right &mdash; and knowing what <em>not</em> to base it on &mdash; is the foundation the whole domain rests on.</p>
+
+    <h3>What &amp; why</h3>
+    <p>The agentic loop is the cycle that lets Claude execute a multi-step task on its own. Each turn, you send the conversation to Claude and inspect the response&rsquo;s <code>stop_reason</code>. If it&rsquo;s <code>"tool_use"</code>, Claude is asking you to run a tool &mdash; you execute it, append the result to the conversation, and loop again. If it&rsquo;s <code>"end_turn"</code>, Claude is done &mdash; you stop. That single signal, <code>stop_reason</code>, is the correct control-flow mechanism, and building the loop around anything else is where most agent bugs come from.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The loop lifecycle: send request &rarr; inspect <code>stop_reason</code> (<code>"tool_use"</code> vs <code>"end_turn"</code>) &rarr; execute requested tools &rarr; return results for the next iteration.</li>
+        <li>Tool results are <strong>appended to conversation history</strong> so the model can reason about the next action with the new information in context.</li>
+        <li>The distinction between <strong>model-driven decision-making</strong> (Claude reasons about which tool to call next based on context) and <strong>pre-configured decision trees</strong> or fixed tool sequences. The loop is driven by the model, not a hardcoded flowchart.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Continue the loop while <code>stop_reason == "tool_use"</code>; terminate when it&rsquo;s <code>"end_turn"</code>. That&rsquo;s the whole control condition.</li>
+        <li>After executing each tool, add a <code>tool_result</code> block to the conversation before the next request, so the model incorporates it into its reasoning.</li>
+        <li>Let the model choose the next tool from context rather than encoding a fixed sequence &mdash; that adaptability is the point of an agent.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Parsing natural-language signals</strong> to decide the loop is done (&ldquo;if the reply says &lsquo;finished&rsquo;&hellip;&rdquo;) &mdash; brittle and wrong; use <code>stop_reason</code>.</li>
+        <li><strong>Arbitrary iteration caps as the primary stopping mechanism</strong> &mdash; a safety backstop is fine, but the loop should terminate on <code>end_turn</code>, not because it hit turn 10.</li>
+        <li><strong>Checking for assistant text content as a completion indicator</strong> &mdash; a response can contain text <em>and</em> a tool call; text presence doesn&rsquo;t mean done.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      A scenario shows an agent that stops too early or loops forever. The tempting answers add a
+      turn cap or scan the text for a keyword. The right answer is almost always
+      &ldquo;drive termination off <code>stop_reason</code>&rdquo; &mdash; <code>end_turn</code> stops,
+      <code>tool_use</code> continues. If an answer relies on reading the model&rsquo;s prose to decide
+      control flow, it&rsquo;s the distractor.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        Every SDK lab runs this loop, but the <strong>Customer Support Resolution Agent</strong> lab
+        makes the loop&rsquo;s control flow explicit &mdash; watch where <code>stop_reason</code> drives
+        the intake&rarr;lookup&rarr;resolve cycle.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>Can you state the exact condition that continues the loop, and the one that ends it?</li>
+        <li>Can you name three things that must <em>not</em> be used to decide the loop is complete?</li>
+        <li>Why must tool results be appended to history before the next request?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 1.2 ============ -->
+  <section class="stage" id="s1-2">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.2</span>
+      <h2>Orchestrate multi-agent systems with coordinator&ndash;subagent patterns</h2>
+      <span class="domain-tag">Task Statement 1.2</span>
+    </div>
+    <p class="lede">One agent handles one task well; hard problems need several, coordinated. The dominant pattern is hub-and-spoke: a coordinator that decomposes the work, delegates to specialist subagents, and aggregates what comes back &mdash; routing <em>all</em> communication through itself.</p>
+
+    <h3>What &amp; why</h3>
+    <p>In a coordinator&ndash;subagent (hub-and-spoke) architecture, a single coordinator manages all inter-subagent communication, error handling, and information routing. Subagents don&rsquo;t talk to each other; they talk to the coordinator. This centralization is what gives the system observability, consistent error handling, and controlled information flow &mdash; the coordinator is the one place you can see and govern what&rsquo;s happening. Its job is task decomposition, delegation, result aggregation, and deciding <em>which</em> subagents to invoke based on the query, rather than always running the full pipeline.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Hub-and-spoke</strong>: the coordinator manages all inter-subagent communication, error handling, and routing &mdash; subagents don&rsquo;t communicate directly.</li>
+        <li>Subagents operate with <strong>isolated context</strong> &mdash; they do <em>not</em> automatically inherit the coordinator&rsquo;s conversation history.</li>
+        <li>The coordinator&rsquo;s role: decomposition, delegation, aggregation, and deciding which subagents to invoke based on query complexity.</li>
+        <li>The risk of <strong>overly narrow decomposition</strong> &mdash; partitioning a broad research topic so tightly that coverage ends up incomplete.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Design coordinators that <strong>analyze the query and dynamically select</strong> which subagents to invoke, rather than always routing through the whole pipeline.</li>
+        <li>Partition scope to <strong>minimize duplication</strong> &mdash; assign distinct subtopics or source types to each subagent.</li>
+        <li>Implement <strong>iterative refinement</strong>: the coordinator evaluates synthesis output for gaps, re-delegates targeted queries to search/analysis subagents, and re-invokes synthesis until coverage is sufficient.</li>
+        <li>Route <strong>all subagent communication through the coordinator</strong> for observability and consistent error handling.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Always running the full pipeline</strong> regardless of the query &mdash; a simple question shouldn&rsquo;t fan out to every subagent; the coordinator should select.</li>
+        <li><strong>Subagents communicating directly</strong> with each other &mdash; breaks observability and centralized error handling; everything routes through the hub.</li>
+        <li><strong>Over-narrow decomposition</strong> that leaves a broad topic with gaps &mdash; the coordinator must check coverage and re-delegate, not assume the first partition was complete.</li>
+        <li>Assuming subagents <strong>inherit context</strong> &mdash; they start fresh; anything they need must be passed explicitly (see 1.3).</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      A scenario describes a research system missing whole subtopics, or two subagents duplicating
+      work. The fix isn&rsquo;t &ldquo;add more subagents&rdquo; &mdash; it&rsquo;s the coordinator partitioning scope
+      to avoid overlap and running an <strong>iterative refinement loop</strong> that detects gaps and
+      re-delegates. Answers where subagents coordinate among themselves, or where the pipeline runs
+      identically for every query, are the distractors.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Multi-Agent Research System</strong> lab is this section end to end &mdash; a
+        coordinator delegating to searcher, analyzer, synthesizer, and reporter subagents, with the
+        gap-check-and-re-delegate loop.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>Why does all subagent communication route through the coordinator rather than agent-to-agent?</li>
+        <li>What does &ldquo;dynamic selection&rdquo; buy you over always running the full pipeline?</li>
+        <li>How does a coordinator recover from overly narrow decomposition?</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+  <!-- ============ 1.3 ============ -->
+  <section class="stage" id="s1-3">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.3</span>
+      <h2>Configure subagent invocation, context passing, and spawning</h2>
+      <span class="domain-tag">Task Statement 1.3</span>
+    </div>
+    <p class="lede">If 1.2 is the shape of a multi-agent system, this is the wiring: how a coordinator actually spawns a subagent, what crosses the boundary between them, and how to run several at once. The recurring truth here &mdash; a subagent knows only what you put in its prompt.</p>
+
+    <h3>What &amp; why</h3>
+    <p>Subagents are spawned through the <strong>Task tool</strong>, and a coordinator can only invoke them if <code>"Task"</code> is in its <code>allowedTools</code> &mdash; miss that, and delegation silently collapses to a single agent doing everything itself. Because subagents run in isolated context, <em>everything they need must be provided explicitly in the prompt</em>: they don&rsquo;t inherit parent context or share memory between invocations. Each subagent type is described by an <code>AgentDefinition</code> &mdash; its description, system prompt, and tool restrictions.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The <strong>Task tool</strong> is the spawning mechanism; <code>allowedTools</code> must include <code>"Task"</code> for a coordinator to invoke subagents.</li>
+        <li>Subagent context must be <strong>explicitly provided in the prompt</strong> &mdash; no automatic inheritance, no shared memory across invocations.</li>
+        <li><strong>AgentDefinition</strong> configures each subagent type: description, system prompt, tool restrictions.</li>
+        <li><strong>Fork-based session management</strong> for exploring divergent approaches from a shared analysis baseline (see also 1.7).</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Pass <strong>complete findings from prior agents directly in the subagent&rsquo;s prompt</strong> &mdash; e.g., feed web-search results and document-analysis output into the synthesis subagent&rsquo;s prompt.</li>
+        <li>Use <strong>structured data formats</strong> to separate content from metadata (source URLs, document names, page numbers) so attribution survives the handoff.</li>
+        <li>Spawn <strong>parallel subagents by emitting multiple Task calls in a single coordinator response</strong> &mdash; not across separate turns.</li>
+        <li>Write coordinator prompts that specify <strong>goals and quality criteria, not step-by-step procedures</strong>, so subagents can adapt.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Assuming a subagent can <strong>see the coordinator&rsquo;s conversation</strong> &mdash; it can&rsquo;t; unpassed context is invisible to it.</li>
+        <li>Forgetting <strong><code>"Task"</code> in <code>allowedTools</code></strong> &mdash; the coordinator then can&rsquo;t delegate and quietly runs as one agent.</li>
+        <li>Spawning parallel work <strong>across separate turns</strong> instead of multiple Task calls in one response &mdash; serializes what should be concurrent.</li>
+        <li>Passing <strong>procedural step-by-step instructions</strong> that prevent the subagent from adapting to what it finds.</li>
+        <li>Compressing context so metadata (source, page, date) is <strong>stripped before the handoff</strong>, destroying downstream attribution.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      A scenario shows a synthesis agent producing uncited or context-free output. The tempting
+      answer tweaks the synthesis prompt&rsquo;s wording; the right answer is that the coordinator must
+      <strong>pass the prior findings (with their source metadata) explicitly into the synthesis
+      prompt</strong> &mdash; the subagent never had them otherwise. Any answer assuming shared memory
+      between agents is wrong by construction.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Multi-Agent Research System</strong> lab passes each subagent&rsquo;s findings forward
+        in the next prompt and preserves source metadata through synthesis &mdash; this section&rsquo;s
+        skills, made concrete.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>What single <code>allowedTools</code> entry makes delegation possible, and what happens without it?</li>
+        <li>How do you spawn subagents in parallel rather than serially?</li>
+        <li>Why must source metadata travel as structured data across the handoff?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 1.4 ============ -->
+  <section class="stage" id="s1-4">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.4</span>
+      <h2>Implement multi-step workflows with enforcement and handoff patterns</h2>
+      <span class="domain-tag">Task Statement 1.4</span>
+    </div>
+    <p class="lede">Some ordering is a preference; some is a hard requirement. When a step <em>must</em> happen before another &mdash; verify identity before moving money &mdash; a prompt instruction isn&rsquo;t enough, because prompts have a non-zero failure rate. That&rsquo;s where programmatic enforcement comes in.</p>
+
+    <h3>What &amp; why</h3>
+    <p>There are two ways to order a workflow: <strong>programmatic enforcement</strong> (hooks, prerequisite gates that block a tool until a condition is met) and <strong>prompt-based guidance</strong> (telling the model the order). They are not interchangeable. When deterministic compliance is required &mdash; identity verification before a financial operation &mdash; prompt instructions alone will eventually fail, because the model follows them <em>probabilistically</em>. For those cases you enforce the prerequisite in code. This section also covers structured handoffs: when a process escalates mid-stream, the human receiving it needs customer details, root-cause analysis, and recommended actions in a compiled summary.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The difference between <strong>programmatic enforcement</strong> (hooks, prerequisite gates) and <strong>prompt-based guidance</strong> for workflow ordering.</li>
+        <li>When deterministic compliance is required, <strong>prompt instructions alone have a non-zero failure rate</strong> &mdash; not good enough for identity-before-refund.</li>
+        <li><strong>Structured handoff protocols</strong> for mid-process escalation: customer details, root-cause analysis, recommended actions.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Implement <strong>programmatic prerequisites that block downstream tool calls</strong> until prior steps complete &mdash; e.g., block <code>process_refund</code> until <code>get_customer</code> has returned a verified customer ID.</li>
+        <li>Decompose <strong>multi-concern requests into distinct items</strong>, investigate each in parallel using shared context, then synthesize a unified resolution.</li>
+        <li>Compile <strong>structured handoff summaries</strong> (customer ID, root cause, refund amount, recommended action) when escalating to a human who can&rsquo;t see the transcript.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Relying on a <strong>prompt instruction (&ldquo;always verify identity first&rdquo;)</strong> for a rule that must hold every time &mdash; non-zero failure rate makes it unsafe for financial/irreversible actions.</li>
+        <li>Escalating with a <strong>bare &ldquo;please help this customer&rdquo;</strong> and no compiled context &mdash; the human starts from zero.</li>
+        <li>Treating a <strong>multi-concern request as one blob</strong> instead of decomposing it into separately-investigated items.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The classic item: an agent occasionally issues a refund without verifying the customer,
+      despite a system-prompt rule to verify first. The tempting answer strengthens the prompt
+      wording. The correct answer is a <strong>prerequisite gate in code</strong> that makes
+      <code>process_refund</code> impossible to call until <code>get_customer</code> has returned a
+      verified ID &mdash; deterministic enforcement, not a better sentence.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Customer Support Resolution Agent</strong> lab builds exactly this &mdash; the guarded
+        <code>process_refund</code> with a confirmation gate and permission-evaluation order, plus a
+        structured escalation handoff.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>Why is a prompt instruction insufficient for &ldquo;verify identity before refund&rdquo;?</li>
+        <li>What belongs in a mid-process escalation handoff, and why?</li>
+        <li>How do you handle a request that raises three separate issues at once?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 1.5 ============ -->
+  <section class="stage" id="s1-5">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.5</span>
+      <h2>Apply Agent SDK hooks for tool-call interception and data normalization</h2>
+      <span class="domain-tag">Task Statement 1.5</span>
+    </div>
+    <p class="lede">Hooks are the SDK&rsquo;s interception points &mdash; code that runs at a lifecycle moment to transform a tool result before the model sees it, or to block an outgoing tool call before it runs. They&rsquo;re how you get <em>deterministic</em> guarantees where prompts only offer probabilities.</p>
+
+    <h3>What &amp; why</h3>
+    <p>A <code>PostToolUse</code> hook intercepts a tool&rsquo;s <em>result</em> and can transform it before the model processes it &mdash; ideal for normalizing heterogeneous data from different MCP tools. A tool-call-interception hook catches an <em>outgoing</em> call and can block it &mdash; ideal for enforcing a compliance rule like &ldquo;no refund above $500.&rdquo; The throughline with 1.4: hooks give <strong>deterministic guarantees</strong>, where prompt instructions give <strong>probabilistic compliance</strong>. When a business rule must hold every time, it belongs in a hook.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>PostToolUse</strong> hooks intercept tool results for transformation before the model processes them.</li>
+        <li>Interception hooks on <strong>outgoing tool calls</strong> enforce compliance (e.g., blocking refunds above a threshold).</li>
+        <li>The distinction between using hooks for <strong>deterministic guarantees</strong> versus prompts for <strong>probabilistic compliance</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Use <strong>PostToolUse to normalize heterogeneous formats</strong> &mdash; Unix timestamps, ISO 8601, numeric status codes from different MCP tools &mdash; into one shape before the agent reasons over them.</li>
+        <li>Use <strong>interception hooks to block policy-violating actions</strong> (a refund exceeding $500) and redirect to an alternative workflow (human escalation).</li>
+        <li><strong>Choose hooks over prompt-based enforcement</strong> whenever a rule requires guaranteed compliance.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Putting a <strong>hard compliance limit in the prompt</strong> (&ldquo;never refund more than $500&rdquo;) instead of a hook &mdash; same non-zero-failure problem as 1.4.</li>
+        <li>Making the <strong>model normalize inconsistent data formats</strong> in-context turn after turn, instead of normalizing once in a PostToolUse hook.</li>
+        <li>Treating hooks and prompt instructions as <strong>interchangeable</strong> &mdash; they differ precisely on the guarantee.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Two flavors show up. One: heterogeneous timestamps confuse the agent &mdash; the answer is a
+      <strong>PostToolUse normalization hook</strong>, not a prompt asking the model to be careful.
+      Two: refunds occasionally exceed the policy cap &mdash; the answer is an <strong>interception hook
+      that blocks and redirects</strong>, not a firmer instruction. If a rule must be guaranteed, the
+      hook is the answer.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Customer Support Resolution Agent</strong> and <strong>Developer Productivity</strong>
+        labs both use hooks for guaranteed rules &mdash; the refund cap and the PreToolUse guards on
+        writes and Bash commands.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>Which hook transforms a tool result, and which blocks a tool call?</li>
+        <li>Why normalize data formats in a hook rather than in the prompt?</li>
+        <li>State the one-line rule for choosing a hook over a prompt instruction.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+  <!-- ============ 1.6 ============ -->
+  <section class="stage" id="s1-6">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.6</span>
+      <h2>Design task decomposition strategies for complex workflows</h2>
+      <span class="domain-tag">Task Statement 1.6</span>
+    </div>
+    <p class="lede">Not every complex task is decomposed the same way. Some split into a fixed sequence known up front; others have to grow their plan as they discover what&rsquo;s there. Choosing the right decomposition strategy for the workflow is the skill this section builds.</p>
+
+    <h3>What &amp; why</h3>
+    <p>Two decomposition patterns, two situations. <strong>Fixed sequential pipelines</strong> (prompt chaining) suit predictable, multi-aspect work where you know the steps in advance &mdash; analyze each file, then run a cross-file pass. <strong>Dynamic adaptive decomposition</strong> suits open-ended investigation, where each step&rsquo;s findings generate the next subtasks &mdash; you can&rsquo;t write the plan up front because you don&rsquo;t yet know what you&rsquo;ll find. Matching the pattern to the task is the judgment; forcing an open-ended investigation into a fixed pipeline (or over-engineering a predictable review into an adaptive one) is the error.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>When to use <strong>fixed sequential pipelines (prompt chaining)</strong> vs <strong>dynamic adaptive decomposition</strong> based on intermediate findings.</li>
+        <li>Prompt-chaining patterns that break a review into sequential steps (analyze each file individually, then a cross-file integration pass).</li>
+        <li>The value of <strong>adaptive investigation plans</strong> that generate subtasks from what&rsquo;s discovered at each step.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Select <strong>prompt chaining for predictable multi-aspect reviews</strong>; <strong>dynamic decomposition for open-ended investigation</strong>.</li>
+        <li>Split large code reviews into <strong>per-file local analysis passes plus a separate cross-file integration pass</strong> to avoid attention dilution.</li>
+        <li>Decompose an open-ended task (&ldquo;add comprehensive tests to a legacy codebase&rdquo;) by <strong>mapping structure first, identifying high-impact areas, then building a prioritized plan that adapts</strong> as dependencies surface.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Forcing an <strong>open-ended investigation into a rigid fixed pipeline</strong> &mdash; the plan can&rsquo;t adapt to what&rsquo;s found.</li>
+        <li>Reviewing a large multi-file change in <strong>one undivided pass</strong> &mdash; attention dilutes and cross-file issues get missed or findings contradict.</li>
+        <li>Building an <strong>adaptive, agentic plan for a simple predictable task</strong> that a straight chain would handle &mdash; needless complexity.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      A scenario gives a task and asks how to decompose it. The tell is <em>predictability</em>: a
+      known set of aspects &rarr; <strong>prompt chaining</strong>; an open-ended &ldquo;explore and figure
+      out what matters&rdquo; &rarr; <strong>adaptive decomposition</strong>. For big reviews, the expected
+      answer is <strong>per-file passes plus a cross-file integration pass</strong> &mdash; the
+      &ldquo;one giant pass&rdquo; option is the distractor.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Developer Productivity</strong> lab decomposes &ldquo;understand this legacy system&rdquo;
+        adaptively (map, then investigate high-impact areas), while the <strong>Code Review</strong> and
+        <strong>CI/CD</strong> labs use per-file-plus-integration chaining.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>What property of a task pushes you toward adaptive rather than fixed decomposition?</li>
+        <li>Why split a large review into per-file plus cross-file passes?</li>
+        <li>How would you decompose &ldquo;add tests to a legacy codebase&rdquo;?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 1.7 ============ -->
+  <section class="stage" id="s1-7">
+    <div class="stage-head">
+      <span class="stage-num">Section 1.7</span>
+      <h2>Manage session state, resumption, and forking</h2>
+      <span class="domain-tag">Task Statement 1.7</span>
+    </div>
+    <p class="lede">Long-running work spans sessions, and branches into alternatives. Knowing how to resume a prior session, when to fork one, and &mdash; the subtle part &mdash; when <em>not</em> to resume because the prior context has gone stale, is what keeps extended work reliable.</p>
+
+    <h3>What &amp; why</h3>
+    <p>Named session resumption (<code>--resume</code>) continues a specific prior conversation. <code>fork_session</code> creates an independent branch from a shared analysis baseline, so you can explore divergent approaches without them interfering. The judgment the exam probes: resumption is right when prior context is <em>mostly valid</em>, but when prior tool results have gone <strong>stale</strong> &mdash; files changed since &mdash; starting fresh with a structured summary is more reliable than resuming with outdated results. And if you do resume after code changed, you must tell the agent <em>what</em> changed so it re-analyzes the right files rather than trusting stale reads.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Named resumption with <code>--resume</code></strong> to continue a specific prior conversation.</li>
+        <li><strong><code>fork_session</code></strong> for independent branches from a shared baseline to explore divergent approaches.</li>
+        <li>The importance of <strong>informing the agent about changes to previously analyzed files</strong> when resuming after modifications.</li>
+        <li>Why <strong>starting fresh with a structured summary</strong> can beat resuming with <strong>stale tool results</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Use <strong><code>--resume</code> with session names</strong> to continue named investigations across work sessions.</li>
+        <li>Use <strong><code>fork_session</code></strong> to create parallel exploration branches (comparing two testing strategies or refactoring approaches from a shared codebase analysis).</li>
+        <li><strong>Choose between resumption and fresh-with-summary</strong>: resume when prior context is mostly valid; start fresh with an injected summary when prior tool results are stale.</li>
+        <li>When resuming after edits, <strong>tell the agent which files changed</strong> for targeted re-analysis rather than full re-exploration.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Resuming a session whose tool results are stale</strong> (files changed) and trusting them &mdash; the agent reasons over outdated reads.</li>
+        <li>Resuming after edits <strong>without telling the agent what changed</strong> &mdash; it won&rsquo;t know to re-analyze.</li>
+        <li>Using <strong>one linear session to explore two divergent approaches</strong> instead of <code>fork_session</code> &mdash; the branches contaminate each other.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      A scenario resumes a days-old session after the code was refactored, and the agent gives
+      answers based on the old structure. The tempting answer is &ldquo;just <code>--resume</code>.&rdquo; The
+      better answer recognizes the tool results are <strong>stale</strong>: either start fresh with a
+      structured summary, or resume <em>and explicitly inform the agent which files changed</em>. For
+      &ldquo;compare two approaches,&rdquo; <code>fork_session</code> from a shared baseline is the expected call.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Developer Productivity</strong> lab&rsquo;s legacy-exploration work is where resumption
+        and stale-context judgment matter most &mdash; long sessions across a large codebase that changes
+        underneath you.
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Check your understanding</span>
+      <ul>
+        <li>When is starting fresh with a summary better than <code>--resume</code>?</li>
+        <li>What must you tell a resumed agent after files have changed?</li>
+        <li>What does <code>fork_session</code> give you that a linear session can&rsquo;t?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ WRAP-UP ============ -->
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Module 1 · Wrap-up</span>
+      <h2>What this domain comes down to</h2>
+    </div>
+    <p>Agentic Architecture &amp; Orchestration is the exam&rsquo;s largest domain because it&rsquo;s the foundation: the agentic loop driven by <code>stop_reason</code> (1.1), coordinated into hub-and-spoke multi-agent systems (1.2) with explicit context passing through the Task tool (1.3), made reliable with programmatic enforcement and hooks rather than hopeful prompts (1.4&ndash;1.5), decomposed by the pattern that fits the task (1.6), and sustained across sessions with sound resumption and forking judgment (1.7).</p>
+    <p>One thread ties most of the anti-patterns together: <strong>deterministic mechanisms beat probabilistic ones for anything that must hold</strong>. Drive loops off <code>stop_reason</code>, not parsed text. Enforce prerequisites in gates, not prompt sentences. Guarantee compliance with hooks, not instructions. Pass context explicitly, because nothing is inherited. If you internalize that one idea, most of this domain&rsquo;s scenario questions answer themselves.</p>
+    <div class="capstone" style="margin-top:22px">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Your capstones for this domain</span>
+        <strong>Multi-Agent Research System</strong> (1.2, 1.3, 1.6) &middot;
+        <strong>Customer Support Resolution Agent</strong> (1.1, 1.4, 1.5) &middot;
+        <strong>Developer Productivity</strong> (1.6, 1.7). Build at least one before the evaluation &mdash;
+        the exam rewards having done the thing, not just read about it.
+      </div>
+    </div>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next in the track.</strong> Module 2 &mdash; Tool Design &amp; MCP Integration &mdash; picks up
+        where the Task tool and hooks left off: designing the tools your agents actually call. The
+        evaluation comes after all five modules, and its questions are drawn from the capstone
+        scenarios, so the labs are your best preparation for it.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA Knowledge Track &middot; Module 1: Agentic Architecture &amp; Orchestration
+  <p class="disclaimer">
+    Part of the Claude Certified Architect &mdash; Knowledge Track, the structured-knowledge companion
+    to the CCA capstone labs. A recommended preparatory resource &mdash; not affiliated with or endorsed
+    by Anthropic, not a substitute for the official exam or its prerequisites. SDK mechanisms, tool
+    names, and configuration reflect the toolchain as of mid-2026 and carry a real shelf-life; verify
+    against current documentation before relying on specifics.
+  </p>
+</footer>
+
+</body>
+</html>
