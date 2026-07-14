@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<!-- build: 2026071402 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F Capstone Lab · Claude Code in CI/CD</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · Exam Prep Lab</p>
+    <h1 class="title">Put Claude Code<br>in your <em>pipeline</em>.</h1>
+    <p class="standfirst">
+      A single hands-on capstone: Claude Code running headless in your CI/CD pipeline &mdash;
+      reviewing pull requests, generating test cases, and posting feedback automatically. The
+      hard part isn&rsquo;t wiring the YAML; it&rsquo;s designing prompts that give <strong>actionable
+      feedback and don&rsquo;t drown developers in false positives</strong>. You build the pipeline,
+      then calibrate the reviewer until people actually trust it.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Finishing this lab does not grant a certificate and is not the CCA-F exam.
+        The exam is booked separately through Anthropic and requires completing
+        Anthropic&rsquo;s four official Skilljar courses first. Treat this as the
+        &ldquo;build something real&rdquo; practice the exam rewards.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>The build, in seven stages</h2>
+    <p class="sub">One project &mdash; Claude Code integrated into a CI pipeline that reviews PRs and generates tests, tuned to be useful rather than noisy. Work top to bottom; each stage builds on the last.</p>
+    <ol>
+      <li class="rm-start"><div class="rm-body"><a href="#orient">Orientation &mdash; what you&rsquo;re building</a><small>the pipeline, the flow diagram, the terms</small></div><span class="rm-domain">start here</span></li>
+      <li><div class="rm-body"><a href="#s1">Run Claude Code headless</a><small>the -p flag, output formats, exit codes</small></div><span class="rm-domain">Claude Code Config · 20%</span></li>
+      <li><div class="rm-body"><a href="#s2">Wire it into the pipeline</a><small>the workflow, scopes, fork safety</small></div><span class="rm-domain">Claude Code Config · 20%</span></li>
+      <li><div class="rm-body"><a href="#s3">Write the review prompt</a><small>role, focus, severity, output shape</small></div><span class="rm-domain">Prompt &amp; Output · 20%</span></li>
+      <li><div class="rm-body"><a href="#s4">Minimize false positives</a><small>confidence, verification, exclusions</small></div><span class="rm-domain">Prompt &amp; Output · 20%</span></li>
+      <li><div class="rm-body"><a href="#s5">Generate test cases</a><small>a second, separate CI job</small></div><span class="rm-domain">Prompt &amp; Output · 20%</span></li>
+      <li><div class="rm-body"><a href="#s6">Give it project context</a><small>CLAUDE.md / REVIEW.md as CI config</small></div><span class="rm-domain">Claude Code Config · 20%</span></li>
+      <li><div class="rm-body"><a href="#s7">Calibrate on real PRs</a><small>measure dismissals, tune, control cost</small></div><span class="rm-domain">reliability in practice</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>Before you start</h3>
+    <p>You should be comfortable with a CI system and a terminal &mdash; this lab assumes the developer experience the exam itself assumes. It does not stop to explain what a GitHub Actions workflow file is or how secrets work.</p>
+    <ul>
+      <li><strong>Claude Code installed</strong>, and an <strong>Anthropic API key</strong> for CI use &mdash; a dedicated key stored as a repository or org <strong>secret</strong> (<code>ANTHROPIC_API_KEY</code>), separate from your personal dev key so you can track and rotate it.</li>
+      <li>A <strong>repo with real pull requests and a test suite</strong> &mdash; ideally one with recent merged PRs you can calibrate against in Stage 7.</li>
+      <li>Permission to add a <strong>workflow file</strong> and configure token scopes on that repo.</li>
+    </ul>
+    <div class="verify">
+      <span class="lbl">Verify before you build</span>
+      Headless flags, the first-party <code>claude-code-action</code>, output formats, and token-scope
+      behavior all move fast. Flag names (<code>-p</code>, <code>--output-format</code>,
+      <code>--allowedTools</code>, <code>--max-turns</code>), action versions, and env-scrub variables
+      carry real shelf-life. Wherever you see a <em>Verify</em> note, check it against the current
+      docs at <code>code.claude.com/docs</code>. The <em>shape</em> of each pattern is stable; exact
+      identifiers drift.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ ORIENTATION ============ -->
+  <section class="stage" id="orient">
+    <div class="stage-head">
+      <span class="stage-num">Orientation</span>
+      <h2>What you&rsquo;re building, before you build it</h2>
+    </div>
+
+    <p class="orient-intro">
+      By the end of this lab you&rsquo;ll have <strong>one working pipeline</strong>: a CI/CD workflow
+      that runs Claude Code headless on every pull request, reviews the diff, generates test
+      cases for uncovered code, and posts feedback developers actually act on. The build has two
+      halves that matter equally &mdash; the <strong>mechanics</strong> (running Claude non-interactively
+      in CI, safely) and the <strong>prompting</strong> (feedback that&rsquo;s actionable and low-noise).
+      Each stage adds one piece. You are not doing seven disconnected exercises; you are building
+      and calibrating one pipeline in seven passes.
+    </p>
+
+    <div class="build-card">
+      <h3>The one thing you&rsquo;re building</h3>
+      <p style="margin:0">
+        A <strong>CI/CD pipeline with Claude Code in it</strong>. On each PR it runs headless
+        (<code>claude -p</code>), reviews the diff with a calibrated prompt, generates tests in a
+        separate job, and posts severity-tagged, actionable comments &mdash; tuned so developers
+        trust it rather than dismiss it.
+      </p>
+      <div class="reads">
+        <span class="chip">input &rarr; a pull request</span>
+        <span class="chip">output &rarr; actionable review + tests</span>
+        <span class="chip">target &rarr; low false-positive rate</span>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:20px">
+      <strong>Two ways to do this, and they&rsquo;re both valid.</strong> Anthropic offers a managed
+      <em>Code Review</em> service (multi-agent, confidence-filtered, zero prompt-writing) and the
+      option to run Claude yourself in CI via headless mode + the <code>claude-code-action</code>. This
+      lab builds the <em>self-hosted</em> path, because that&rsquo;s where the prompt-engineering and
+      configuration judgment the exam tests actually lives. The managed service is noted where relevant.
+    </div>
+
+    <h3>How the seven stages connect</h3>
+    <p>
+      Read the diagram as a pipeline triggered by a PR. Claude Code runs <strong>headless</strong>
+      (Stage 1) inside a <strong>CI job</strong> (Stage 2). What it produces is governed by the
+      <strong>review prompt</strong> (Stage 3) and the <strong>false-positive controls</strong> (Stage 4);
+      a separate job <strong>generates tests</strong> (Stage 5). <strong>Project context</strong> (Stage 6)
+      feeds the prompts, and <strong>calibration</strong> (Stage 7) is the loop that tunes the whole
+      thing against real PRs until developers trust it.
+    </p>
+
+    <figure class="flow-wrap">
+      <svg class="flow-svg" viewBox="0 0 820 500" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Diagram of a CI/CD pipeline with Claude Code: a pull request triggers a CI job that runs Claude headless; a review prompt and false-positive controls shape a separate review job and test-generation job; project context feeds the prompts; a calibration loop tunes the pipeline against real PRs.">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" class="arrowhead"/>
+          </marker>
+          <marker id="aha" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" class="arrowhead-accent"/>
+          </marker>
+        </defs>
+
+        <!-- PR trigger -->
+        <rect class="box" x="20" y="222" width="104" height="56" rx="8"/>
+        <text class="lbl" x="72" y="246" text-anchor="middle">Pull request</text>
+        <text class="sub" x="72" y="263" text-anchor="middle">opened / pushed</text>
+        <path class="flowline-accent" d="M124,250 L166,250" marker-end="url(#aha)"/>
+
+        <!-- CI job / headless -->
+        <rect class="box-accent" x="170" y="212" width="150" height="76" rx="10"/>
+        <text class="stg" x="245" y="232" text-anchor="middle">STAGE 1&ndash;2</text>
+        <text class="lbl" x="245" y="252" text-anchor="middle">CI job</text>
+        <text class="sub" x="245" y="270" text-anchor="middle">claude -p (headless)</text>
+
+        <!-- prompt config feeds job (top) -->
+        <rect class="box" x="360" y="140" width="200" height="44" rx="8"/>
+        <text class="stg" x="460" y="158" text-anchor="middle">STAGE 3&ndash;4</text>
+        <text class="lbl" x="460" y="175" text-anchor="middle" style="font-size:12px">Prompt + FP controls</text>
+        <path class="flowline" d="M360,162 C338,162 330,215 320,232" marker-end="url(#ah)"/>
+
+        <!-- context feeds prompt (top) -->
+        <rect class="box" x="360" y="86" width="200" height="40" rx="8"/>
+        <text class="stg" x="460" y="103" text-anchor="middle">STAGE 6</text>
+        <text class="lbl" x="460" y="119" text-anchor="middle" style="font-size:12px">CLAUDE.md / REVIEW.md</text>
+        <path class="flowline" d="M460,126 L460,138" marker-end="url(#ah)"/>
+
+        <!-- two output jobs -->
+        <rect class="box" x="360" y="212" width="200" height="44" rx="8"/>
+        <text class="lbl" x="460" y="230" text-anchor="middle" style="font-size:12px">Review job</text>
+        <text class="sub" x="460" y="246" text-anchor="middle">severity-tagged comments</text>
+        <path class="flowline-accent" d="M320,240 L358,234" marker-end="url(#aha)"/>
+
+        <rect class="box" x="360" y="266" width="200" height="44" rx="8"/>
+        <text class="stg" x="460" y="284" text-anchor="middle">STAGE 5</text>
+        <text class="lbl" x="460" y="300" text-anchor="middle" style="font-size:12px">Test-gen job</text>
+        <path class="flowline" d="M320,262 L358,286" marker-end="url(#ah)"/>
+
+        <!-- posted to PR -->
+        <rect class="box-accent" x="600" y="212" width="150" height="44" rx="8"/>
+        <text class="lbl" x="675" y="230" text-anchor="middle">Posted to PR</text>
+        <text class="sub" x="675" y="246" text-anchor="middle">actionable feedback</text>
+        <path class="flowline-accent" d="M560,234 L596,234" marker-end="url(#aha)"/>
+
+        <!-- calibration loop -->
+        <rect class="box-amber" x="300" y="392" width="260" height="52" rx="10"/>
+        <text class="stg" x="430" y="412" text-anchor="middle">STAGE 7</text>
+        <text class="lbl" x="430" y="430" text-anchor="middle">Calibrate: measure dismissals → tune</text>
+        <path class="flowline" d="M600,250 C640,300 560,392 500,392" marker-end="url(#ah)"/>
+        <path class="flowline-accent" d="M360,410 C320,410 250,360 245,292" marker-end="url(#aha)"/>
+        <text class="sub" x="300" y="360" text-anchor="middle" style="fill:var(--amber)">tune the prompt &amp; controls</text>
+      </svg>
+      <figcaption>A PR triggers a headless CI job; prompt and controls shape the review; calibration tunes the loop until it&rsquo;s trusted.</figcaption>
+    </figure>
+
+    <div class="note">
+      Don&rsquo;t worry if a box uses a word you don&rsquo;t know yet &mdash; the glossary below defines
+      every term in the diagram, and each stage explains its own box in full when you reach it.
+    </div>
+
+    <h3>The terms this lab uses</h3>
+    <p>These come up across multiple stages. Skim them now; you don&rsquo;t need to memorize them &mdash; they&rsquo;ll make sense as you build.</p>
+
+    <div class="glossary">
+      <dl>
+        <dt>Headless mode <span class="also">(-p / --print)</span></dt>
+        <dd>Claude Code without an interactive session: pass one prompt via <code>-p</code>, it runs the full agent loop and exits with a result. This is what makes Claude Code runnable in any CI system. The single most common CI mistake is omitting <code>-p</code> &mdash; the job hangs waiting for input that never comes.</dd>
+
+        <dt>Output format</dt>
+        <dd>How headless results come back: <code>text</code> (debugging), <code>json</code> (programmatic, parse with jq), or <code>stream-json</code> (real-time). Choose <code>json</code> when a later step reads the result.</dd>
+
+        <dt>Exit code</dt>
+        <dd>Headless Claude returns <code>0</code> on success and non-zero on failure, so it composes with <code>&amp;&amp;</code>/<code>||</code> in shell scripts and can gate a pipeline step.</dd>
+
+        <dt>claude-code-action</dt>
+        <dd>Anthropic&rsquo;s first-party GitHub Action that handles auth, rate limiting, and output formatting for you &mdash; the drop-in way to run Claude in a GitHub Actions workflow.</dd>
+
+        <dt>Managed Code Review</dt>
+        <dd>Anthropic&rsquo;s hosted review service: multiple agents analyze the diff in parallel, a verification step filters false positives, and findings post as severity-ranked inline comments &mdash; no prompt-writing. An alternative to the self-hosted path this lab builds.</dd>
+
+        <dt>Fork safety</dt>
+        <dd>PRs from forks don&rsquo;t get your repository secrets by default &mdash; so an untrusted contributor can&rsquo;t trigger your workflow and spend your API credits. Supporting fork PRs (<code>pull_request_target</code>) needs great care about what code you check out.</dd>
+
+        <dt>Token scope / least privilege</dt>
+        <dd>The GitHub token&rsquo;s permissions. A workflow that only posts comments needs <code>pull-requests: write</code> and <code>contents: read</code> &mdash; nothing more. Adding a <code>permissions</code> block resets every unnamed scope to none.</dd>
+
+        <dt>False positive</dt>
+        <dd>A finding that isn&rsquo;t a real problem &mdash; a flagged non-issue. The metric that decides whether developers trust the reviewer: too many, and they start ignoring all of it. Minimizing these is the central prompt-engineering task.</dd>
+
+        <dt>Confidence scoring</dt>
+        <dd>Having the review rate each candidate finding 1&ndash;10 and post only the high-confidence ones (Anthropic&rsquo;s own tooling uses a threshold like &ge;8). The primary lever for cutting noise.</dd>
+
+        <dt>Verification step</dt>
+        <dd>Requiring evidence before a finding posts &mdash; a <code>file:line</code> citation, a concrete attack path &mdash; rather than an inference from naming. Filters out plausible-but-wrong flags.</dd>
+
+        <dt>Severity</dt>
+        <dd>A label on each finding (blocker / major / minor / nit) so developers can triage at a glance. Consistent severity labels, plus a cap on nits, keep reviews actionable.</dd>
+
+        <dt>CLAUDE.md / REVIEW.md</dt>
+        <dd>Project files that give the CI-invoked reviewer the same context a human reviewer would have &mdash; conventions, what to focus on, what to skip. REVIEW.md is injected at highest priority for review rules specifically.</dd>
+      </dl>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Before Stage 1</span>
+      <ul>
+        <li>You can state, in one sentence, what the finished pipeline does on each PR.</li>
+        <li>You can trace a PR through the diagram: trigger &rarr; headless job &rarr; prompt/controls &rarr; posted feedback &rarr; calibrate.</li>
+        <li>You can name the two halves of the build &mdash; mechanics and prompting &mdash; and why both matter.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============ STAGE 1 ============ -->
+  <section class="stage" id="s1">
+    <div class="stage-head">
+      <span class="stage-num">Stage 01</span>
+      <h2>Run Claude Code headless</h2>
+      <span class="domain-tag">Claude Code Configuration &amp; Workflows &middot; 20%</span>
+    </div>
+    <p class="lede">Everything in this lab rests on one flag. Interactive Claude Code waits for you; a pipeline has no one to wait for. Headless mode runs a single prompt and exits &mdash; and getting this right (or wrong) is the difference between a working job and one that hangs forever.</p>
+
+    <div class="scenario">Your pipeline runs <code>claude "review this PR"</code> and the job hangs indefinitely. The logs show it&rsquo;s waiting for interactive input. You try redirecting stdin, setting an env var &mdash; nothing works. The fix is one flag: <code>-p</code>.</div>
+
+    <h3>1a &middot; The -p flag is headless mode</h3>
+    <p><code>-p</code> (short for <code>--print</code>) runs Claude Code non-interactively: it processes the prompt, runs the full agent loop (thinking, tool calls, edits), prints the result to stdout, and exits. No confirmations, no waiting. This is <em>the</em> way Claude Code runs in CI, pre-commit hooks, and any script.</p>
+    <div class="code"><span class="c"># Pipe the PR diff in, get a review out, then exit.</span>
+<span class="cmd">gh pr diff 123 | claude -p "Review this diff for bugs, security, and correctness."</span></div>
+    <div class="note">
+      This is a known exam item: a pipeline hangs because <code>-p</code> is missing. Invented
+      alternatives &mdash; a <code>CLAUDE_HEADLESS</code> env var, an stdin redirect, a
+      <code>--batch</code> flag &mdash; are <em>not</em> real Claude Code features. The fix is
+      always <code>-p</code>.
+    </div>
+
+    <h3>1b &middot; Choose an output format</h3>
+    <p>Headless mode emits three shapes: <code>text</code> for quick debugging, <code>json</code> for programmatic processing (parse with <code>jq</code>), and <code>stream-json</code> for real-time feedback on long tasks. When a later pipeline step reads the result, use JSON.</p>
+    <div class="code"><span class="cmd">claude -p "$(cat review-prompt.txt)" --output-format json --max-turns 3</span></div>
+
+    <h3>1c &middot; Exit codes compose with the shell</h3>
+    <p>Headless Claude returns <code>0</code> on success and non-zero on failure, so it drops straight into shell logic with <code>&amp;&amp;</code> and <code>||</code> &mdash; run the review, and only post if it succeeded; or fail the step if Claude errored. Pair this with <code>--max-turns</code> (bound the loop) and <code>--allowedTools</code> (scope what it can do) to keep CI runs bounded and cheap.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know cold that <strong><code>-p</code> is what makes Claude Code work in CI</strong>, and that a
+      hanging pipeline means it&rsquo;s missing. Know the three output formats and when to use JSON,
+      and that exit codes make it scriptable. <code>--max-turns</code> and <code>--allowedTools</code>
+      as cost/scope bounds are the other reliable items here.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      <code>-p</code>, <code>--output-format</code>, <code>--max-turns</code>, and <code>--allowedTools</code>
+      are current but the CLI moves fast. Confirm flag names and output-format values against
+      <code>code.claude.com/docs</code> before wiring a pipeline.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 1 done when</span>
+      <ul>
+        <li>You can run a review headless with <code>-p</code> and get a result without the process hanging.</li>
+        <li>You&rsquo;ve produced JSON output and parsed a field out of it.</li>
+        <li><code>--max-turns</code> and <code>--allowedTools</code> bound the run.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 2 ============ -->
+  <section class="stage" id="s2">
+    <div class="stage-head">
+      <span class="stage-num">Stage 02</span>
+      <h2>Wire it into the pipeline</h2>
+      <span class="domain-tag">Claude Code Configuration &amp; Workflows &middot; 20%</span>
+    </div>
+    <p class="lede">Now put the headless call inside a real workflow that triggers on pull requests, posts back to GitHub, and does so safely. Two things bite teams here: token permissions and fork safety. Get them right and the pipeline is both functional and secure.</p>
+
+    <h3>2a &middot; A minimal review workflow</h3>
+    <p>Trigger on PR events, check out the code, get the diff, run Claude headless, post the result. You can use the first-party <code>anthropics/claude-code-action</code> (it handles auth, rate limiting, and formatting) or call <code>claude -p</code> directly.</p>
+    <div class="code"><span class="k">on</span>:
+  pull_request:
+    types: [opened, synchronize]
+    paths-ignore: [<span class="s">"**.md"</span>, <span class="s">"docs/**"</span>]   <span class="c"># don't review docs-only PRs</span>
+<span class="k">permissions</span>:
+  contents: read           <span class="c"># read the code</span>
+  pull-requests: write     <span class="c"># post comments — nothing more</span>
+<span class="k">jobs</span>:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          gh pr diff ${{ github.event.number }} | \
+            claude -p "$(cat .github/review-prompt.txt)" --output-format json > out.json
+          gh pr comment ${{ github.event.number }} --body-file review.md
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}</div>
+
+    <h3>2b &middot; Scope the token to least privilege</h3>
+    <p>The GitHub token&rsquo;s permissions should be exactly what the job needs, no more. A reviewer that posts comments needs <code>contents: read</code> and <code>pull-requests: write</code> &mdash; not <code>contents: write</code>, not <code>issues</code> unless it touches them. One sharp gotcha: the moment you add a <code>permissions</code> block, GitHub resets every scope you <em>don&rsquo;t</em> name to none &mdash; so a job that posts a comment with only <code>contents: read</code> gets rejected. Name every scope you use.</p>
+
+    <h3>2c &middot; Fork safety and secret hygiene</h3>
+    <p>Two security facts that matter in CI:</p>
+    <ul>
+      <li><strong>Fork safety:</strong> PRs from forks don&rsquo;t receive your repository secrets by default &mdash; which is what stops an untrusted contributor from triggering your workflow and burning your API credits. Supporting fork PRs means <code>pull_request_target</code>, and then you must be extremely careful about what code you check out and run.</li>
+      <li><strong>Secret hygiene:</strong> the API key lives in secrets, never in the YAML or logs. GitHub masks secrets automatically, but in custom scripts pass the key via the environment, never on the command line where it lands in the process list. <code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1</code> strips sensitive env vars from Claude&rsquo;s subprocess context so it can&rsquo;t read or leak them.</li>
+    </ul>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Two heavily-tested CI ideas: <strong>least-privilege token scopes</strong> (and that a
+      <code>permissions</code> block zeroes unnamed scopes &mdash; a classic &ldquo;why is my comment
+      rejected&rdquo; answer), and <strong>fork safety</strong> (secrets withheld from fork PRs;
+      <code>pull_request_target</code> is the risky opt-in). Path filters to skip docs-only PRs are a
+      standard cost control.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      The <code>claude-code-action</code> version and inputs, token-scope reset behavior, and
+      <code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB</code> are current but evolve. Confirm the action inputs
+      and the GitHub Actions permission model against the current docs.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 2 done when</span>
+      <ul>
+        <li>A workflow triggers on PRs, runs Claude headless, and posts a comment back.</li>
+        <li>Token scopes are minimal, and you named every scope the job uses.</li>
+        <li>You can explain why fork PRs can&rsquo;t spend your credits by default.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 3 ============ -->
+  <section class="stage" id="s3">
+    <div class="stage-head">
+      <span class="stage-num">Stage 03</span>
+      <h2>Write the review prompt</h2>
+      <span class="domain-tag">Prompt Engineering &amp; Structured Output &middot; 20%</span>
+    </div>
+    <p class="lede">With Claude running in the pipeline, the prompt becomes the review strategy. In CI there&rsquo;s no back-and-forth to clarify &mdash; the prompt must contain everything. A lazy prompt gives a noisy, generic dump; a sharp one gives a review that reads like a senior engineer who actually read the code.</p>
+
+    <div class="scenario">&ldquo;Review this code&rdquo; produces a laundry list of style nitpicks nobody asked for. The same diff with a focused, structured prompt produces three real bugs with line numbers and fixes. Same model &mdash; the difference is entirely the prompt.</div>
+
+    <h3>3a &middot; The three levers: role, focus, format</h3>
+    <p>Every good review prompt sets three things:</p>
+    <ul>
+      <li><strong>Role</strong> &mdash; who Claude is reviewing as (&ldquo;a senior engineer applying our standards&rdquo;), which sets the bar.</li>
+      <li><strong>Focus</strong> &mdash; what to inspect and what to ignore (&ldquo;correctness, security, and edge cases; <em>not</em> style &mdash; the linter owns that&rdquo;). Naming the failure modes to hunt beats asking for &ldquo;feedback.&rdquo;</li>
+      <li><strong>Format</strong> &mdash; the exact output shape: severity, rationale, a <code>file:line</code>, and a suggested fix &mdash; ready to post as a GitHub comment, not an abstract opinion.</li>
+    </ul>
+
+    <h3>3b &middot; A review prompt that produces postable output</h3>
+    <div class="code">You are reviewing a pull request as a senior engineer applying our
+conventions. Inspect ONLY for: correctness and logic errors, security
+issues, broken edge cases, and missing error handling. Do NOT comment
+on style or formatting — the linter handles those.
+
+For each issue, output:
+- severity: blocker | major | minor | nit
+- location: file:line
+- problem: one sentence
+- fix: a concrete suggestion
+
+Separate CONFIRMED issues from POSSIBLE risks. If you are not certain
+an issue is real, put it under POSSIBLE and say what you're unsure about.
+If there are no confirmed issues, say so plainly.</div>
+
+    <h3>3c &middot; Ask it to express uncertainty, not hide it</h3>
+    <p>The single easiest noise-reducer: tell Claude to <strong>separate confirmed issues from possible risks</strong>, and to never present a guess as a fact. A reviewer that says &ldquo;I&rsquo;m not certain, but check whether this handles null&rdquo; is useful; one that states a confident falsehood is worse than silence. This also sets up the confidence machinery in Stage 4.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know the <strong>role / focus / format</strong> structure, and that in CI the prompt must be
+      self-contained (no clarifying turns). Asking for <strong>severity-ranked, evidence-tied,
+      ready-to-post</strong> findings &mdash; and separating confirmed from possible &mdash; is the
+      canonical &ldquo;actionable feedback&rdquo; pattern. &ldquo;Just ask it to review the code&rdquo; is the
+      distractor.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 3 done when</span>
+      <ul>
+        <li>Your prompt sets role, focus (with explicit exclusions), and a postable output shape.</li>
+        <li>It separates confirmed issues from possible risks and forbids presenting guesses as facts.</li>
+        <li>Run on a real diff, it produces severity-tagged findings with line numbers and fixes.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 4 ============ -->
+  <section class="stage" id="s4">
+    <div class="stage-head">
+      <span class="stage-num">Stage 04</span>
+      <h2>Minimize false positives</h2>
+      <span class="domain-tag">Prompt Engineering &amp; Structured Output &middot; 20%</span>
+    </div>
+    <p class="lede">This is the stage that decides whether the pipeline survives. A reviewer that cries wolf gets muted &mdash; once developers dismiss a few bad flags, they stop reading all of them, and the whole investment is wasted. Minimizing false positives isn&rsquo;t polish; it&rsquo;s what makes the reviewer trusted.</p>
+
+    <div class="scenario">The reviewer flags a &ldquo;SQL injection&rdquo; that&rsquo;s actually a parameterized query, and a &ldquo;race condition&rdquo; that&rsquo;s theoretical. Two bad flags on one PR, and the author starts ignoring every comment the bot posts. That&rsquo;s the failure this stage prevents.</div>
+
+    <h3>4a &middot; Confidence scoring with a threshold</h3>
+    <p>The primary lever, straight from Anthropic&rsquo;s own review tooling: have the review assign each candidate finding a <strong>confidence score</strong> (say 1&ndash;10) and post only the high-confidence ones. The security-review tooling filters anything below <strong>8</strong>. Low-confidence candidates become noise; drop them before they reach a developer.</p>
+    <div class="code">For each candidate finding, assign a confidence score 1–10:
+  1–3  likely false positive or noise → DISCARD
+  4–7  uncertain → list under POSSIBLE, do not post inline
+  8–10 high confidence → post as a finding
+
+Ask yourself: would this finding be actionable for the team?
+If not, discard it.</div>
+
+    <h3>4b &middot; Require verification, not inference</h3>
+    <p>The second lever: demand <strong>evidence before a finding posts</strong>. A behavior claim needs a <code>file:line</code> citation in the actual source, not an inference from a function&rsquo;s name. A security finding needs a concrete, specific attack path, not a theoretical one. This verification bar is exactly what the managed Code Review service does &mdash; a step that checks candidates against actual code behavior before posting.</p>
+
+    <h3>4c &middot; Explicit exclusions for your codebase</h3>
+    <p>The third lever: tell the reviewer what <em>not</em> to flag, based on what generates noise in your code. Anthropic&rsquo;s own security review prompt is full of these &mdash; don&rsquo;t report memory-safety issues in memory-safe languages, don&rsquo;t flag client-side auth (the server handles it), don&rsquo;t report theoretical race conditions, skip test-only files. Add your codebase&rsquo;s known non-issues (&ldquo;don&rsquo;t flag <code>any</code> in <code>/src/legacy</code>&rdquo;), and cap nits (&ldquo;report at most five nits; summarize the rest as a count&rdquo;).</p>
+    <div class="note">
+      Skip rules keep reviews focused: list paths and categories where Claude posts nothing &mdash;
+      generated code, lockfiles, vendored dependencies, and anything your CI already enforces
+      (lint, spellcheck). No point paying Claude to re-flag what a linter already caught.
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      This is the most tested idea in the scenario. The three levers &mdash; <strong>confidence
+      threshold</strong>, <strong>verification/evidence bar</strong>, and <strong>explicit exclusions</strong>
+      &mdash; are all ways to cut false positives. Know the &ldquo;would this be actionable?&rdquo; test and
+      that a noisy reviewer gets ignored entirely. &ldquo;Tell it to try harder&rdquo; or &ldquo;flag everything
+      to be safe&rdquo; are the wrong answers &mdash; over-flagging is the failure, not under-flagging.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      The confidence-threshold convention (&ge;8) comes from Anthropic&rsquo;s published security-review
+      tooling and is a strong default, but tune it to your codebase. The managed Code Review&rsquo;s
+      verification behavior may change; confirm against <code>code.claude.com/docs/en/code-review</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 4 done when</span>
+      <ul>
+        <li>Your prompt scores findings by confidence and posts only high-confidence ones.</li>
+        <li>Findings require a <code>file:line</code> evidence citation, not an inference.</li>
+        <li>Explicit exclusions and a nit cap keep the output focused on what matters.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 5 ============ -->
+  <section class="stage" id="s5">
+    <div class="stage-head">
+      <span class="stage-num">Stage 05</span>
+      <h2>Generate test cases</h2>
+      <span class="domain-tag">Prompt Engineering &amp; Structured Output &middot; 20%</span>
+    </div>
+    <p class="lede">The second job the pipeline does: generate tests for code that lacks them. This is a distinct task from review &mdash; and it belongs in a <em>separate</em> CI step with its own fresh session, not bolted onto the reviewer.</p>
+
+    <div class="scenario">A PR adds a new function with no test. The pipeline should notice the coverage gap, generate a test that actually exercises the function&rsquo;s behavior and edge cases, and open it for the author &mdash; without contaminating the review job&rsquo;s reasoning.</div>
+
+    <h3>5a &middot; Keep generation and review in separate sessions</h3>
+    <p>Each <code>claude -p</code> invocation is a fresh session with no memory of the others &mdash; and in CI that isolation is the correct architecture, not a limitation. Run test generation as its own step so its context doesn&rsquo;t bleed into the review (a reviewer that just wrote the tests isn&rsquo;t an independent reviewer of them).</p>
+    <div class="code">- name: Review
+  run: gh pr diff $PR | claude -p "$(cat review-prompt.txt)" --output-format json
+- name: Generate tests
+  run: claude -p "$(cat testgen-prompt.txt)" --allowedTools "Read,Write,Bash"
+  <span class="c"># separate step, separate session — no shared reasoning</span></div>
+
+    <h3>5b &middot; Prompt for tests that exercise behavior</h3>
+    <p>Weak test generation produces tests that assert the code does what it does &mdash; passing but worthless. Prompt for tests that cover the <em>real</em> cases: the happy path, the edge cases (empty, null, boundary), and the error conditions. Point it at the project&rsquo;s test conventions (framework, structure, naming) so the output fits in.</p>
+
+    <h3>5c &middot; Detect the gap, then fill it</h3>
+    <p>The useful pattern is coverage-aware: identify which changed functions lack tests, and generate only for those. That keeps the job focused and cheap, and it mirrors how a good human reviewer thinks &mdash; &ldquo;this new function needs a test&rdquo; &mdash; rather than regenerating a whole suite.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know that <strong>each <code>claude -p</code> is a fresh, isolated session</strong>, and that
+      running generation and review as <strong>separate steps</strong> is the correct architecture
+      (independence, clean context). Know that good test-generation prompts target <strong>behavior
+      and edge cases</strong>, not tautological pass-through tests.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      <code>--allowedTools</code> values and how the action exposes the diff/coverage to a step vary
+      by version. Confirm the current tool names and step wiring against the docs.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 5 done when</span>
+      <ul>
+        <li>Test generation runs as its own CI step with a separate session from the review.</li>
+        <li>Generated tests exercise real behavior and edge cases, matching your test conventions.</li>
+        <li>The job targets the coverage gap rather than regenerating everything.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 6 ============ -->
+  <section class="stage" id="s6">
+    <div class="stage-head">
+      <span class="stage-num">Stage 06</span>
+      <h2>Give it project context</h2>
+      <span class="domain-tag">Claude Code Configuration &amp; Workflows &middot; 20%</span>
+    </div>
+    <p class="lede">A CI-invoked reviewer starts knowing nothing about your project &mdash; so it reviews generically, flagging things your team decided long ago and missing what you actually care about. <code>CLAUDE.md</code> (and <code>REVIEW.md</code>) is how you give it the context a human reviewer would already have.</p>
+
+    <h3>6a &middot; CLAUDE.md is your CI review config</h3>
+    <p>Committed to the repo and read on every run, <code>CLAUDE.md</code> carries your conventions, build/test commands, and architectural rules into the pipeline. With it, the reviewer focuses on what your team cares about and skips what your existing tools already handle. Without it, every review is generic. This is the same file the rest of Claude Code uses &mdash; here it doubles as review configuration.</p>
+
+    <h3>6b &middot; REVIEW.md for review-specific rules, at highest priority</h3>
+    <p>For rules that must land reliably on every PR &mdash; &ldquo;new API routes require an integration test,&rdquo; &ldquo;in <code>scripts/</code>, only flag near-certain severe issues&rdquo; &mdash; a <code>REVIEW.md</code> is injected at highest priority, so these are followed more reliably than the same rules buried in a long CLAUDE.md. Put the review&rsquo;s must-follow rules and skip rules here.</p>
+
+    <h3>6c &middot; Control cost with context and caching</h3>
+    <p>Context feeds cost, so manage both together: <strong>path filters</strong> skip PRs that don&rsquo;t need review (docs-only); <strong>prompt caching</strong> caches the CLAUDE.md and system context that&rsquo;s identical run-to-run, cutting input token cost substantially; and <code>--max-turns</code> keeps any single run bounded. A tighter context is both cheaper and more focused.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know that <strong>CLAUDE.md gives the CI reviewer human-equivalent context</strong> (without it,
+      generic reviews), and that <strong>REVIEW.md is highest-priority</strong> for review rules. Know
+      the cost levers &mdash; path filters, prompt caching, <code>--max-turns</code> &mdash; and that
+      skip rules should offload to existing tools (linters) rather than re-checking them.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      <code>REVIEW.md</code> priority behavior, prompt-caching setup in the action, and path-filter
+      syntax are current but evolve. Confirm against <code>code.claude.com/docs/en/code-review</code>
+      and the memory docs.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 6 done when</span>
+      <ul>
+        <li>A committed <code>CLAUDE.md</code> gives the reviewer your conventions and it visibly follows them.</li>
+        <li>A <code>REVIEW.md</code> carries the must-follow and skip rules for reviews.</li>
+        <li>Path filters and caching are in place, and you can explain how each controls cost.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 7 ============ -->
+  <section class="stage" id="s7">
+    <div class="stage-head">
+      <span class="stage-num">Stage 07</span>
+      <h2>Calibrate on real PRs</h2>
+      <span class="domain-tag">Reliability in practice</span>
+    </div>
+    <p class="lede">A review pipeline isn&rsquo;t &ldquo;done&rdquo; when it runs &mdash; it&rsquo;s done when developers trust it. That&rsquo;s a measurable state, and reaching it means treating the first period as calibration: run the reviewer on real PRs, watch what it flags, and tune until the signal-to-noise is right.</p>
+
+    <h3>7a &middot; Measure the dismissal rate</h3>
+    <p>The honest metric of a review bot is how often its comments get dismissed. A useful benchmark from teams running this in production: <strong>if developers are dismissing more than ~60% of automated comments, the prompt needs work.</strong> Watch the 👍/👎 reactions (the managed service attaches them and tunes on the aggregate) or track how many comments get resolved by a real fix versus ignored.</p>
+
+    <h3>7b &middot; Calibrate against merged PRs</h3>
+    <p>Don&rsquo;t tune in the abstract. Run the reviewer on your <strong>last 20 merged PRs</strong> and compare its findings to what your human reviewers actually cared about. Where it flagged noise, add an exclusion or raise the confidence bar (Stage 4). Where it missed a real issue, sharpen the focus (Stage 3). This is the loop the diagram&rsquo;s calibration arrow represents.</p>
+
+    <h3>7c &middot; Frame it as a first pass, not a gatekeeper</h3>
+    <p>Set the expectation explicitly, in the reviewer&rsquo;s own comment header: this is an automated first pass for the mechanical issues, and human review is still required for architecture, business logic, and judgment. The managed service reinforces this by design &mdash; its findings don&rsquo;t approve or block the PR, so existing review workflows stay intact. An honest frame is what keeps the tool trusted instead of resented.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The reliability framing: a CI reviewer&rsquo;s success is <strong>measured</strong> (dismissal rate,
+      resolved-vs-ignored), not assumed, and reached through <strong>calibration on real PRs</strong>.
+      Know the &ldquo;first pass, not a gatekeeper&rdquo; framing and that automated findings shouldn&rsquo;t
+      hard-block merges. The tempting wrong answer treats setup as completion &mdash; the work is the
+      tuning.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 7 done when</span>
+      <ul>
+        <li>You&rsquo;re tracking a dismissal/resolution signal and know your current rate.</li>
+        <li>You&rsquo;ve calibrated against recent merged PRs and tuned the prompt/controls from what you saw.</li>
+        <li>The reviewer presents itself as a first pass, and its findings don&rsquo;t hard-block merges.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Wrap-up</span>
+      <h2>What you built, and how it maps</h2>
+    </div>
+    <p>You now have one working CI/CD pipeline that exercises the scenario&rsquo;s two primary domains: Claude Code Configuration &amp; Workflows (20%) &mdash; headless mode, the workflow, token scopes and fork safety, project context, and cost control &mdash; and Prompt Engineering &amp; Structured Output (20%) &mdash; role/focus/format review prompts, the false-positive controls (confidence, verification, exclusions), and behavior-focused test generation. Completing it, you should be able to answer any question the scenario raises &mdash; why a pipeline hangs without <code>-p</code>, how to scope a token, which levers cut false positives, and why calibration is the real work.</p>
+    <p>The exam is 60 scenario questions in 120 minutes, and it rewards judgment over recall &mdash; the wrong answers are written to tempt people with partial knowledge. Having actually run Claude headless, scoped the token, and tuned a prompt down from noisy to trusted is the difference between recognizing the right call and guessing.</p>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next step toward the exam.</strong> Complete Anthropic&rsquo;s four official
+        Skilljar courses, request exam access, and take the official practice test before
+        booking. This lab is preparation &mdash; the credential comes from Anthropic&rsquo;s
+        proctored exam, not from here.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA-F Capstone Lab &middot; Scenario: Claude Code for Continuous Integration
+  <p class="disclaimer">
+    A recommended preparatory lab for the Anthropic Claude Certified Architect &mdash;
+    Foundations (CCA-F) exam. Not affiliated with or endorsed by Anthropic, and not a
+    substitute for the official exam or its prerequisites. Flags, action versions, workflow
+    syntax, and configuration reflect the toolchain as of mid-2026 and carry a real shelf-life
+    &mdash; check every <em>Verify</em> note against current documentation before relying on it.
+  </p>
+</footer>
+
+</body>
+</html>
