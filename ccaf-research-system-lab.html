@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<!-- build: 2026071301 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F Capstone Lab · Build a Multi-Agent Research System</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · Exam Prep Lab</p>
+    <h1 class="title">Build a research system<br>that <em>cites its sources</em>.</h1>
+    <p class="standfirst">
+      A single hands-on capstone: a multi-agent research system on the Claude Agent SDK. A
+      coordinator delegates to four specialists &mdash; one searches the web, one analyzes
+      documents, one synthesizes findings, one writes the report &mdash; and the system turns a
+      topic into a comprehensive report where <strong>every claim traces to a source a subagent
+      actually returned</strong>.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Finishing this lab does not grant a certificate and is not the CCA-F exam.
+        The exam is booked separately through Anthropic and requires completing
+        Anthropic&rsquo;s four official Skilljar courses first. Treat this as the
+        &ldquo;build something real&rdquo; practice the exam rewards.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>The build, in seven stages</h2>
+    <p class="sub">One project &mdash; a coordinator that researches a topic by delegating to four specialists and emits one cited report. Work top to bottom; each stage builds on the last.</p>
+    <ol>
+      <li class="rm-start"><div class="rm-body"><a href="#orient">Orientation &mdash; what you&rsquo;re building</a><small>the system, the flow diagram, the terms</small></div><span class="rm-domain">start here</span></li>
+      <li><div class="rm-body"><a href="#s1">Stand up the coordinator</a><small>the loop that delegates and assembles</small></div><span class="rm-domain">Agentic Arch · 27%</span></li>
+      <li><div class="rm-body"><a href="#s2">Define the four subagents</a><small>roles, descriptions, tool boundaries</small></div><span class="rm-domain">Agentic Arch · 27%</span></li>
+      <li><div class="rm-body"><a href="#s3">Give each subagent its tools</a><small>WebSearch, web_fetch, MCP boundaries</small></div><span class="rm-domain">Tool &amp; MCP · 18%</span></li>
+      <li><div class="rm-body"><a href="#s4">Orchestrate the delegation</a><small>context passing, sequencing, sprawl</small></div><span class="rm-domain">Agentic Arch · 27%</span></li>
+      <li><div class="rm-body"><a href="#s5">Keep the coordinator&rsquo;s context small</a><small>summaries in, not raw work</small></div><span class="rm-domain">Context &amp; Reliability · 15%</span></li>
+      <li><div class="rm-body"><a href="#s6">Enforce cited claims</a><small>every claim traces to a real source</small></div><span class="rm-domain">Context &amp; Reliability · 15%</span></li>
+      <li><div class="rm-body"><a href="#s7">Assemble &amp; verify the report</a><small>the report generator, the citation check</small></div><span class="rm-domain">reliability in practice</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>Before you start</h3>
+    <p>You should be comfortable in a terminal and reading code &mdash; this lab assumes the developer experience the exam itself assumes (roughly 6+ months building with Claude). It does not stop to explain async functions or what a system prompt is.</p>
+    <ul>
+      <li><strong>Python 3.10+</strong> or <strong>Node 18+</strong> &mdash; the Agent SDK ships for both. Examples lead in Python; the shape is identical in TypeScript.</li>
+      <li>An <strong>Anthropic API key</strong> exported as <code>ANTHROPIC_API_KEY</code>, with <strong>web search enabled</strong> in your Console (an admin toggle). Bedrock/Vertex auth also works.</li>
+      <li>A couple of <strong>local documents</strong> (a PDF or two, some markdown) for the analyzer subagent to read &mdash; so you can see document analysis alongside web research.</li>
+    </ul>
+    <div class="verify">
+      <span class="lbl">Verify before you build</span>
+      The Agent SDK, its subagent API, and the built-in web-search / web-fetch tools have all
+      moved recently and continue to. Package names, the <code>agents</code> parameter shape, tool
+      version strings (<code>web_search_20250305</code> and newer), and citation fields carry real
+      shelf-life. Wherever you see a <em>Verify</em> note, check it against the current docs at
+      <code>code.claude.com/docs</code> and <code>platform.claude.com/docs</code>. The <em>shape</em> of
+      each pattern is stable; exact identifiers drift.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ ORIENTATION ============ -->
+  <section class="stage" id="orient">
+    <div class="stage-head">
+      <span class="stage-num">Orientation</span>
+      <h2>What you&rsquo;re building, before you build it</h2>
+    </div>
+
+    <p class="orient-intro">
+      By the end of this lab you&rsquo;ll have <strong>one working program</strong>: a coordinator agent
+      that takes a research topic (&ldquo;the current state of solid-state batteries&rdquo;), delegates
+      to four specialist subagents in turn &mdash; search the web, analyze documents, synthesize
+      findings, write the report &mdash; and produces one comprehensive report where every claim
+      traces to a source a subagent actually returned. Each stage adds one part of that system.
+      You are not building seven disconnected exercises; you are building one research system in
+      seven passes.
+    </p>
+
+    <div class="build-card">
+      <h3>The one thing you&rsquo;re building</h3>
+      <p style="margin:0">
+        A <strong>multi-agent research system</strong>. A coordinator orchestrates four specialists
+        &mdash; <code>searcher</code> (web), <code>analyzer</code> (documents),
+        <code>synthesizer</code> (findings), <code>reporter</code> (the write-up) &mdash; each in its
+        own context, and assembles their outputs into a cited report on any topic.
+      </p>
+      <div class="reads">
+        <span class="chip">input &rarr; a research topic</span>
+        <span class="chip">output &rarr; a comprehensive report</span>
+        <span class="chip">guarantee &rarr; every claim is cited</span>
+      </div>
+    </div>
+
+    <h3>How the seven stages connect</h3>
+    <p>
+      Read the diagram as a delegation flow. The <strong>coordinator</strong> (Stage 1) sits at the
+      center and never does the research itself &mdash; it delegates. It hands the topic to the
+      <strong>searcher</strong>, then the <strong>analyzer</strong>, then the <strong>synthesizer</strong>,
+      then the <strong>reporter</strong> (Stages 2&ndash;4), each returning a summary rather than its raw
+      work. <strong>Context management</strong> (Stage 5) is why that summary-only flow matters;
+      the <strong>citation check</strong> (Stages 6&ndash;7) gates the final report so nothing
+      uncited ships.
+    </p>
+
+    <figure class="flow-wrap">
+      <svg class="flow-svg" viewBox="0 0 820 500" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Diagram of a multi-agent research system: a coordinator receives a topic and delegates in sequence to a searcher, an analyzer, a synthesizer, and a reporter subagent, each returning only a summary; context management keeps the coordinator lean; a citation check gates the final report.">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" class="arrowhead"/>
+          </marker>
+          <marker id="aha" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" class="arrowhead-accent"/>
+          </marker>
+        </defs>
+
+        <!-- TOPIC -->
+        <rect class="box" x="20" y="222" width="104" height="56" rx="8"/>
+        <text class="lbl" x="72" y="246" text-anchor="middle">Topic</text>
+        <text class="sub" x="72" y="263" text-anchor="middle">to research</text>
+        <path class="flowline-accent" d="M124,250 L166,250" marker-end="url(#aha)"/>
+
+        <!-- COORDINATOR -->
+        <rect class="box-accent" x="170" y="212" width="140" height="76" rx="10"/>
+        <text class="stg" x="240" y="232" text-anchor="middle">STAGE 1</text>
+        <text class="lbl" x="240" y="252" text-anchor="middle">Coordinator</text>
+        <text class="sub" x="240" y="270" text-anchor="middle">delegates &amp; assembles</text>
+
+        <!-- context zone wraps coordinator + subagents -->
+        <rect x="152" y="120" width="536" height="230" rx="12" fill="none"
+              stroke="var(--accent)" stroke-width="1" stroke-dasharray="5 4" opacity="0.5"/>
+        <text class="zonelbl" x="160" y="138">STAGE 5 · context management — summaries in, not raw work</text>
+
+        <!-- four subagents in a column to the right -->
+        <!-- searcher -->
+        <rect class="box" x="360" y="150" width="150" height="40" rx="8"/>
+        <text class="lbl" x="435" y="167" text-anchor="middle" style="font-size:12px">searcher</text>
+        <text class="sub" x="435" y="181" text-anchor="middle">web · cited</text>
+        <!-- analyzer -->
+        <rect class="box" x="360" y="200" width="150" height="40" rx="8"/>
+        <text class="lbl" x="435" y="217" text-anchor="middle" style="font-size:12px">analyzer</text>
+        <text class="sub" x="435" y="231" text-anchor="middle">documents</text>
+        <!-- synthesizer -->
+        <rect class="box" x="360" y="250" width="150" height="40" rx="8"/>
+        <text class="lbl" x="435" y="267" text-anchor="middle" style="font-size:12px">synthesizer</text>
+        <text class="sub" x="435" y="281" text-anchor="middle">findings</text>
+        <!-- reporter -->
+        <rect class="box" x="360" y="300" width="150" height="40" rx="8"/>
+        <text class="lbl" x="435" y="317" text-anchor="middle" style="font-size:12px">reporter</text>
+        <text class="sub" x="435" y="331" text-anchor="middle">writes it up</text>
+
+        <text class="stg" x="330" y="128" text-anchor="middle" style="fill:var(--accent)">STAGE 2&ndash;4</text>
+
+        <!-- delegate arrows (coordinator → each) and return arrows -->
+        <path class="flowline-accent" d="M310,238 C336,238 340,170 358,170" marker-end="url(#aha)"/>
+        <path class="flowline-accent" d="M310,248 C336,248 340,220 358,220" marker-end="url(#aha)"/>
+        <path class="flowline-accent" d="M310,258 C336,258 340,270 358,270" marker-end="url(#aha)"/>
+        <path class="flowline-accent" d="M310,268 C336,268 340,320 358,320" marker-end="url(#aha)"/>
+        <text class="stg" x="335" y="352" text-anchor="middle" style="fill:var(--ink-soft)">summary returns to coordinator</text>
+
+        <!-- sequence hint among subagents -->
+        <path class="loopline" d="M512,170 C534,185 534,205 512,220" marker-end="url(#aha)"/>
+        <path class="loopline" d="M512,220 C534,235 534,255 512,270" marker-end="url(#aha)"/>
+        <path class="loopline" d="M512,270 C534,285 534,305 512,320" marker-end="url(#aha)"/>
+
+        <!-- coordinator → citation check → report -->
+        <path class="flowline-accent" d="M240,288 L240,378" marker-end="url(#aha)"/>
+
+        <!-- citation check -->
+        <rect class="box-amber" x="150" y="382" width="180" height="52" rx="10"/>
+        <text class="stg" x="240" y="402" text-anchor="middle">STAGE 6&ndash;7</text>
+        <text class="lbl" x="240" y="420" text-anchor="middle">Citation check</text>
+
+        <!-- check → report / back -->
+        <path class="flowline-accent" d="M330,398 C368,398 372,398 408,398" marker-end="url(#aha)"/>
+        <rect class="box-accent" x="412" y="372" width="150" height="52" rx="10"/>
+        <text class="lbl" x="487" y="396" text-anchor="middle">Cited report</text>
+        <text class="sub" x="487" y="412" text-anchor="middle">every claim sourced</text>
+        <!-- fail loop back -->
+        <path class="flowline" d="M420,424 C400,452 300,452 280,434" marker-end="url(#ah)"/>
+        <text class="sub" x="350" y="462" text-anchor="middle" style="fill:var(--amber)">uncited claim → back for a source</text>
+      </svg>
+      <figcaption>The coordinator delegates in sequence; each subagent returns a summary; the report ships only once every claim is cited.</figcaption>
+    </figure>
+
+    <div class="note">
+      Don&rsquo;t worry if a box uses a word you don&rsquo;t know yet &mdash; the glossary below defines
+      every term in the diagram, and each stage explains its own box in full when you reach it.
+    </div>
+
+    <h3>The terms this lab uses</h3>
+    <p>These come up across multiple stages. Skim them now; you don&rsquo;t need to memorize them &mdash; they&rsquo;ll make sense as you build.</p>
+
+    <div class="glossary">
+      <dl>
+        <dt>Coordinator</dt>
+        <dd>The top-level agent that receives the topic and delegates to specialists rather than doing the research itself. Its context stays focused on orchestration &mdash; deciding who does what and assembling the results. Sometimes called the lead or supervisor.</dd>
+
+        <dt>Subagent</dt>
+        <dd>A specialized child agent the coordinator spawns for a scoped task. It runs in its <em>own</em> fresh context, with its own system prompt, tools, and model, and returns only its final message to the coordinator. Your four: <code>searcher</code>, <code>analyzer</code>, <code>synthesizer</code>, <code>reporter</code>.</dd>
+
+        <dt>Delegation</dt>
+        <dd>The coordinator handing a task to a subagent. It rests on one idea: the parent receives the <em>conclusion</em>, not the work that produced it. The subagent&rsquo;s prompt string is the only channel from parent to child.</dd>
+
+        <dt>Claude Agent SDK</dt>
+        <dd>The library that runs the loop, subagents, tools, and context management for you, from Python or TypeScript. <span class="also">The renamed successor to the &ldquo;Claude Code SDK&rdquo; &mdash; old names <code>claude-code-sdk</code> / <code>ClaudeCodeOptions</code> are stale.</span></dd>
+
+        <dt>Context isolation</dt>
+        <dd>The core reason subagents exist here: a searcher can read twenty pages in its own context and hand back a three-line summary, so none of that raw content lands in the coordinator&rsquo;s window. Keeps the coordinator&rsquo;s reasoning room free for orchestration.</dd>
+
+        <dt>WebSearch <span class="also">(built-in tool)</span></dt>
+        <dd>The Agent SDK&rsquo;s built-in web search tool. Claude decides when to search; the API runs it and returns results with citations <em>always</em> attached &mdash; each cited passage carries a URL, title, and the exact cited text.</dd>
+
+        <dt>web_fetch <span class="also">(built-in tool)</span></dt>
+        <dd>Retrieves the full content of a specific URL or PDF. Paired with WebSearch in a &ldquo;search then fetch&rdquo; flow. Its citations are optional &mdash; you enable them explicitly.</dd>
+
+        <dt>Citation</dt>
+        <dd>A claim&rsquo;s link back to the source it came from &mdash; URL, title, and the passage that supports it. In this system, a report claim without one is a defect, not a stylistic choice.</dd>
+
+        <dt>Over-delegation / subagent sprawl</dt>
+        <dd>The named failure modes of multi-agent systems: delegating a task too small to be worth the round-trip, or spawning so many subagents that merging their summaries costs more than the work saved. Keep the count deliberate.</dd>
+
+        <dt>One level deep</dt>
+        <dd>A hard boundary in the current model: a subagent cannot spawn its own subagents. The coordinator delegates; the specialists do the work. Don&rsquo;t design for recursive delegation.</dd>
+
+        <dt>Synthesis</dt>
+        <dd>Combining findings from search and document analysis into a coherent set of claims &mdash; reconciling agreement, noting conflict &mdash; before anything is written up. The synthesizer&rsquo;s job, and a data dependency: it can&rsquo;t start until search and analysis finish.</dd>
+
+        <dt>Verification pass</dt>
+        <dd>A step that checks the finished report against the sources the subagents returned, flagging any claim that isn&rsquo;t backed by one. The difference between &ldquo;asked for citations&rdquo; and &ldquo;guaranteed them.&rdquo;</dd>
+      </dl>
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Before Stage 1</span>
+      <ul>
+        <li>You can state, in one sentence, what the finished system does end to end.</li>
+        <li>You can trace the topic through the diagram: coordinator &rarr; search &rarr; analyze &rarr; synthesize &rarr; report &rarr; citation check.</li>
+        <li>You can explain why the coordinator receives summaries, not raw research.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============ STAGE 1 ============ -->
+  <section class="stage" id="s1">
+    <div class="stage-head">
+      <span class="stage-num">Stage 01</span>
+      <h2>Stand up the coordinator</h2>
+      <span class="domain-tag">Agentic Architecture &amp; Orchestration &middot; 27%</span>
+    </div>
+    <p class="lede">The coordinator is the agent at the center of the system. Its defining trait: it does <em>not</em> do the research &mdash; it delegates and assembles. Build the loop first, with a system prompt that makes delegation its job, and confirm it can spawn a subagent at all.</p>
+
+    <div class="scenario">A topic comes in: &ldquo;the current state of solid-state batteries.&rdquo; The coordinator needs to route it through search, analysis, synthesis, and writing &mdash; without trying to do all four itself and drowning its own context.</div>
+
+    <h3>1a &middot; Install and set up the coordinator</h3>
+    <p>The Claude Agent SDK is the renamed successor to the old &ldquo;Claude Code SDK.&rdquo; If a tutorial imports <code>claude-code-sdk</code> or <code>ClaudeCodeOptions</code>, it&rsquo;s stale.</p>
+    <span class="code-label">Install</span>
+    <div class="code"><span class="c"># Python 3.10+</span>
+<span class="cmd">pip install claude-agent-sdk</span>
+
+<span class="c"># TypeScript (bundles the Claude Code binary — nothing else to install)</span>
+<span class="cmd">npm install @anthropic-ai/claude-agent-sdk</span></div>
+
+    <span class="code-label">The coordinator, with a delegation-first system prompt (Python)</span>
+    <div class="code"><span class="k">import</span> asyncio
+<span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
+
+COORDINATOR = <span class="s">"""You are a research coordinator. You do NOT research directly.</span>
+<span class="s">Delegate to your specialist subagents in order: use the searcher for web</span>
+<span class="s">sources, the analyzer for local documents, the synthesizer to combine</span>
+<span class="s">findings, and the reporter to write the final cited report. Pass each</span>
+<span class="s">subagent exactly what it needs. Assemble their summaries; never redo their work."""</span>
+
+<span class="k">async def</span> main():
+    <span class="k">async for</span> message <span class="k">in</span> query(
+        prompt=<span class="s">"Research: the current state of solid-state batteries."</span>,
+        options=ClaudeAgentOptions(
+            system_prompt=COORDINATOR,
+            allowed_tools=[<span class="s">"Agent"</span>],   <span class="c"># REQUIRED or delegation is blocked</span>
+            max_turns=<span class="s">20</span>,             <span class="c"># orchestration takes several turns</span>
+        ),
+    ):
+        <span class="k">if</span> hasattr(message, <span class="s">"result"</span>):
+            print(message.result)
+
+asyncio.run(main())</div>
+
+    <h3>1b &middot; The one rule that trips everyone up</h3>
+    <p><strong><code>Agent</code> must be in <code>allowed_tools</code>.</strong> Without it, the coordinator&rsquo;s attempts to delegate fall through to your permission callback or get denied &mdash; and Claude, unable to delegate, just does the work itself in one context. If your &ldquo;multi-agent&rdquo; system is quietly running as a single agent, this is almost always why. You can also nudge delegation by naming a subagent in the prompt (&ldquo;Use the searcher to&hellip;&rdquo;).</p>
+
+    <h3>1c &middot; Cap the orchestration</h3>
+    <p>The coordinator carries the full conversation plus every subagent&rsquo;s description on every turn, so long runs get progressively more expensive. Set <code>max_turns</code> as a circuit breaker and watch cost &mdash; every <code>ResultMessage</code> carries token usage with a per-model breakdown when subagents run.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know the <strong>supervisor/coordinator pattern</strong>: one lead decomposes and delegates,
+      specialists work on non-overlapping subtasks, the lead aggregates. Know that
+      <code>Agent</code> in <code>allowedTools</code> is what makes delegation actually happen, and
+      that the coordinator&rsquo;s value is <em>keeping its context on orchestration</em>. &ldquo;The
+      coordinator does the research and also coordinates&rdquo; is the wrong shape.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      The <code>agents</code>/<code>Agent</code>-tool mechanics and <code>ClaudeAgentOptions</code> fields
+      are current but the SDK is pre-1.0 and moving. Confirm the import path, the
+      <code>allowed_tools=["Agent"]</code> requirement, and delegation setup against
+      <code>code.claude.com/docs/en/agent-sdk/subagents</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 1 done when</span>
+      <ul>
+        <li>Your coordinator runs with a system prompt that makes delegation its job.</li>
+        <li><code>Agent</code> is in <code>allowed_tools</code>, and you&rsquo;ve confirmed it can spawn at least one subagent.</li>
+        <li><code>max_turns</code> is set and you can read token usage from the result.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 2 ============ -->
+  <section class="stage" id="s2">
+    <div class="stage-head">
+      <span class="stage-num">Stage 02</span>
+      <h2>Define the four subagents</h2>
+      <span class="domain-tag">Agentic Architecture &amp; Orchestration &middot; 27%</span>
+    </div>
+    <p class="lede">Each specialist is a subagent with its own role, its own system prompt, and &mdash; crucially &mdash; a <em>description</em> the coordinator reads to decide when to use it. Define all four in the <code>agents</code> parameter, each scoped to exactly its job.</p>
+
+    <h3>2a &middot; The four roles</h3>
+    <p>Define them programmatically. Each runs in a fresh context and returns only its final message to the coordinator.</p>
+    <div class="code">options = ClaudeAgentOptions(
+    system_prompt=COORDINATOR,
+    allowed_tools=[<span class="s">"Agent"</span>],
+    agents={
+      <span class="s">"searcher"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Searches the web for sources on a topic. Use FIRST, to gather cited web sources."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You find and return web sources with citations. Return a list of claims, each with its source URL and the cited passage. Do not synthesize."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"WebSearch"</span>, <span class="s">"WebFetch"</span>],
+      },
+      <span class="s">"analyzer"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Analyzes LOCAL documents (PDFs, markdown). Use to extract claims from files, not the web."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You read local documents and extract relevant claims, each tagged with the file and location it came from."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"Read"</span>, <span class="s">"Grep"</span>],
+      },
+      <span class="s">"synthesizer"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Combines search + document findings into coherent claims. Use AFTER search and analysis."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You merge findings into a deduplicated claim set. Note agreement and conflict. Preserve every claim's source. Do not write prose."</span>,
+        <span class="s">"tools"</span>: [],   <span class="c"># reasons over what it's given; needs no tools</span>
+      },
+      <span class="s">"reporter"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Writes the final report from synthesized claims. Use LAST."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You write a comprehensive report. Every claim MUST carry its citation. Never state a claim you cannot cite."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"Write"</span>],
+      },
+    },
+)</div>
+
+    <h3>2b &middot; Descriptions are how the coordinator routes</h3>
+    <p>The coordinator reads each <code>description</code> exactly the way a model reads a tool description &mdash; to decide when to delegate. So the descriptions must draw sharp boundaries: <em>web</em> vs. <em>local documents</em>, and <em>ordering</em> (searcher first, reporter last). Vague descriptions cause the coordinator to route to the wrong specialist or skip one.</p>
+
+    <h3>2c &middot; Scope each subagent&rsquo;s tools to its role</h3>
+    <p>Tool boundaries do real work here: the <code>synthesizer</code> has <em>no</em> tools (it only reasons over what it&rsquo;s given), the <code>analyzer</code> reads local files but can&rsquo;t search the web, the <code>searcher</code> searches but doesn&rsquo;t write. A subagent that can only do its job can&rsquo;t wander into another&rsquo;s.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Two tested ideas here. First, the coordinator delegates based on the subagent&rsquo;s
+      <strong>description</strong> &mdash; write it to say <em>when</em> to use the agent, not just what
+      it is. Second, <strong>tool scoping per subagent</strong> is a real design lever: a specialist
+      with a minimal tool set is safer and less likely to be mis-selected. Subagents are also
+      <strong>one level deep</strong> &mdash; they can&rsquo;t delegate further.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      The <code>agents</code> object keys (<code>description</code>, <code>prompt</code>, <code>tools</code>,
+      <code>model</code>), the built-in tool names (<code>WebSearch</code> vs <code>web_search</code>
+      casing), and filesystem-based <code>.claude/agents/</code> definitions all vary by version.
+      Confirm against the subagents docs before relying on the exact shape.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 2 done when</span>
+      <ul>
+        <li>All four subagents are defined with distinct roles and sharp, when-to-use descriptions.</li>
+        <li>Each subagent&rsquo;s tools are scoped to exactly its job &mdash; no more.</li>
+        <li>The coordinator routes the topic to the searcher first, not to itself.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 3 ============ -->
+  <section class="stage" id="s3">
+    <div class="stage-head">
+      <span class="stage-num">Stage 03</span>
+      <h2>Give each subagent its tools</h2>
+      <span class="domain-tag">Tool Design &amp; MCP Integration &middot; 18%</span>
+    </div>
+    <p class="lede">The searcher and analyzer are only as good as the tools behind them. The searcher uses the SDK&rsquo;s built-in web tools &mdash; which cite sources automatically &mdash; and the analyzer reads local files. Wire them up, and understand why the built-in web search is the reason citations are even possible.</p>
+
+    <h3>3a &middot; The searcher&rsquo;s web tools cite for free</h3>
+    <p>The built-in <code>WebSearch</code> tool is special for this system: <strong>citations are always enabled</strong>. When Claude answers from search results, each supporting passage comes back as a citation with the source <code>url</code>, <code>title</code>, and the exact <code>cited_text</code>. You don&rsquo;t have to ask for citations &mdash; they arrive with the results. That&rsquo;s the foundation the whole &ldquo;every claim is cited&rdquo; guarantee rests on.</p>
+    <div class="code"><span class="c"># The searcher subagent's tools — WebSearch cites automatically.</span>
+<span class="c"># A minimal standalone research agent looks like this:</span>
+<span class="k">async for</span> msg <span class="k">in</span> query(
+    prompt=<span class="s">"Find recent sources on solid-state battery energy density."</span>,
+    options=ClaudeAgentOptions(allowed_tools=[<span class="s">"WebSearch"</span>]),
+):
+    ...   <span class="c"># results come back with url + title + cited_text attached</span></div>
+
+    <h3>3b &middot; Add web_fetch for full-text (search then fetch)</h3>
+    <p>Search returns snippets; when the searcher needs the full text of a promising page, <code>web_fetch</code> pulls it. The canonical pattern is <strong>search then fetch</strong> &mdash; search to find candidate URLs, fetch to read the best ones in depth. Unlike WebSearch, <code>web_fetch</code> citations are <em>optional</em>, so enable them:</p>
+    <div class="code"><span class="c"># web_fetch citations are off by default — turn them on:</span>
+{ <span class="k">"type"</span>: <span class="s">"web_fetch_20250910"</span>, <span class="k">"name"</span>: <span class="s">"web_fetch"</span>,
+  <span class="k">"max_uses"</span>: <span class="s">5</span>, <span class="k">"citations"</span>: {<span class="k">"enabled"</span>: <span class="k">True</span>} }</div>
+    <div class="note">
+      Know the tool&rsquo;s limits so the searcher doesn&rsquo;t rely on it wrongly: <code>web_fetch</code>
+      gets the initial HTML, <em>not</em> JavaScript-rendered content, and returns raw text (no
+      structured extraction). For a research report over articles and PDFs that&rsquo;s usually fine
+      &mdash; but it&rsquo;s a real boundary worth stating in the searcher&rsquo;s prompt.
+    </div>
+
+    <h3>3c &middot; The analyzer reads local documents</h3>
+    <p>The analyzer&rsquo;s tools are <code>Read</code> and <code>Grep</code> &mdash; it works over the PDFs and markdown you provided, extracting claims tagged with the file and location they came from. That file-and-location tag is the analyzer&rsquo;s version of a citation, so document-sourced claims are as traceable as web ones.</p>
+    <div class="note">
+      If a subagent needs an external system instead of the built-ins &mdash; a private paper
+      database, an internal wiki &mdash; that&rsquo;s where an MCP server comes in, scoped to just that
+      subagent. The built-in web + file tools cover this lab; MCP is the extension point when
+      the source lives behind your own API.
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know the <strong>built-in web tools</strong>: WebSearch cites automatically, web_fetch
+      citations are opt-in, and the <strong>search-then-fetch</strong> pattern. Know web_fetch&rsquo;s
+      limits (no JS rendering, raw text). And know when a task needs an <strong>MCP server</strong>
+      (a source behind your own API) versus a built-in tool &mdash; scoped per subagent.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Tool version strings move fast (<code>web_search_20250305</code>, <code>web_fetch_20250910</code>,
+      and newer dated versions with dynamic filtering), and which models support which version
+      varies. Web search also requires a Console admin toggle. Confirm current versions and model
+      support against <code>platform.claude.com/docs</code> before wiring them in.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 3 done when</span>
+      <ul>
+        <li>The searcher returns web claims that each carry a real <code>url</code> and <code>cited_text</code>.</li>
+        <li>web_fetch is enabled with citations on, and used to read at least one full page.</li>
+        <li>The analyzer extracts claims from your local documents, each tagged with its file and location.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 4 ============ -->
+  <section class="stage" id="s4">
+    <div class="stage-head">
+      <span class="stage-num">Stage 04</span>
+      <h2>Orchestrate the delegation</h2>
+      <span class="domain-tag">Agentic Architecture &amp; Orchestration &middot; 27%</span>
+    </div>
+    <p class="lede">Four subagents don&rsquo;t make a system &mdash; the <em>orchestration</em> does. The coordinator has to pass each specialist what it needs, run them in the right order, and avoid the two classic failure modes: over-delegation and subagent sprawl.</p>
+
+    <div class="scenario">The synthesizer can&rsquo;t combine findings that don&rsquo;t exist yet. So the coordinator must run search and analysis <em>before</em> synthesis, and synthesis before the report &mdash; a sequence driven by data dependency, not preference.</div>
+
+    <h3>4a &middot; Pass context explicitly &mdash; the prompt is the only channel</h3>
+    <p>A subagent starts with a fresh context and <em>no</em> access to the coordinator&rsquo;s conversation. The only thing that crosses from parent to child is the <strong>prompt string</strong> the coordinator sends. So whatever a subagent needs &mdash; the topic, the searcher&rsquo;s findings for the synthesizer, the synthesized claims for the reporter &mdash; must be put directly in that prompt. This is the single most common orchestration bug: assuming a subagent &ldquo;knows&rdquo; what the coordinator knows.</p>
+
+    <h3>4b &middot; Sequence by data dependency</h3>
+    <p>This system is deliberately sequential, because each step feeds the next:</p>
+    <ol>
+      <li><strong>searcher</strong> &rarr; web claims with citations</li>
+      <li><strong>analyzer</strong> &rarr; document claims with file locations</li>
+      <li><strong>synthesizer</strong> &rarr; both sets merged into one coherent claim set (can&rsquo;t start until 1&ndash;2 are done)</li>
+      <li><strong>reporter</strong> &rarr; the written report (can&rsquo;t start until 3 is done)</li>
+    </ol>
+    <p>The coordinator enforces this order &mdash; it doesn&rsquo;t hand the reporter anything until the synthesizer has returned. Sequence isn&rsquo;t a style choice; it&rsquo;s the shape of the data flow.</p>
+
+    <h3>4c &middot; Avoid over-delegation and sprawl</h3>
+    <p>Two named failure modes the exam cares about:</p>
+    <ul>
+      <li><strong>Over-delegation:</strong> handing a subagent a task so small the coordinator could have done it in fewer turns than the round-trip costs. If the coordinator has to do real work to <em>use</em> a subagent&rsquo;s result, the delegation was wrong.</li>
+      <li><strong>Subagent sprawl:</strong> spawning more agents than the work needs. Every subagent costs a full context window and round-trip overhead; too many, and merging their summaries costs more than you saved. Four specialists, each clearly earning its place, is the right size here.</li>
+    </ul>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      This is the central thread of the Orchestration domain. Know that the <strong>prompt string is the
+      only parent&rarr;child channel</strong> (so context must be passed explicitly), that
+      <strong>sequencing follows data dependency</strong>, and the two failure modes &mdash;
+      <strong>over-delegation</strong> and <strong>sprawl</strong> &mdash; by name. Scenarios describe a
+      multi-agent system misbehaving; the fix is usually &ldquo;pass the context in the prompt&rdquo; or
+      &ldquo;that task didn&rsquo;t need a subagent.&rdquo;
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      How the coordinator invokes subagents in sequence, and how it threads one subagent&rsquo;s
+      output into the next one&rsquo;s prompt, depends on current SDK delegation mechanics. Confirm
+      the delegation and context-passing details against
+      <code>code.claude.com/docs/en/agent-sdk/subagents</code>.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 4 done when</span>
+      <ul>
+        <li>Each subagent receives, in its prompt, exactly the context it needs from the prior step.</li>
+        <li>The four run in dependency order &mdash; synthesis after search + analysis, report after synthesis.</li>
+        <li>You can explain why this system uses four subagents and not fourteen.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 5 ============ -->
+  <section class="stage" id="s5">
+    <div class="stage-head">
+      <span class="stage-num">Stage 05</span>
+      <h2>Keep the coordinator&rsquo;s context small</h2>
+      <span class="domain-tag">Context Management &amp; Reliability &middot; 15%</span>
+    </div>
+    <p class="lede">A research run reads a lot &mdash; dozens of pages, several documents. If all of that landed in the coordinator&rsquo;s context, it would fill fast and the coordinator would lose the thread of what it&rsquo;s orchestrating. The whole reason for subagents here is that they don&rsquo;t let that happen.</p>
+
+    <h3>5a &middot; Summaries in, not raw work</h3>
+    <p>This is the core idea, worth stating plainly: a subagent does the noisy work &mdash; the twenty page reads, the document crawl &mdash; <em>entirely inside its own context</em>, and returns <strong>one thing</strong> to the coordinator: a summary. The coordinator pays for the three-line finding, not the twenty pages behind it. That asymmetric information flow is the point of delegation, not a side benefit.</p>
+    <div class="code"><span class="c"># The searcher reads 20 pages in ITS context and returns:</span>
+{ <span class="k">"claims"</span>: [
+    {<span class="k">"claim"</span>: <span class="s">"Solid-state cells reached ~400 Wh/kg in 2025 lab tests"</span>,
+     <span class="k">"url"</span>: <span class="s">"https://…"</span>, <span class="k">"cited_text"</span>: <span class="s">"…achieved 400 Wh/kg…"</span>},
+    ...
+] }
+<span class="c"># The coordinator never sees the 20 pages — only this.</span></div>
+
+    <h3>5b &middot; Watch the orchestrator&rsquo;s own growth</h3>
+    <p>Even with summaries, the coordinator&rsquo;s context grows: every turn carries the full conversation plus all four subagent descriptions. On a long research run this adds up. Keep subagent descriptions tight, keep the number of subagents deliberate (Stage 4), and reset the session between unrelated topics rather than letting one coordinator accumulate three reports&rsquo; worth of context.</p>
+
+    <h3>5c &middot; A scratchpad for the claim set</h3>
+    <p>For a big report, keep the growing claim set on disk rather than only in the coordinator&rsquo;s window &mdash; the synthesizer writes claims to a file, the reporter reads them back. State lives in the file; the coordinator&rsquo;s context holds only what the current delegation step needs. It also means a long run survives a session reset.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The reliable theme: <strong>delegation is context management</strong>. The subagent isolates the
+      noisy work and returns a summary, keeping the coordinator&rsquo;s window free for orchestration.
+      Know <strong>why the coordinator gets summaries not raw output</strong>, that its context still
+      grows with subagent descriptions, and that <strong>external state</strong> (a claims file) beats
+      holding everything in-context. This is the same principle as fact-extraction, applied to a
+      multi-agent shape.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 5 done when</span>
+      <ul>
+        <li>Each subagent returns a compact summary; the coordinator never accumulates raw pages.</li>
+        <li>You&rsquo;ve checked token usage and can see the coordinator&rsquo;s context staying lean across steps.</li>
+        <li>The claim set lives in a file the synthesizer writes and the reporter reads.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 6 ============ -->
+  <section class="stage" id="s6">
+    <div class="stage-head">
+      <span class="stage-num">Stage 06</span>
+      <h2>Enforce cited claims</h2>
+      <span class="domain-tag">Context Management &amp; Reliability &middot; 15%</span>
+    </div>
+    <p class="lede">&ldquo;Comprehensive, cited reports&rdquo; is only real if it&rsquo;s enforced. Asking the reporter nicely to cite everything isn&rsquo;t a guarantee &mdash; a model can still assert an unsupported claim. You need every claim to trace to a source a subagent actually returned, and a check that flags the ones that don&rsquo;t.</p>
+
+    <div class="scenario">The reporter writes: &ldquo;Solid-state batteries will be in mass-market EVs by 2027.&rdquo; Confident, plausible &mdash; and backed by none of the sources the searcher returned. That&rsquo;s the exact failure the citation check exists to catch.</div>
+
+    <h3>6a &middot; Carry the source with every claim, end to end</h3>
+    <p>The guarantee is built by construction, not bolted on at the end. Each claim carries its source from the moment it&rsquo;s found: the searcher attaches <code>url</code> + <code>cited_text</code>, the analyzer attaches file + location, the synthesizer <em>preserves</em> those through the merge, and the reporter is instructed never to state a claim it can&rsquo;t cite. By the time the report exists, every claim already has a source attached &mdash; or it shouldn&rsquo;t be there.</p>
+
+    <h3>6b &middot; The verification pass</h3>
+    <p>Construction isn&rsquo;t enough on its own, because a model can still slip in an unsupported claim. So add a verification step: check the finished report against the set of sources the subagents returned, and flag any claim without a match. This is the difference between &ldquo;asked for citations&rdquo; and &ldquo;guaranteed them.&rdquo;</p>
+    <div class="code"><span class="c"># Verification: every report claim must map to a returned source.</span>
+returned_sources = collect_sources(searcher_out, analyzer_out)   <span class="c"># urls + file refs</span>
+<span class="k">for</span> claim <span class="k">in</span> report_claims:
+    <span class="k">if</span> claim.citation <span class="k">not in</span> returned_sources:
+        flag(claim, <span class="s">"UNSUPPORTED — no source backs this"</span>)   <span class="c"># send back for a source or cut</span></div>
+
+    <h3>6c &middot; Make it enforcement, not guidance</h3>
+    <p>The reliable pattern &mdash; the same one that matters across all these systems &mdash; is that a hard requirement belongs in a deterministic check, not only in a prompt. A <code>SubagentStop</code>-style gate or a post-generation verification function <em>enforces</em> &ldquo;no uncited claims&rdquo; regardless of what the reporter decided. Put the guarantee where it holds even when the model doesn&rsquo;t cooperate.</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The through-line of the reliability domain: <strong>a prompt is guidance; a check is a
+      guarantee</strong>. &ldquo;Tell the model to always cite&rdquo; is the tempting wrong answer when the
+      requirement is hard. The right shape carries the source with each claim <em>and</em> verifies
+      the output against the returned sources. Unsupported-but-confident claims (fabrication) are
+      the named risk this guards against.
+    </div>
+
+    <div class="verify">
+      <span class="lbl">Verify</span>
+      Gating mechanisms (<code>SubagentStop</code> hooks, output validation) and how to read the
+      structured citation fields (<code>web_search_result_location</code>, <code>cited_text</code>)
+      out of tool results evolve with the SDK. Confirm the current hook events and citation
+      response shape before wiring the check.
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 6 done when</span>
+      <ul>
+        <li>Every claim carries its source from search/analysis through synthesis to the report.</li>
+        <li>A verification pass flags any report claim not backed by a returned source.</li>
+        <li>The &ldquo;no uncited claims&rdquo; rule lives in a check, not only in the reporter&rsquo;s prompt.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ STAGE 7 ============ -->
+  <section class="stage" id="s7">
+    <div class="stage-head">
+      <span class="stage-num">Stage 07</span>
+      <h2>Assemble &amp; verify the report</h2>
+      <span class="domain-tag">Reliability in practice</span>
+    </div>
+    <p class="lede">The last stage brings it together: the reporter turns the synthesized, sourced claims into a comprehensive report, the verification pass confirms every claim is backed, and you run the whole system end to end on a real topic to see it produce something you&rsquo;d actually trust.</p>
+
+    <h3>7a &middot; The reporter writes from sourced claims only</h3>
+    <p>The reporter receives the synthesizer&rsquo;s merged claim set &mdash; each claim already carrying its source &mdash; and writes the report around them: an overview, the findings organized by theme, the areas where sources conflict, and a references section. Its one hard rule, from Stage 2: never state a claim it can&rsquo;t cite. It&rsquo;s writing <em>up</em> sourced claims, not generating new ones.</p>
+
+    <h3>7b &middot; Run the full pipeline</h3>
+    <p>Give the coordinator a real topic and watch the whole flow: it delegates to the searcher (web sources with citations), the analyzer (document claims), the synthesizer (one merged claim set), then the reporter (the write-up) &mdash; and finally the verification pass. A claim that fails verification goes back for a source or gets cut before the report is final.</p>
+
+    <h3>7c &middot; Judge it like a reader would</h3>
+    <p>&ldquo;Comprehensive and cited&rdquo; has a testable meaning: pick any claim in the finished report and follow its citation to a source the searcher or analyzer actually returned. If every claim survives that trace, the system did its job. If one doesn&rsquo;t, the verification pass should have caught it &mdash; and that gap is where you tune (usually the synthesizer dropping a source, or the reporter over-reaching past its claims).</p>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The exam frames reliability as <strong>verifiable</strong>: a definition of &ldquo;done&rdquo; you can
+      check, not a hope. For this system, &ldquo;every claim traces to a returned source&rdquo; is that
+      definition. Expect a scenario where the report looks great but a claim can&rsquo;t be traced &mdash;
+      the fix is upstream (preserve sources through synthesis), not &ldquo;ask the reporter to try
+      harder.&rdquo;
+    </div>
+
+    <div class="checkpoint">
+      <span class="lbl">Stage 7 done when</span>
+      <ul>
+        <li>The system produces a comprehensive report on a real topic, organized and readable.</li>
+        <li>Every claim in it traces to a source a subagent actually returned.</li>
+        <li>A deliberately unsupported claim is caught by verification before the report is final.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Wrap-up</span>
+      <h2>What you built, and how it maps</h2>
+    </div>
+    <p>You now have one working multi-agent system that exercises the scenario&rsquo;s three primary domains: a coordinator orchestrating four specialist subagents with scoped roles and sequencing (Agentic Architecture &amp; Orchestration, 27%); built-in web tools that cite automatically plus scoped tool boundaries per subagent, with MCP as the extension point (Tool &amp; MCP, 18%); and delegation-as-context-management with an enforced, verified citation guarantee (Context &amp; Reliability, 15%). Completing it, you should be able to answer any question the scenario raises &mdash; why the coordinator delegates rather than researches, how context passes to a subagent, why the flow is sequential, and how &ldquo;every claim is cited&rdquo; becomes a guarantee rather than a hope.</p>
+    <p>The exam is 60 scenario questions in 120 minutes, and it rewards judgment over recall &mdash; the wrong answers are written to tempt people with partial knowledge. Having actually built the coordinator, felt why <code>Agent</code> must be in the allowlist, and enforced the citation check is the difference between recognizing the right architectural call and guessing.</p>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next step toward the exam.</strong> Complete Anthropic&rsquo;s four official
+        Skilljar courses, request exam access, and take the official practice test before
+        booking. This lab is preparation &mdash; the credential comes from Anthropic&rsquo;s
+        proctored exam, not from here.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA-F Capstone Lab &middot; Scenario: Multi-Agent Research System
+  <p class="disclaimer">
+    A recommended preparatory lab for the Anthropic Claude Certified Architect &mdash;
+    Foundations (CCA-F) exam. Not affiliated with or endorsed by Anthropic, and not a
+    substitute for the official exam or its prerequisites. Commands, package names, tool version
+    strings, and API fields reflect the toolchain as of mid-2026 and carry a real shelf-life
+    &mdash; check every <em>Verify</em> note against current documentation before relying on it.
+  </p>
+</footer>
+
+</body>
+</html>
