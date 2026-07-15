@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<!-- build: 2026071505 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA Knowledge Track · Module 4 · Prompt Engineering &amp; Structured Output</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* ---- module-specific ---- */
+.antipattern{background:#fbeeee;border:1px solid #e3b7b0;border-left:3px solid #b0432f;border-radius:8px;padding:16px 20px;margin:22px 0;font-size:15px}
+.antipattern .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#b0432f;margin-bottom:8px;font-weight:600}
+.antipattern ul{margin:8px 0 0;padding-left:20px}
+.antipattern li{margin:5px 0}
+.capstone{background:#eaf1ee;border:1px solid #bcd6cb;border-radius:10px;padding:16px 20px;margin:22px 0;display:flex;gap:14px;align-items:flex-start}
+.capstone .icn{color:var(--accent);font-size:20px;line-height:1;flex-shrink:0;margin-top:1px}
+.capstone .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:600}
+.capstone a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(47,111,94,.35)}
+.capstone a:hover{border-bottom-color:var(--accent)}
+.kpoints{margin:16px 0}
+.kpoints .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+.taskref{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+.in-practice{margin:16px 0}
+.in-practice .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+
+/* ---- knowledge check MCQ ---- */
+.kcheck{background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-radius:12px;padding:24px 26px;margin:28px 0 0}
+.kcheck > .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;font-weight:600}
+.kcheck .kc-sub{font-size:13.5px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5}
+.kq{margin:0 0 20px;padding:0 0 20px;border-bottom:1px dashed #c5d8d0}
+.kcheck .kq:last-of-type{border-bottom:none;padding-bottom:6px;margin-bottom:10px}
+.kq .qtext{display:block;font-weight:600;font-size:15.5px;margin:0 0 14px;color:var(--ink);line-height:1.5}
+.kq .qnum{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--accent);background:#dfeae5;border-radius:4px;padding:2px 6px;margin-right:9px;vertical-align:2px}
+.kq .opt{display:flex!important;width:100%;box-sizing:border-box;gap:11px;align-items:flex-start;padding:11px 14px;margin:0 0 8px;background:var(--card);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14.5px;line-height:1.55;transition:border-color .12s,background .12s}
+.kq .opt:hover{border-color:var(--accent);background:#fbfaf7}
+.kq .opt input{margin:3px 0 0;flex:0 0 auto;cursor:pointer;accent-color:var(--accent)}
+.kq .opt > span{flex:1 1 auto}
+.kq .opt.correct{background:#e5efe9;border-color:var(--accent)}
+.kq .opt.wrong{background:#fbeeee;border-color:#c98374}
+.kq .opt.disabled{cursor:default}
+.kq .opt.disabled:hover{border-color:var(--line);background:var(--card)}
+.kq .opt.correct.disabled{border-color:var(--accent);background:#e5efe9}
+.kfb{display:none;margin:12px 0 0;padding:12px 15px;border-radius:8px;font-size:14px;line-height:1.6}
+.kfb.show{display:block}
+.kfb.ok{background:#e5efe9;border:1px solid #bcd6cb;color:#245244}
+.kfb.no{background:#fbeeee;border:1px solid #e3b7b0;color:#8f3a2b}
+.kfb strong{font-weight:600}
+.kc-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.btn-check{font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:8px;padding:11px 22px;cursor:pointer;transition:opacity .15s}
+.btn-check:hover:not(:disabled){opacity:.88}
+.btn-check:disabled{background:#bfcbc6;cursor:not-allowed}
+.kc-status{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+.kc-status.done{color:var(--accent);font-weight:600}
+
+/* section gate — toggle button */
+.sect-gate{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 8px;padding:18px 26px 26px;background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-top:none;border-radius:0 0 12px 12px}
+.btn-next{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-size:15px;font-weight:600;text-decoration:none;border:none;border-radius:8px;padding:12px 24px;transition:background .18s,color .18s,opacity .15s}
+.btn-next .lockicn{font-size:13px;line-height:1}
+.btn-next.locked{background:#d3dbd8;color:#7d8a85;cursor:not-allowed;pointer-events:none}
+.btn-next.unlocked{background:var(--accent);color:#fff;cursor:pointer}
+.btn-next.unlocked:hover{opacity:.88}
+.gate-note{font-size:13.5px;color:var(--ink-soft)}
+.gate-note.unlocked{color:var(--accent);font-weight:600}
+
+.mod-done{background:#e5efe9;border:1px solid #bcd6cb;border-radius:12px;padding:24px 26px;margin:28px 0;display:none}
+.mod-done.show{display:block}
+.mod-done h3{margin:0 0 8px;font-size:19px;color:var(--accent)}
+.mod-done p{margin:0;font-size:15px;color:var(--ink-soft);line-height:1.6}
+.reset-link{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0}
+.reset-link:hover{color:var(--accent)}
+
+/* ---- section locking ---- */
+.lock-shade{display:flex;align-items:center;gap:16px;background:var(--paper-2);border:1px dashed #c8bfa9;border-radius:12px;padding:20px 24px;margin:20px 0 8px}
+.lock-shade .lock-ic{font-size:22px;line-height:1;opacity:.55;flex-shrink:0}
+.lock-shade strong{display:block;font-size:15px;color:var(--ink);margin-bottom:3px}
+.lock-shade p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.lock-shade > div{flex:1 1 auto}
+.lock-jump{flex-shrink:0;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid #bcd6cb;background:#eef3f1;border-radius:7px;padding:9px 15px;transition:background .15s}
+.lock-jump:hover{background:#e0ebe6}
+.lock-shade.hidden{display:none}
+.sect-body{display:none}
+.sect-body.open{display:block}
+.stage.is-locked .stage-head h2{opacity:.5}
+.stage.is-locked .domain-tag{opacity:.5}
+</style>
+</head><body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · CCA Knowledge Track</p>
+    <h1 class="title">Module 4<br><em>Prompt Engineering</em> &amp; Structured Output</h1>
+    <p class="standfirst">
+      The craft of the prompt itself, and of getting output a program can trust. Explicit criteria
+      that cut false positives, few-shot examples that fix what instructions can&rsquo;t, JSON schemas
+      that guarantee structure, validation loops that catch what schemas can&rsquo;t, batch processing,
+      and review architectures that don&rsquo;t mark their own homework. Six task statements.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Completing this module does not grant a certificate and is not the CCA exam. The exam is
+        booked separately through Anthropic and has its own prerequisites. This track is the
+        structured-knowledge companion to the hands-on capstone labs &mdash; use both.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>This module, in six sections</h2>
+    <p class="sub">One per task statement in the Prompt Engineering &amp; Structured Output domain. Each pairs the knowledge the exam tests with the anti-patterns it probes &mdash; and links to the capstone lab where you build it.</p>
+    <ol>
+      <li><div class="rm-body"><a href="#s4-1">4.1 · Explicit criteria &amp; false positives</a><small>specific rules beat &ldquo;be conservative&rdquo;</small></div><span class="rm-domain">Task 4.1</span></li>
+      <li><div class="rm-body"><a href="#s4-2">4.2 · Few-shot prompting</a><small>examples for consistency and judgment</small></div><span class="rm-domain">Task 4.2</span></li>
+      <li><div class="rm-body"><a href="#s4-3">4.3 · Structured output via tool use</a><small>JSON schemas, tool_choice, schema design</small></div><span class="rm-domain">Task 4.3</span></li>
+      <li><div class="rm-body"><a href="#s4-4">4.4 · Validation, retry &amp; feedback loops</a><small>semantic vs syntax, when retry won&rsquo;t help</small></div><span class="rm-domain">Task 4.4</span></li>
+      <li><div class="rm-body"><a href="#s4-5">4.5 · Batch processing strategies</a><small>50% savings, 24h window, when not to</small></div><span class="rm-domain">Task 4.5</span></li>
+      <li><div class="rm-body"><a href="#s4-6">4.6 · Multi-instance &amp; multi-pass review</a><small>independent instances beat self-review</small></div><span class="rm-domain">Task 4.6</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>How to use this module</h3>
+    <p>Same fixed shape as the previous modules: <strong>what &amp; why</strong>, <strong>knowledge points</strong>, <strong>in practice</strong>, <strong>anti-patterns</strong>, an <strong>exam lens</strong>, and a gated <strong>knowledge check</strong>, with capstone links. Answer every question correctly to unlock the next section.</p>
+    <div class="note">
+      The thread through this domain: <strong>be specific, then verify</strong>. Vague instructions
+      produce vague results; schemas guarantee shape but not truth; a model reviewing its own work
+      sees what it already believes. Each section is one form of that idea.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ 4.1 ============ -->
+  <section class="stage" id="s4-1">
+    <div class="stage-head">
+      <span class="stage-num">Section 4.1</span>
+      <h2>Design prompts with explicit criteria to improve precision and reduce false positives</h2>
+      <span class="domain-tag">Task Statement 4.1</span>
+    </div>
+    <p class="lede">&ldquo;Be conservative&rdquo; and &ldquo;only report high-confidence findings&rdquo; feel like precision instructions. They aren&rsquo;t &mdash; they&rsquo;re vague, and vague instructions don&rsquo;t improve precision. What works is telling the model exactly which categorical conditions constitute a finding.</p>
+
+    <h3>What &amp; why</h3>
+    <p>The difference is concrete criteria versus general exhortation. &ldquo;Flag comments only when claimed behavior contradicts actual code behavior&rdquo; is a rule the model can apply consistently; &ldquo;check that comments are accurate&rdquo; is not. General instructions like &ldquo;be conservative&rdquo; or &ldquo;only report high-confidence findings&rdquo; <strong>fail to improve precision</strong> compared to specific categorical criteria. This matters because of trust: a category with a high false-positive rate doesn&rsquo;t just waste time, it <strong>undermines developer confidence in the accurate categories too</strong> &mdash; people start dismissing everything.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The importance of <strong>explicit criteria over vague instructions</strong> &mdash; &ldquo;flag comments only when claimed behavior contradicts actual code behavior&rdquo; vs &ldquo;check that comments are accurate.&rdquo;</li>
+        <li>General instructions like <strong>&ldquo;be conservative&rdquo; or &ldquo;only report high-confidence findings&rdquo; fail to improve precision</strong> compared to specific categorical criteria.</li>
+        <li>The impact of false-positive rates on developer trust: <strong>high-FP categories undermine confidence in accurate categories</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Write <strong>specific review criteria defining which issues to report</strong> (bugs, security) <strong>versus skip</strong> (minor style, local patterns) &mdash; rather than relying on confidence-based filtering.</li>
+        <li><strong>Temporarily disable high-false-positive categories</strong> to restore developer trust while you improve the prompts for those categories.</li>
+        <li>Define <strong>explicit severity criteria with concrete code examples for each level</strong> to achieve consistent classification.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Adding <strong>&ldquo;be conservative&rdquo; or &ldquo;only high-confidence findings&rdquo;</strong> and expecting precision to improve &mdash; these are the named ineffective instructions.</li>
+        <li><strong>Leaving a noisy category running</strong> while you work on it &mdash; it erodes trust in the categories that <em>are</em> accurate.</li>
+        <li><strong>Severity labels without concrete criteria</strong> &mdash; classification drifts between runs.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      A reviewer produces too many false positives. The tempting answers add &ldquo;be conservative&rdquo; or a
+      confidence filter. The correct move is <strong>specific categorical criteria</strong> &mdash; state
+      exactly what constitutes a finding and what to skip. And when one category is the problem,
+      <strong>disable it temporarily</strong> to protect trust in the rest while you fix its prompt.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code in CI/CD</strong> lab tunes a reviewer down from noisy to trusted, and the
+        <strong>Code-Review Agent</strong> lab defines the criteria that decide what gets flagged.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-4-1">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Specific categorical criteria give the model a rule it can apply consistently. Vague exhortations don&#x27;t." data-why-no="&quot;Be conservative&quot; and &quot;only high-confidence findings&quot; are the named ineffective instructions — they don&#x27;t improve precision. Explicit categorical criteria do.">
+          <p class="qtext"><span class="qnum">Q1</span>Your code reviewer flags too many non-issues. Which prompt change actually improves precision?</p>
+          <label class="opt"><input type="radio" name="sec-4-1-q1" value="a"><span>Add "be conservative and only report high-confidence findings"</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q1" value="b"><span>Define specific categorical criteria — e.g. "flag comments only when claimed behavior contradicts actual code behavior"</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q1" value="c"><span>Ask the model to double-check each finding before reporting</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q1" value="d"><span>Lower the temperature</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Trust is not compartmentalized. A noisy category teaches developers to dismiss everything the reviewer says." data-why-no="The named impact: high false-positive categories undermine confidence in the accurate ones. Developers start ignoring all findings, not just the noisy category&#x27;s.">
+          <p class="qtext"><span class="qnum">Q2</span>One review category has a high false-positive rate; the others are accurate. Why does this matter beyond that category?</p>
+          <label class="opt"><input type="radio" name="sec-4-1-q2" value="a"><span>It slows the pipeline down</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q2" value="b"><span>High-FP categories undermine developer confidence in the accurate categories too</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q2" value="c"><span>It increases token costs across all categories</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q2" value="d"><span>It doesn't — developers evaluate each category independently</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Temporarily disabling the high-FP category protects trust in the rest while you fix its prompt." data-why-no="The named practice is temporarily disabling high-false-positive categories to restore trust while improving their prompts.">
+          <p class="qtext"><span class="qnum">Q3</span>You're improving the prompt for a noisy category, but the fix will take a week. What's the recommended interim move?</p>
+          <label class="opt"><input type="radio" name="sec-4-1-q3" value="a"><span>Leave it running and add a disclaimer to its findings</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q3" value="b"><span>Temporarily disable that category to restore developer trust while you improve it</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q3" value="c"><span>Route its findings to a separate channel nobody reads</span></label>
+          <label class="opt"><input type="radio" name="sec-4-1-q3" value="d"><span>Reduce its severity level to "nit"</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-4-1">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-4-1">
+      <a class="btn-next locked" href="#s4-2" data-label="Continue to Section 4.2"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 4.2</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+  </section>
+
+  <!-- ============ 4.2 ============ -->
+  <section class="stage" id="s4-2">
+    <div class="stage-head">
+      <span class="stage-num">Section 4.2</span>
+      <h2>Apply few-shot prompting to improve output consistency and quality</h2>
+      <span class="domain-tag">Task Statement 4.2</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-4-1">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 4.1 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s4-1">Go to Section 4.1</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-4-2">
+    <p class="lede">When detailed instructions still produce inconsistent output, examples are the fix. Not because the model can&rsquo;t read &mdash; because a worked example carries judgment that prose can&rsquo;t express, and lets the model generalize to cases you never listed.</p>
+
+    <h3>What &amp; why</h3>
+    <p>Few-shot examples are <strong>the most effective technique for consistently formatted, actionable output</strong> when detailed instructions alone fall short. Their real power is in <em>ambiguous</em> cases: an example that shows the reasoning for why one action was chosen over a plausible alternative teaches judgment. And crucially, examples let the model <strong>generalize to novel patterns</strong> rather than matching only the cases you enumerated &mdash; which is why 2&ndash;4 well-chosen examples beat a long list of rules. They also reduce hallucination in extraction tasks, where varied document structures otherwise produce invented or empty fields.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>Few-shot examples as <strong>the most effective technique for consistently formatted, actionable output</strong> when instructions alone produce inconsistency.</li>
+        <li>Their role in demonstrating <strong>ambiguous-case handling</strong> (tool selection for ambiguous requests, branch-level coverage gaps).</li>
+        <li>How examples enable the model to <strong>generalize judgment to novel patterns</strong> rather than matching only pre-specified cases.</li>
+        <li>Their effectiveness for <strong>reducing hallucination in extraction</strong> (informal measurements, varied document structures).</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Create <strong>2&ndash;4 targeted examples for ambiguous scenarios</strong> that show the reasoning for why one action was chosen over plausible alternatives.</li>
+        <li>Include examples demonstrating the <strong>desired output format</strong> (location, issue, severity, suggested fix) for consistency.</li>
+        <li>Provide examples <strong>distinguishing acceptable patterns from genuine issues</strong> to cut false positives while enabling generalization.</li>
+        <li>Use examples to demonstrate <strong>correct handling of varied document structures</strong> (inline citations vs bibliographies, methodology sections vs embedded details).</li>
+        <li>Add examples showing <strong>correct extraction from varied formats</strong> to fix empty/null extraction of required fields.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Writing more detailed instructions</strong> when output is inconsistently formatted &mdash; examples are the named more-effective technique.</li>
+        <li><strong>Enumerating every case as a rule</strong> instead of showing a few examples that generalize &mdash; you can&rsquo;t list every novel pattern.</li>
+        <li>Examples that show <strong>only the answer, not the reasoning</strong>, for ambiguous cases &mdash; the judgment is the point.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      &ldquo;Detailed instructions, still inconsistent output&rdquo; &rarr; <strong>few-shot examples</strong>,
+      every time. For ambiguity, the expected answer is <strong>2&ndash;4 examples that show the
+      reasoning</strong>, not a longer rule list &mdash; because the goal is generalization to cases you
+      didn&rsquo;t anticipate. Watch for extraction scenarios too: empty/null required fields across
+      varied formats is a few-shot problem.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Structured Data Extraction</strong> lab uses worked examples to handle messy document
+        formats; the <strong>Code-Review Agent</strong> lab uses them to separate acceptable patterns from
+        real issues.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-4-2">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Few-shot examples are the named most-effective technique for consistently formatted output when instructions alone fall short." data-why-no="When detailed instructions alone produce inconsistent results, few-shot examples are the named most effective technique — not more instructions.">
+          <p class="qtext"><span class="qnum">Q1</span>Your detailed instructions produce inconsistently formatted output. What's the most effective fix?</p>
+          <label class="opt"><input type="radio" name="sec-4-2-q1" value="a"><span>Rewrite the instructions to be even more detailed</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q1" value="b"><span>Few-shot examples demonstrating the desired output format</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q1" value="c"><span>A stricter system prompt</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q1" value="d"><span>Raise max_tokens so output isn't truncated</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Showing the reasoning is what teaches judgment — the model can then generalize to novel ambiguous cases you never listed." data-why-no="For ambiguous scenarios, examples should show the reasoning for why one action was chosen over plausible alternatives. Bare input→output doesn&#x27;t carry the judgment.">
+          <p class="qtext"><span class="qnum">Q2</span>You're writing few-shot examples for ambiguous tool-selection cases. What should each example include?</p>
+          <label class="opt"><input type="radio" name="sec-4-2-q2" value="a"><span>Just the input and the correct tool choice</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q2" value="b"><span>The reasoning for why one action was chosen over plausible alternatives</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q2" value="c"><span>A list of every tool and its description</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q2" value="d"><span>The full conversation history that led to the choice</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Generalization is the point — you can&#x27;t enumerate every novel pattern, but examples teach the underlying judgment." data-why-no="The named benefit is generalization: examples let the model apply judgment to novel patterns, whereas a rule list only covers the cases you thought to specify.">
+          <p class="qtext"><span class="qnum">Q3</span>Why are 2–4 few-shot examples often better than an exhaustive list of rules?</p>
+          <label class="opt"><input type="radio" name="sec-4-2-q3" value="a"><span>They use fewer tokens</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q3" value="b"><span>They enable the model to generalize judgment to novel patterns rather than matching only pre-specified cases</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q3" value="c"><span>Rules are ignored by the model</span></label>
+          <label class="opt"><input type="radio" name="sec-4-2-q3" value="d"><span>Examples are processed earlier in the context window</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-4-2">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-4-2">
+      <a class="btn-next locked" href="#s4-3" data-label="Continue to Section 4.3"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 4.3</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.3 ============ -->
+  <section class="stage" id="s4-3">
+    <div class="stage-head">
+      <span class="stage-num">Section 4.3</span>
+      <h2>Enforce structured output using tool use and JSON schemas</h2>
+      <span class="domain-tag">Task Statement 4.3</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-4-2">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 4.2 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s4-2">Go to Section 4.2</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-4-3">
+    <p class="lede">Asking for JSON and hoping is not a strategy. Tool use with a JSON schema <em>guarantees</em> schema-compliant output &mdash; no syntax errors, ever. What it doesn&rsquo;t guarantee is that the values are right, and that distinction is the most tested idea in this section.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Tool use with JSON schemas is the most reliable approach for guaranteed schema-compliant structured output</strong> &mdash; it eliminates JSON syntax errors entirely. The <code>tool_choice</code> setting controls how tools fire: <code>"auto"</code> means the model <em>may</em> return text instead of calling a tool; <code>"any"</code> means it must call a tool but chooses which; forced (<code>{"type":"tool","name":"..."}</code>) means it must call a specific one. The critical caveat: <strong>strict schemas eliminate syntax errors but not semantic errors</strong> &mdash; line items that don&rsquo;t sum to the total, values in the wrong field. Schema design matters too: fields that may be absent should be <strong>optional/nullable</strong>, or the model fabricates values to satisfy them.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Tool use with JSON schemas</strong> as the most reliable approach for guaranteed schema-compliant output, eliminating JSON syntax errors.</li>
+        <li><strong><code>tool_choice</code></strong>: <code>"auto"</code> (may return text), <code>"any"</code> (must call a tool, its choice), forced (must call a specific named tool).</li>
+        <li>Strict schemas <strong>eliminate syntax errors but not semantic errors</strong> (line items that don&rsquo;t sum, values in wrong fields).</li>
+        <li>Schema design: <strong>required vs optional fields</strong>, and <strong>enum + &ldquo;other&rdquo; + detail string</strong> patterns for extensible categories.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Define <strong>extraction tools with JSON schemas as input parameters</strong> and read the structured data from the <code>tool_use</code> response.</li>
+        <li>Set <strong><code>tool_choice: "any"</code></strong> to guarantee structured output when multiple extraction schemas exist and the document type is unknown.</li>
+        <li><strong>Force a specific tool</strong> (<code>{"type":"tool","name":"extract_metadata"}</code>) to ensure a particular extraction runs before enrichment steps.</li>
+        <li>Design fields as <strong>optional/nullable when source documents may not contain the information</strong>, preventing fabrication to satisfy required fields.</li>
+        <li>Add <strong>enum values like &ldquo;unclear&rdquo;</strong> for ambiguous cases and <strong>&ldquo;other&rdquo; + detail fields</strong> for extensible categorization.</li>
+        <li>Include <strong>format normalization rules in the prompt</strong> alongside strict schemas to handle inconsistent source formatting.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Assuming a <strong>strict schema guarantees correct data</strong> &mdash; it guarantees <em>shape</em>; semantic errors pass straight through.</li>
+        <li>Making a field <strong>required when the document may not contain it</strong> &mdash; this <em>forces</em> the model to fabricate a value.</li>
+        <li>Using <strong><code>tool_choice: "auto"</code></strong> when you need guaranteed structured output &mdash; the model may return conversational text instead.</li>
+        <li><strong>Closed enums with no escape hatch</strong> &mdash; an unanticipated category gets crammed into the nearest wrong bin.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Know the three <code>tool_choice</code> modes cold &mdash; which guarantees <em>a</em> tool
+      (<code>"any"</code>) versus <em>a specific</em> tool (forced) versus nothing (<code>"auto"</code>).
+      Know that <strong>schemas fix syntax, not semantics</strong> &mdash; a scenario where totals don&rsquo;t
+      add up is a validation problem (4.4), not a schema problem. And &ldquo;the model invents values for
+      missing data&rdquo; &rarr; <strong>make the field nullable</strong>, don&rsquo;t scold it in the prompt.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Structured Data Extraction</strong> lab is this section end to end &mdash; schema design
+        within the supported subset, constrained output, and the nullable-vs-required decision.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-4-3">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="&lt;code&gt;&quot;any&quot;&lt;/code&gt; guarantees a tool call (so you get structured output) while letting the model pick the right schema for the document." data-why-no="&lt;code&gt;&quot;any&quot;&lt;/code&gt; is the fit: it guarantees the model calls &lt;em&gt;a&lt;/em&gt; tool rather than returning text, but lets it choose which schema. Forced pins one specific tool; &quot;auto&quot; guarantees nothing.">
+          <p class="qtext"><span class="qnum">Q1</span>You need guaranteed structured output, but the document type is unknown and you have several extraction schemas. Which <code>tool_choice</code> setting?</p>
+          <label class="opt"><input type="radio" name="sec-4-3-q1" value="a"><span><code>"auto"</code> — let the model decide whether to use a tool</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q1" value="b"><span><code>"any"</code> — the model must call a tool but chooses which</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q1" value="c"><span>Forced: <code>{"type":"tool","name":"extract"}</code></span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q1" value="d"><span>No tool_choice — describe the JSON format in the prompt</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Schemas guarantee shape, not truth. Values that don&#x27;t add up are semantic errors and need a validation step." data-why-no="This is the key caveat: strict JSON schemas via tool use eliminate syntax errors but do not prevent semantic errors — like line items that don&#x27;t sum to the total.">
+          <p class="qtext"><span class="qnum">Q2</span>Your extraction uses a strict JSON schema via tool use. The output is valid JSON matching the schema, but the line items don't sum to the stated total. What kind of error is this?</p>
+          <label class="opt"><input type="radio" name="sec-4-3-q2" value="a"><span>A schema syntax error — tighten the schema</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q2" value="b"><span>A semantic error — strict schemas eliminate syntax errors but not semantic ones</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q2" value="c"><span>A tool_choice misconfiguration</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q2" value="d"><span>A model capability limit that can't be addressed</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="A required field forces a value — that&#x27;s what causes the fabrication. Nullable gives the model an honest way to say &quot;not present.&quot;" data-why-no="The named skill: design fields as optional/nullable when source documents may not contain the information, preventing the model from fabricating values to satisfy required fields.">
+          <p class="qtext"><span class="qnum">Q3</span>Some source documents lack a PO number, and the model keeps inventing one. What's the schema fix?</p>
+          <label class="opt"><input type="radio" name="sec-4-3-q3" value="a"><span>Add a prompt instruction: "never guess a PO number"</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q3" value="b"><span>Make the field optional/nullable so the model isn't forced to produce a value</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q3" value="c"><span>Add a regex pattern constraint to the field</span></label>
+          <label class="opt"><input type="radio" name="sec-4-3-q3" value="d"><span>Remove the field from the schema entirely</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-4-3">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-4-3">
+      <a class="btn-next locked" href="#s4-4" data-label="Continue to Section 4.4"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 4.4</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.4 ============ -->
+  <section class="stage" id="s4-4">
+    <div class="stage-head">
+      <span class="stage-num">Section 4.4</span>
+      <h2>Implement validation, retry, and feedback loops for extraction quality</h2>
+      <span class="domain-tag">Task Statement 4.4</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-4-3">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 4.3 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s4-3">Go to Section 4.3</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-4-4">
+    <p class="lede">Section 4.3 got you guaranteed structure. This one catches everything structure can't: values that don't add up, fields in the wrong place, data that simply isn't there. And it teaches the judgment of knowing when a retry will help &mdash; and when it's pointless.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Retry-with-error-feedback</strong> means appending the specific validation errors to the prompt on retry, so the model can self-correct against a concrete problem rather than guessing. But retry has a hard limit: it's <strong>ineffective when the required information is simply absent from the source document</strong> &mdash; no amount of retrying conjures data that isn't there. That's the key discrimination: <em>format and structural errors</em> retry successfully; <em>missing information</em> does not. Feedback loops close the circle: tracking a <code>detected_pattern</code> field lets you analyse which code constructs trigger findings that developers dismiss.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Retry-with-error-feedback</strong>: appending specific validation errors to the prompt on retry to guide correction.</li>
+        <li>The <strong>limits of retry</strong>: ineffective when the required information is absent from the source (vs format or structural errors).</li>
+        <li><strong>Feedback loop design</strong>: tracking which code constructs trigger findings (<code>detected_pattern</code>) to enable systematic analysis of dismissal patterns.</li>
+        <li>The difference between <strong>semantic validation errors</strong> (values don't sum, wrong field placement) and <strong>schema syntax errors</strong> (eliminated by tool use).</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Implement follow-up requests including <strong>the original document, the failed extraction, and the specific validation errors</strong> for self-correction.</li>
+        <li><strong>Identify when retries will be ineffective</strong> (information exists only in an external document not provided) versus when they'll succeed (format mismatches, structural output errors).</li>
+        <li>Add <strong><code>detected_pattern</code> fields</strong> to structured findings to enable analysis of false-positive patterns when developers dismiss them.</li>
+        <li>Design <strong>self-correction validation flows</strong>: extract <code>calculated_total</code> alongside <code>stated_total</code> to flag discrepancies; add <code>conflict_detected</code> booleans for inconsistent source data.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Retrying when the information isn't in the document</strong> &mdash; burns cost and time on something that cannot succeed.</li>
+        <li><strong>Retrying with the same prompt</strong> instead of feeding back the specific validation error &mdash; the model has nothing new to work with.</li>
+        <li>Assuming <strong>tool-use schemas make validation unnecessary</strong> &mdash; they eliminate syntax errors only; semantic errors need checking.</li>
+        <li>Dismissing false positives <strong>without tracking what triggered them</strong> &mdash; no data to improve the prompt systematically.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The discriminating question: <em>can a retry possibly fix this?</em> Format wrong, structure
+      wrong &rarr; <strong>yes, retry with the error fed back</strong>. Information not in the source
+      &rarr; <strong>no &mdash; retry is the wrong answer</strong>, route it elsewhere. And the
+      <code>calculated_total</code> vs <code>stated_total</code> pattern is the canonical
+      self-validation trick for catching semantic errors a schema can't.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Structured Data Extraction</strong> lab builds the validate-and-retry loop, including
+        the bounded-retry-then-human-review fallback.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-4-4">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="c" data-why-ok="Retry fixes format and structural errors. It cannot conjure information that isn&#x27;t in the document." data-why-no="This is the named limit of retry: it&#x27;s ineffective when the required information is absent from the source. Retries succeed on format mismatches and structural errors, not missing data.">
+          <p class="qtext"><span class="qnum">Q1</span>An extraction fails validation because a required field is missing — and the information only exists in an external document you didn't provide. Will a retry help?</p>
+          <label class="opt"><input type="radio" name="sec-4-4-q1" value="a"><span>Yes — retry with the validation error fed back</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q1" value="b"><span>Yes — retry with a higher temperature for variation</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q1" value="c"><span>No — retries are ineffective when the information is simply absent from the source</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q1" value="d"><span>Yes — retry up to three times, then escalate</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Retry-with-error-feedback gives the model something concrete to correct against — the specific error, not a vague nudge." data-why-no="The named pattern: follow-up requests include the original document, the failed extraction, and the specific validation errors for model self-correction.">
+          <p class="qtext"><span class="qnum">Q2</span>When an extraction fails validation for a fixable reason, what should the retry request include?</p>
+          <label class="opt"><input type="radio" name="sec-4-4-q2" value="a"><span>Just the original document again</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q2" value="b"><span>The original document, the failed extraction, and the specific validation errors</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q2" value="c"><span>The original document and an instruction to be more careful</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q2" value="d"><span>A simplified schema with fewer fields</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="Extracting both and comparing is the named self-correction validation flow for catching semantic discrepancies." data-why-no="The named design: extract &lt;code&gt;calculated_total&lt;/code&gt; alongside &lt;code&gt;stated_total&lt;/code&gt; to flag discrepancies — a self-validation flow catching what schemas can&#x27;t.">
+          <p class="qtext"><span class="qnum">Q3</span>Which technique lets you catch arithmetic inconsistencies a schema can't?</p>
+          <label class="opt"><input type="radio" name="sec-4-4-q3" value="a"><span>Extract <code>calculated_total</code> alongside <code>stated_total</code> and flag discrepancies</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q3" value="b"><span>Add a <code>minimum</code> constraint to the total field</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q3" value="c"><span>Force the extraction tool with tool_choice</span></label>
+          <label class="opt"><input type="radio" name="sec-4-4-q3" value="d"><span>Increase the number of few-shot examples</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-4-4">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-4-4">
+      <a class="btn-next locked" href="#s4-5" data-label="Continue to Section 4.5"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 4.5</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.5 ============ -->
+  <section class="stage" id="s4-5">
+    <div class="stage-head">
+      <span class="stage-num">Section 4.5</span>
+      <h2>Design efficient batch processing strategies</h2>
+      <span class="domain-tag">Task Statement 4.5</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-4-4">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 4.4 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s4-4">Go to Section 4.4</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-4-5">
+    <p class="lede">The Message Batches API halves your cost. It also gives you no latency guarantee and up to a 24-hour window &mdash; which makes it perfect for overnight work and completely wrong for anything blocking a merge. Matching the API to the workload is the skill.</p>
+
+    <h3>What &amp; why</h3>
+    <p>The <strong>Message Batches API</strong> offers <strong>50% cost savings</strong> with an <strong>up-to-24-hour processing window</strong> and <strong>no guaranteed latency SLA</strong>. That trade makes it right for <strong>non-blocking, latency-tolerant workloads</strong> &mdash; overnight reports, weekly audits, nightly test generation &mdash; and wrong for <strong>blocking workflows</strong> like pre-merge checks, where someone is waiting. One important constraint: <strong>batch does not support multi-turn tool calling within a single request</strong> &mdash; it can't execute tools mid-request and return results. <code>custom_id</code> fields correlate request/response pairs.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The Message Batches API: <strong>50% cost savings, up to 24-hour processing window, no guaranteed latency SLA</strong>.</li>
+        <li>Appropriate for <strong>non-blocking, latency-tolerant workloads</strong> (overnight reports, weekly audits, nightly test generation); inappropriate for <strong>blocking workflows</strong> (pre-merge checks).</li>
+        <li>Batch <strong>does not support multi-turn tool calling within a single request</strong>.</li>
+        <li><strong><code>custom_id</code> fields</strong> for correlating batch request/response pairs.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li><strong>Match API to latency requirements</strong>: synchronous for blocking pre-merge checks, batch for overnight/weekly analysis.</li>
+        <li><strong>Calculate submission frequency from SLA constraints</strong> &mdash; e.g. 4-hour windows to guarantee a 30-hour SLA given 24-hour batch processing.</li>
+        <li><strong>Handle failures by resubmitting only the failed documents</strong> (identified by <code>custom_id</code>) with appropriate modifications (chunking documents that exceeded context limits).</li>
+        <li><strong>Refine prompts on a sample set before batch-processing large volumes</strong> to maximize first-pass success and reduce resubmission costs.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Using <strong>batch for a blocking workflow</strong> &mdash; a pre-merge check can't wait up to 24 hours with no SLA.</li>
+        <li>Expecting <strong>multi-turn tool calling inside a batch request</strong> &mdash; not supported.</li>
+        <li><strong>Resubmitting the entire batch</strong> when a few documents failed, instead of just the failures by <code>custom_id</code>.</li>
+        <li><strong>Batching 10,000 documents before testing the prompt</strong> on a sample &mdash; you pay for every failure at scale.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The tell is always <strong>&ldquo;is anyone waiting?&rdquo;</strong> Blocking (pre-merge, interactive)
+      &rarr; synchronous. Non-blocking (overnight, weekly) &rarr; batch, for the 50% saving. Expect
+      arithmetic too: given a 24-hour window and an SLA, compute the submission cadence. And know the
+      <strong>no-multi-turn-tools</strong> constraint &mdash; it rules batch out for agentic workloads.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Structured Data Extraction</strong> lab scales extraction with the Batches API and
+        handles per-document failures by <code>custom_id</code>.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-4-5">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Batch suits non-blocking, latency-tolerant workloads — overnight reports are the canonical case, and you get 50% savings." data-why-no="Batch has up to a 24-hour window and no latency SLA, so it fits non-blocking, latency-tolerant work (overnight reports, weekly audits) — not blocking checks, interactive use, or multi-turn tool calling.">
+          <p class="qtext"><span class="qnum">Q1</span>Which workload is appropriate for the Message Batches API?</p>
+          <label class="opt"><input type="radio" name="sec-4-5-q1" value="a"><span>A pre-merge check that blocks the PR until it completes</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q1" value="b"><span>An overnight report generated from thousands of documents</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q1" value="c"><span>An interactive assistant answering user questions</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q1" value="d"><span>A multi-turn agentic workflow that calls tools mid-request</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Batch can&#x27;t execute tools mid-request and return results — which rules it out for agentic workloads." data-why-no="The named constraint: the batch API does not support multi-turn tool calling within a single request — it cannot execute tools mid-request and return results.">
+          <p class="qtext"><span class="qnum">Q2</span>What does the Message Batches API NOT support?</p>
+          <label class="opt"><input type="radio" name="sec-4-5-q2" value="a"><span>Structured output via JSON schemas</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q2" value="b"><span>Correlating requests and responses</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q2" value="c"><span>Multi-turn tool calling within a single request</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q2" value="d"><span>Processing more than 100 requests at once</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="&lt;code&gt;custom_id&lt;/code&gt; correlates request/response pairs, so you resubmit just the failures with the right modification — chunking, in this case." data-why-no="The named skill: handle batch failures by resubmitting only the failed documents (identified by &lt;code&gt;custom_id&lt;/code&gt;) with appropriate modifications, such as chunking documents that exceeded context limits.">
+          <p class="qtext"><span class="qnum">Q3</span>A batch of 5,000 documents completes, but 40 failed because they exceeded context limits. What's the efficient recovery?</p>
+          <label class="opt"><input type="radio" name="sec-4-5-q3" value="a"><span>Resubmit the whole batch with a larger model</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q3" value="b"><span>Resubmit only the failed documents, identified by <code>custom_id</code>, chunked to fit</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q3" value="c"><span>Switch the entire workload to the synchronous API</span></label>
+          <label class="opt"><input type="radio" name="sec-4-5-q3" value="d"><span>Reduce the batch size and rerun everything</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-4-5">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-4-5">
+      <a class="btn-next locked" href="#s4-6" data-label="Continue to Section 4.6"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 4.6</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 4.6 ============ -->
+  <section class="stage" id="s4-6">
+    <div class="stage-head">
+      <span class="stage-num">Section 4.6</span>
+      <h2>Design multi-instance and multi-pass review architectures</h2>
+      <span class="domain-tag">Task Statement 4.6</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-4-5">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 4.5 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s4-5">Go to Section 4.5</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-4-6">
+    <p class="lede">A model that just wrote the code carries its own reasoning forward &mdash; it's already convinced. Asking it to review its own work, however firmly, doesn't undo that. An independent instance without the generation context catches what self-review can't.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Self-review is limited by construction</strong>: the model retains reasoning context from generation, making it less likely to question its own decisions in the same session. <strong>Independent review instances</strong> &mdash; without prior reasoning context &mdash; are more effective at catching subtle issues than self-review instructions <em>or</em> extended thinking. The other half is <strong>multi-pass review</strong>: splitting large reviews into per-file local analysis passes plus separate cross-file integration passes, which avoids attention dilution and the contradictory findings that come from trying to hold everything at once.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Self-review limitations</strong>: the model retains reasoning context from generation, so it's less likely to question its own decisions in the same session.</li>
+        <li><strong>Independent review instances</strong> (without prior reasoning context) are more effective at catching subtle issues than self-review instructions or extended thinking.</li>
+        <li><strong>Multi-pass review</strong>: per-file local analysis passes plus cross-file integration passes, avoiding attention dilution and contradictory findings.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Use a <strong>second independent Claude instance</strong> to review generated code without the generator's reasoning context.</li>
+        <li><strong>Split large multi-file reviews</strong> into focused per-file passes for local issues plus separate integration passes for cross-file data flow.</li>
+        <li>Run <strong>verification passes where the model self-reports confidence</strong> alongside each finding, enabling calibrated review routing.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Asking the generating session to review its own output</strong> &mdash; it's the named limitation, and no instruction fixes it.</li>
+        <li>Reaching for <strong>extended thinking</strong> to improve self-review &mdash; explicitly less effective than an independent instance.</li>
+        <li><strong>One undivided pass over a large multi-file change</strong> &mdash; attention dilutes, findings contradict.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      &ldquo;The reviewer misses issues in code it generated&rdquo; &rarr; <strong>an independent instance</strong>,
+      not a sterner instruction and not extended thinking. Both of those are written as distractors
+      here. For large reviews, the expected architecture is <strong>per-file passes + a cross-file
+      integration pass</strong>. Confidence self-reporting shows up as the routing mechanism.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code in CI/CD</strong> lab runs review and test-generation as separate isolated
+        sessions; the <strong>Code-Review Agent</strong> lab splits per-file and integration passes.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-4-6">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="c" data-why-ok="Independent instances are explicitly more effective than self-review instructions or extended thinking, because they don&#x27;t carry the generation reasoning." data-why-no="Independent review instances (without prior reasoning context) are named as more effective than self-review instructions &lt;em&gt;or&lt;/em&gt; extended thinking. Those two are the distractors here.">
+          <p class="qtext"><span class="qnum">Q1</span>The same Claude session generates code and then reviews it, missing issues an independent reviewer catches. What's the most effective fix?</p>
+          <label class="opt"><input type="radio" name="sec-4-6-q1" value="a"><span>Add "review your work critically" to the prompt</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q1" value="b"><span>Enable extended thinking for the review step</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q1" value="c"><span>Use a second independent Claude instance without the generator's reasoning context</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q1" value="d"><span>Ask it to review twice and compare</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="The generating session is already convinced — it carries its own reasoning forward, so it doesn&#x27;t interrogate its decisions." data-why-no="The named limitation: a model retains reasoning context from generation, making it less likely to question its own decisions in the same session.">
+          <p class="qtext"><span class="qnum">Q2</span>Why is self-review limited even when you instruct the model to be critical?</p>
+          <label class="opt"><input type="radio" name="sec-4-6-q2" value="a"><span>The model has a shorter context window during review</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q2" value="b"><span>It retains reasoning context from generation, making it less likely to question its own decisions</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q2" value="c"><span>Review requires different model weights</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q2" value="d"><span>Self-review is actually equally effective</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Per-file passes catch local issues cleanly; a dedicated integration pass catches cross-file data flow. That&#x27;s the named multi-pass architecture." data-why-no="The named approach is splitting large reviews into per-file local analysis passes plus cross-file integration passes — avoiding attention dilution and contradictory findings.">
+          <p class="qtext"><span class="qnum">Q3</span>You're reviewing a large multi-file change. What architecture avoids attention dilution and contradictory findings?</p>
+          <label class="opt"><input type="radio" name="sec-4-6-q3" value="a"><span>One comprehensive pass over everything at once</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q3" value="b"><span>Per-file local analysis passes plus separate cross-file integration passes</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q3" value="c"><span>Review only the files with the most changes</span></label>
+          <label class="opt"><input type="radio" name="sec-4-6-q3" value="d"><span>One pass per severity level</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-4-6">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-4-6">
+      <a class="btn-next locked" href="#close" data-label="Continue to the wrap-up"><span class="lockicn">&#128274;</span><span class="btxt">Continue to the wrap-up</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ WRAP-UP ============ -->
+  <div class="mod-done" id="mod-done">
+    <h3>&#10003; Module 4 complete</h3>
+    <p>You've cleared every section's knowledge check. Your progress is saved in this browser.
+    Next up: <strong>Module 5 — Context Management &amp; Reliability</strong>, the final domain. The evaluation unlocks once all five modules are done.</p>
+  </div>
+
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Module 4 · Wrap-up</span>
+      <h2>What this domain comes down to</h2>
+    </div>
+    <p>Prompt Engineering &amp; Structured Output is about precision and verification: explicit criteria instead of vague exhortation (4.1), examples that carry judgment prose can't (4.2), schemas that guarantee shape via tool use (4.3), validation that catches what shape can't (4.4), the right API for the latency you need (4.5), and review architectures that don't let a model mark its own homework (4.6).</p>
+    <p>One thread runs through the anti-patterns: <strong>guarantees are narrower than they look</strong>. A strict schema guarantees syntax, not semantics. A retry fixes format, not absent data. &ldquo;Be conservative&rdquo; guarantees nothing at all. And a model reviewing its own work brings its own conclusions with it. Know exactly what each mechanism guarantees &mdash; and put a check on everything it doesn't.</p>
+    <div class="capstone" style="margin-top:22px">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Your capstones for this domain</span>
+        <strong>Structured Data Extraction</strong> (4.3, 4.4, 4.5) &middot;
+        <strong>Claude Code in CI/CD</strong> (4.1, 4.6) &middot;
+        <strong>Code-Review Agent</strong> (4.1, 4.2, 4.6). The Extraction lab covers the schema-and-validation
+        half; the CI/CD lab covers the false-positive half.
+      </div>
+    </div>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next in the track.</strong> Module 5 &mdash; Context Management &amp; Reliability &mdash; the
+        final domain: preserving information across long interactions, escalation, error propagation,
+        confidence calibration, and provenance. Then the evaluation, drawn from the capstone scenarios.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA Knowledge Track &middot; Module 4: Prompt Engineering &amp; Structured Output<br>
+  <button class="reset-link" id="kt-reset">reset my progress for this module</button>
+  <p class="disclaimer">
+    Part of the Claude Certified Architect &mdash; Knowledge Track, the structured-knowledge companion
+    to the CCA capstone labs. A recommended preparatory resource &mdash; not affiliated with or endorsed
+    by Anthropic, not a substitute for the official exam or its prerequisites. API behavior, schema
+    handling, and batch limits reflect the toolchain as of mid-2026 and carry a real shelf-life;
+    verify against current documentation before relying on specifics.
+  </p>
+</footer>
+
+<script>
+  window.KT_MODULE_ID       = 'module-4-prompt-structured-output';
+  window.KT_CONTENT_VERSION = '1';
+  window.KT_TOTAL_SECTIONS  = 6;
+  window.KT_CP_COURSE_ID    = 'shkMbPhlwiihZaLXjn6f';  /* courses catalog doc id */
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CCA Knowledge Track — section gate engine
+   ---------------------------------------------------------------------------
+   Section-level progress  →  localStorage (survives refresh, timeout, breaks)
+   Module-level completion →  Firestore courseProgress  [WIRING PASS — see below]
+
+   Storage key: ccaKT_<MODULE_ID>_<uid>_v<CONTENT_VERSION>
+     · keyed by uid so shared browsers don't collide
+     · versioned so changed questions invalidate stale "complete" state
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var MODULE_ID      = window.KT_MODULE_ID || 'module-x';
+  var CONTENT_VERSION = window.KT_CONTENT_VERSION || '1';
+  var TOTAL_SECTIONS  = window.KT_TOTAL_SECTIONS || 0;
+
+  function uid() {
+    return (window._learnerUid) || (window.sessionStorage && sessionStorage.getItem('_learnerUid')) || 'anon';
+  }
+  var KEY = 'ccaKT_' + MODULE_ID + '_' + uid() + '_v' + CONTENT_VERSION;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { /* storage disabled/full — gate still works in-session */ }
+  }
+
+  var state = load();
+
+  function isSectionComplete(id) { return state[id] === true; }
+
+  /* ── SEAM: module completion ──────────────────────────────────────────────
+     Today: records locally + reveals the module-complete panel.
+     WIRING PASS: add the Firestore courseProgress v2 write here — this is the
+     only function that needs to change. moduleKey = filename minus .html.   */
+  function markModuleComplete() {
+    state.__moduleComplete = true;
+    save(state);
+    var panel = document.getElementById('mod-done');
+    if (panel) panel.classList.add('show');
+    // TODO(wiring): writeCourseProgress(CP_COURSE_ID, MODULE_ID, {complete:true})
+  }
+
+  function completedCount() {
+    return Object.keys(state).filter(function (k) {
+      return k.indexOf('sec-') === 0 && state[k] === true;
+    }).length;
+  }
+
+  function markSectionComplete(id) {
+    state[id] = true;
+    save(state);
+    unlockNext(id);
+    if (TOTAL_SECTIONS && completedCount() >= TOTAL_SECTIONS) markModuleComplete();
+  }
+
+  function unlockNext(id) {
+    var gate = document.querySelector('.sect-gate[data-for="' + id + '"]');
+    if (gate) {
+      var btn  = gate.querySelector('.btn-next');
+      var note = gate.querySelector('.gate-note');
+      if (btn) {
+        btn.classList.remove('locked');
+        btn.classList.add('unlocked');
+        var ic = btn.querySelector('.lockicn');
+        if (ic) ic.innerHTML = '&#10003;';
+      }
+      if (note) { note.textContent = 'Section complete — next section unlocked.'; note.classList.add('unlocked'); }
+    }
+    revealFor(id);
+  }
+
+  /* reveal the section whose prerequisite is `id` */
+  function revealFor(id) {
+    var shade = document.querySelector('.lock-shade[data-locked-for="' + id + '"]');
+    if (!shade) return;
+    shade.classList.add('hidden');
+    var sec = shade.closest('.stage');
+    if (sec) sec.classList.remove('is-locked');
+    var body = sec ? sec.querySelector('.sect-body') : null;
+    if (body) body.classList.add('open');
+  }
+
+  /* ── quiz rendering / grading ─────────────────────────────────────────── */
+  function gradeQuestion(qEl) {
+    var picked = qEl.querySelector('input[type=radio]:checked');
+    if (!picked) return null;
+    return picked.value === qEl.getAttribute('data-answer');
+  }
+
+  function lockQuestion(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.add('disabled');
+      var r = o.querySelector('input'); if (r) r.disabled = true;
+    });
+  }
+
+  function resetQuestionStyles(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.remove('correct', 'wrong');
+    });
+  }
+
+  function checkSection(secId) {
+    var kc = document.querySelector('.kcheck[data-section="' + secId + '"]');
+    if (!kc) return;
+    var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+    var allAnswered = qs.every(function (q) { return q.querySelector('input:checked'); });
+    if (!allAnswered) return;
+
+    var allRight = true;
+    qs.forEach(function (q) {
+      resetQuestionStyles(q);
+      var ok  = gradeQuestion(q);
+      var fb  = q.querySelector('.kfb');
+      var sel = q.querySelector('input:checked');
+      var selOpt = sel ? sel.closest('.opt') : null;
+
+      if (ok) {
+        if (selOpt) selOpt.classList.add('correct');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      } else {
+        allRight = false;
+        if (selOpt) selOpt.classList.add('wrong');
+        if (fb) { fb.className = 'kfb no show'; fb.innerHTML = '<strong>Not quite.</strong> ' + (q.getAttribute('data-why-no') || '') + ' <em>Try again.</em>'; }
+        // wrong answers stay open for retry — clear the selection
+        if (sel) sel.checked = false;
+      }
+    });
+
+    var status = kc.querySelector('.kc-status');
+    if (allRight) {
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      markSectionComplete(secId);
+    } else if (status) {
+      status.textContent = 'Some answers need another look';
+      status.classList.remove('done');
+    }
+  }
+
+  /* ── restore prior progress on load ───────────────────────────────────── */
+  function restore() {
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      if (!isSectionComplete(secId)) return;
+      kc.querySelectorAll('.kq').forEach(function (q) {
+        var ans = q.getAttribute('data-answer');
+        var input = q.querySelector('input[value="' + ans + '"]');
+        if (input) { input.checked = true; var o = input.closest('.opt'); if (o) o.classList.add('correct'); }
+        var fb = q.querySelector('.kfb');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      });
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      var status = kc.querySelector('.kc-status');
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      unlockNext(secId);
+    });
+    if (state.__moduleComplete) {
+      var panel = document.getElementById('mod-done');
+      if (panel) panel.classList.add('show');
+    }
+    // reveal any section whose prerequisite is already complete; lock the rest
+    document.querySelectorAll('.lock-shade').forEach(function (shade) {
+      var prereq = shade.getAttribute('data-locked-for');
+      var sec = shade.closest('.stage');
+      if (isSectionComplete(prereq)) {
+        revealFor(prereq);
+      } else if (sec) {
+        sec.classList.add('is-locked');
+      }
+    });
+  }
+
+  /* ── wire up ──────────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-check').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        checkSection(btn.getAttribute('data-section'));
+      });
+    });
+    // enable the check button only once every question in that block has a pick
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      kc.addEventListener('change', function () {
+        var btn = kc.querySelector('.btn-check');
+        if (!btn || isSectionComplete(secId)) return;   // completed sections stay locked-done
+        var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+        var all = qs.every(function (q) { return q.querySelector('input:checked'); });
+        btn.disabled = !all;                            // enable once every question answered
+      });
+      var btn0 = kc.querySelector('.btn-check');
+      if (btn0) btn0.disabled = true;
+    });
+    var reset = document.getElementById('kt-reset');
+    if (reset) reset.addEventListener('click', function () {
+      if (confirm('Clear your saved progress for this module?')) {
+        localStorage.removeItem(KEY); location.reload();
+      }
+    });
+    restore();
+  });
+})();
+</script>
+</body>
+</html>
