@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071501 -->
+<!-- build: 2026071502 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -315,6 +315,20 @@
 .mod-done p{margin:0;font-size:15px;color:var(--ink-soft);line-height:1.6}
 .reset-link{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0}
 .reset-link:hover{color:var(--accent)}
+
+/* ---- section locking ---- */
+.lock-shade{display:flex;align-items:center;gap:16px;background:var(--paper-2);border:1px dashed #c8bfa9;border-radius:12px;padding:20px 24px;margin:20px 0 8px}
+.lock-shade .lock-ic{font-size:22px;line-height:1;opacity:.55;flex-shrink:0}
+.lock-shade strong{display:block;font-size:15px;color:var(--ink);margin-bottom:3px}
+.lock-shade p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.lock-shade > div{flex:1 1 auto}
+.lock-jump{flex-shrink:0;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid #bcd6cb;background:#eef3f1;border-radius:7px;padding:9px 15px;transition:background .15s}
+.lock-jump:hover{background:#e0ebe6}
+.lock-shade.hidden{display:none}
+.sect-body{display:none}
+.sect-body.open{display:block}
+.stage.is-locked .stage-head h2{opacity:.5}
+.stage.is-locked .domain-tag{opacity:.5}
 </style>
 </head>
 <body>
@@ -371,7 +385,7 @@
   <hr class="rule">
 
   <!-- ============ 1.1 ============ -->
-  <section class="stage" id="s1-1">s1-1
+  <section class="stage" id="s1-1">
     <div class="stage-head">
       <span class="stage-num">Section 1.1</span>
       <h2>Agentic loops for autonomous task execution</h2>
@@ -468,12 +482,21 @@
   </section>
 
   <!-- ============ 1.2 ============ -->
-  <section class="stage" id="s1-2">s1-2
+  <section class="stage" id="s1-2">
     <div class="stage-head">
       <span class="stage-num">Section 1.2</span>
       <h2>Orchestrate multi-agent systems with coordinator&ndash;subagent patterns</h2>
       <span class="domain-tag">Task Statement 1.2</span>
     </div>
+    <div class="lock-shade" data-locked-for="sec-1-1">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 1.1 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s1-1">Go to Section 1.1</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-1-2">
     <p class="lede">One agent handles one task well; hard problems need several, coordinated. The dominant pattern is hub-and-spoke: a coordinator that decomposes the work, delegates to specialist subagents, and aggregates what comes back &mdash; routing <em>all</em> communication through itself.</p>
 
     <h3>What &amp; why</h3>
@@ -565,16 +588,26 @@
       <a class="btn-next locked" href="#s1-3" data-label="Continue to Section 1.3"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 1.3</span></a>
       <span class="gate-note">Answer all questions correctly to unlock.</span>
     </div>
+    </div>
   </section>
 
   <hr class="rule">
   <!-- ============ 1.3 ============ -->
-  <section class="stage" id="s1-3">s1-3
+  <section class="stage" id="s1-3">
     <div class="stage-head">
       <span class="stage-num">Section 1.3</span>
       <h2>Configure subagent invocation, context passing, and spawning</h2>
       <span class="domain-tag">Task Statement 1.3</span>
     </div>
+    <div class="lock-shade" data-locked-for="sec-1-2">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 1.2 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s1-2">Go to Section 1.2</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-1-3">
     <p class="lede">If 1.2 is the shape of a multi-agent system, this is the wiring: how a coordinator actually spawns a subagent, what crosses the boundary between them, and how to run several at once. The recurring truth here &mdash; a subagent knows only what you put in its prompt.</p>
 
     <h3>What &amp; why</h3>
@@ -667,15 +700,25 @@
       <a class="btn-next locked" href="#s1-4" data-label="Continue to Section 1.4"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 1.4</span></a>
       <span class="gate-note">Answer all questions correctly to unlock.</span>
     </div>
+    </div>
   </section>
 
   <!-- ============ 1.4 ============ -->
-  <section class="stage" id="s1-4">s1-4
+  <section class="stage" id="s1-4">
     <div class="stage-head">
       <span class="stage-num">Section 1.4</span>
       <h2>Implement multi-step workflows with enforcement and handoff patterns</h2>
       <span class="domain-tag">Task Statement 1.4</span>
     </div>
+    <div class="lock-shade" data-locked-for="sec-1-3">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 1.3 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s1-3">Go to Section 1.3</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-1-4">
     <p class="lede">Some ordering is a preference; some is a hard requirement. When a step <em>must</em> happen before another &mdash; verify identity before moving money &mdash; a prompt instruction isn&rsquo;t enough, because prompts have a non-zero failure rate. That&rsquo;s where programmatic enforcement comes in.</p>
 
     <h3>What &amp; why</h3>
@@ -756,15 +799,25 @@
       <a class="btn-next locked" href="#s1-5" data-label="Continue to Section 1.5"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 1.5</span></a>
       <span class="gate-note">Answer all questions correctly to unlock.</span>
     </div>
+    </div>
   </section>
 
   <!-- ============ 1.5 ============ -->
-  <section class="stage" id="s1-5">s1-5
+  <section class="stage" id="s1-5">
     <div class="stage-head">
       <span class="stage-num">Section 1.5</span>
       <h2>Apply Agent SDK hooks for tool-call interception and data normalization</h2>
       <span class="domain-tag">Task Statement 1.5</span>
     </div>
+    <div class="lock-shade" data-locked-for="sec-1-4">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 1.4 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s1-4">Go to Section 1.4</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-1-5">
     <p class="lede">Hooks are the SDK&rsquo;s interception points &mdash; code that runs at a lifecycle moment to transform a tool result before the model sees it, or to block an outgoing tool call before it runs. They&rsquo;re how you get <em>deterministic</em> guarantees where prompts only offer probabilities.</p>
 
     <h3>What &amp; why</h3>
@@ -853,16 +906,26 @@
       <a class="btn-next locked" href="#s1-6" data-label="Continue to Section 1.6"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 1.6</span></a>
       <span class="gate-note">Answer all questions correctly to unlock.</span>
     </div>
+    </div>
   </section>
 
   <hr class="rule">
   <!-- ============ 1.6 ============ -->
-  <section class="stage" id="s1-6">s1-6
+  <section class="stage" id="s1-6">
     <div class="stage-head">
       <span class="stage-num">Section 1.6</span>
       <h2>Design task decomposition strategies for complex workflows</h2>
       <span class="domain-tag">Task Statement 1.6</span>
     </div>
+    <div class="lock-shade" data-locked-for="sec-1-5">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 1.5 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s1-5">Go to Section 1.5</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-1-6">
     <p class="lede">Not every complex task is decomposed the same way. Some split into a fixed sequence known up front; others have to grow their plan as they discover what&rsquo;s there. Choosing the right decomposition strategy for the workflow is the skill this section builds.</p>
 
     <h3>What &amp; why</h3>
@@ -951,15 +1014,25 @@
       <a class="btn-next locked" href="#s1-7" data-label="Continue to Section 1.7"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 1.7</span></a>
       <span class="gate-note">Answer all questions correctly to unlock.</span>
     </div>
+    </div>
   </section>
 
   <!-- ============ 1.7 ============ -->
-  <section class="stage" id="s1-7">s1-7
+  <section class="stage" id="s1-7">
     <div class="stage-head">
       <span class="stage-num">Section 1.7</span>
       <h2>Manage session state, resumption, and forking</h2>
       <span class="domain-tag">Task Statement 1.7</span>
     </div>
+    <div class="lock-shade" data-locked-for="sec-1-6">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 1.6 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s1-6">Go to Section 1.6</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-1-7">
     <p class="lede">Long-running work spans sessions, and branches into alternatives. Knowing how to resume a prior session, when to fork one, and &mdash; the subtle part &mdash; when <em>not</em> to resume because the prior context has gone stale, is what keeps extended work reliable.</p>
 
     <h3>What &amp; why</h3>
@@ -1049,6 +1122,7 @@
     <div class="sect-gate" data-for="sec-1-7">
       <a class="btn-next locked" href="#close" data-label="Continue to the wrap-up"><span class="lockicn">&#128274;</span><span class="btxt">Continue to the wrap-up</span></a>
       <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
     </div>
   </section>
 
@@ -1170,16 +1244,29 @@
 
   function unlockNext(id) {
     var gate = document.querySelector('.sect-gate[data-for="' + id + '"]');
-    if (!gate) return;
-    var btn  = gate.querySelector('.btn-next');
-    var note = gate.querySelector('.gate-note');
-    if (btn) {
-      btn.classList.remove('locked');
-      btn.classList.add('unlocked');
-      var ic = btn.querySelector('.lockicn');
-      if (ic) ic.innerHTML = '&#10003;';
+    if (gate) {
+      var btn  = gate.querySelector('.btn-next');
+      var note = gate.querySelector('.gate-note');
+      if (btn) {
+        btn.classList.remove('locked');
+        btn.classList.add('unlocked');
+        var ic = btn.querySelector('.lockicn');
+        if (ic) ic.innerHTML = '&#10003;';
+      }
+      if (note) { note.textContent = 'Section complete — next section unlocked.'; note.classList.add('unlocked'); }
     }
-    if (note) { note.textContent = 'Section complete — next section unlocked.'; note.classList.add('unlocked'); }
+    revealFor(id);
+  }
+
+  /* reveal the section whose prerequisite is `id` */
+  function revealFor(id) {
+    var shade = document.querySelector('.lock-shade[data-locked-for="' + id + '"]');
+    if (!shade) return;
+    shade.classList.add('hidden');
+    var sec = shade.closest('.stage');
+    if (sec) sec.classList.remove('is-locked');
+    var body = sec ? sec.querySelector('.sect-body') : null;
+    if (body) body.classList.add('open');
   }
 
   /* ── quiz rendering / grading ─────────────────────────────────────────── */
@@ -1265,6 +1352,16 @@
       var panel = document.getElementById('mod-done');
       if (panel) panel.classList.add('show');
     }
+    // reveal any section whose prerequisite is already complete; lock the rest
+    document.querySelectorAll('.lock-shade').forEach(function (shade) {
+      var prereq = shade.getAttribute('data-locked-for');
+      var sec = shade.closest('.stage');
+      if (isSectionComplete(prereq)) {
+        revealFor(prereq);
+      } else if (sec) {
+        sec.classList.add('is-locked');
+      }
+    });
   }
 
   /* ── wire up ──────────────────────────────────────────────────────────── */
