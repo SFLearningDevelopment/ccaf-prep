@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<!-- build: 2026071504 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA Knowledge Track · Module 3 · Claude Code Configuration &amp; Workflows</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* ---- module-specific ---- */
+.antipattern{background:#fbeeee;border:1px solid #e3b7b0;border-left:3px solid #b0432f;border-radius:8px;padding:16px 20px;margin:22px 0;font-size:15px}
+.antipattern .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#b0432f;margin-bottom:8px;font-weight:600}
+.antipattern ul{margin:8px 0 0;padding-left:20px}
+.antipattern li{margin:5px 0}
+.capstone{background:#eaf1ee;border:1px solid #bcd6cb;border-radius:10px;padding:16px 20px;margin:22px 0;display:flex;gap:14px;align-items:flex-start}
+.capstone .icn{color:var(--accent);font-size:20px;line-height:1;flex-shrink:0;margin-top:1px}
+.capstone .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:600}
+.capstone a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(47,111,94,.35)}
+.capstone a:hover{border-bottom-color:var(--accent)}
+.kpoints{margin:16px 0}
+.kpoints .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+.taskref{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+.in-practice{margin:16px 0}
+.in-practice .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+
+/* ---- knowledge check MCQ ---- */
+.kcheck{background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-radius:12px;padding:24px 26px;margin:28px 0 0}
+.kcheck > .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;font-weight:600}
+.kcheck .kc-sub{font-size:13.5px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5}
+.kq{margin:0 0 20px;padding:0 0 20px;border-bottom:1px dashed #c5d8d0}
+.kcheck .kq:last-of-type{border-bottom:none;padding-bottom:6px;margin-bottom:10px}
+.kq .qtext{display:block;font-weight:600;font-size:15.5px;margin:0 0 14px;color:var(--ink);line-height:1.5}
+.kq .qnum{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--accent);background:#dfeae5;border-radius:4px;padding:2px 6px;margin-right:9px;vertical-align:2px}
+.kq .opt{display:flex!important;width:100%;box-sizing:border-box;gap:11px;align-items:flex-start;padding:11px 14px;margin:0 0 8px;background:var(--card);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14.5px;line-height:1.55;transition:border-color .12s,background .12s}
+.kq .opt:hover{border-color:var(--accent);background:#fbfaf7}
+.kq .opt input{margin:3px 0 0;flex:0 0 auto;cursor:pointer;accent-color:var(--accent)}
+.kq .opt > span{flex:1 1 auto}
+.kq .opt.correct{background:#e5efe9;border-color:var(--accent)}
+.kq .opt.wrong{background:#fbeeee;border-color:#c98374}
+.kq .opt.disabled{cursor:default}
+.kq .opt.disabled:hover{border-color:var(--line);background:var(--card)}
+.kq .opt.correct.disabled{border-color:var(--accent);background:#e5efe9}
+.kfb{display:none;margin:12px 0 0;padding:12px 15px;border-radius:8px;font-size:14px;line-height:1.6}
+.kfb.show{display:block}
+.kfb.ok{background:#e5efe9;border:1px solid #bcd6cb;color:#245244}
+.kfb.no{background:#fbeeee;border:1px solid #e3b7b0;color:#8f3a2b}
+.kfb strong{font-weight:600}
+.kc-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.btn-check{font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:8px;padding:11px 22px;cursor:pointer;transition:opacity .15s}
+.btn-check:hover:not(:disabled){opacity:.88}
+.btn-check:disabled{background:#bfcbc6;cursor:not-allowed}
+.kc-status{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+.kc-status.done{color:var(--accent);font-weight:600}
+
+/* section gate — toggle button */
+.sect-gate{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 8px;padding:18px 26px 26px;background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-top:none;border-radius:0 0 12px 12px}
+.btn-next{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-size:15px;font-weight:600;text-decoration:none;border:none;border-radius:8px;padding:12px 24px;transition:background .18s,color .18s,opacity .15s}
+.btn-next .lockicn{font-size:13px;line-height:1}
+.btn-next.locked{background:#d3dbd8;color:#7d8a85;cursor:not-allowed;pointer-events:none}
+.btn-next.unlocked{background:var(--accent);color:#fff;cursor:pointer}
+.btn-next.unlocked:hover{opacity:.88}
+.gate-note{font-size:13.5px;color:var(--ink-soft)}
+.gate-note.unlocked{color:var(--accent);font-weight:600}
+
+.mod-done{background:#e5efe9;border:1px solid #bcd6cb;border-radius:12px;padding:24px 26px;margin:28px 0;display:none}
+.mod-done.show{display:block}
+.mod-done h3{margin:0 0 8px;font-size:19px;color:var(--accent)}
+.mod-done p{margin:0;font-size:15px;color:var(--ink-soft);line-height:1.6}
+.reset-link{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0}
+.reset-link:hover{color:var(--accent)}
+
+/* ---- section locking ---- */
+.lock-shade{display:flex;align-items:center;gap:16px;background:var(--paper-2);border:1px dashed #c8bfa9;border-radius:12px;padding:20px 24px;margin:20px 0 8px}
+.lock-shade .lock-ic{font-size:22px;line-height:1;opacity:.55;flex-shrink:0}
+.lock-shade strong{display:block;font-size:15px;color:var(--ink);margin-bottom:3px}
+.lock-shade p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.lock-shade > div{flex:1 1 auto}
+.lock-jump{flex-shrink:0;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid #bcd6cb;background:#eef3f1;border-radius:7px;padding:9px 15px;transition:background .15s}
+.lock-jump:hover{background:#e0ebe6}
+.lock-shade.hidden{display:none}
+.sect-body{display:none}
+.sect-body.open{display:block}
+.stage.is-locked .stage-head h2{opacity:.5}
+.stage.is-locked .domain-tag{opacity:.5}
+</style>
+</head><body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · CCA Knowledge Track</p>
+    <h1 class="title">Module 3<br><em>Claude Code</em> Configuration &amp; Workflows</h1>
+    <p class="standfirst">
+      Modules 1 and 2 covered agents and the tools they call. This domain is about configuring
+      Claude Code itself &mdash; where instructions live and who they reach, custom commands and
+      skills, rules that load only when relevant, when to plan versus just execute, how to
+      iterate effectively, and running it headless in CI. Six task statements on the day-to-day
+      craft.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Completing this module does not grant a certificate and is not the CCA exam. The exam is
+        booked separately through Anthropic and has its own prerequisites. This track is the
+        structured-knowledge companion to the hands-on capstone labs &mdash; use both.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>This module, in six sections</h2>
+    <p class="sub">One per task statement in the Claude Code Configuration &amp; Workflows domain. Each pairs the knowledge the exam tests with the anti-patterns it probes &mdash; and links to the capstone lab where you build it.</p>
+    <ol>
+      <li><div class="rm-body"><a href="#s3-1">3.1 · CLAUDE.md hierarchy &amp; organization</a><small>user vs project vs directory, @import, rules/</small></div><span class="rm-domain">Task 3.1</span></li>
+      <li><div class="rm-body"><a href="#s3-2">3.2 · Custom slash commands &amp; skills</a><small>scoping, SKILL.md frontmatter, context: fork</small></div><span class="rm-domain">Task 3.2</span></li>
+      <li><div class="rm-body"><a href="#s3-3">3.3 · Path-specific rules</a><small>glob frontmatter, conditional loading</small></div><span class="rm-domain">Task 3.3</span></li>
+      <li><div class="rm-body"><a href="#s3-4">3.4 · Plan mode vs direct execution</a><small>when to plan, the Explore subagent</small></div><span class="rm-domain">Task 3.4</span></li>
+      <li><div class="rm-body"><a href="#s3-5">3.5 · Iterative refinement techniques</a><small>examples, test-driven, the interview pattern</small></div><span class="rm-domain">Task 3.5</span></li>
+      <li><div class="rm-body"><a href="#s3-6">3.6 · Claude Code in CI/CD</a><small>-p, --output-format json, independent review</small></div><span class="rm-domain">Task 3.6</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>How to use this module</h3>
+    <p>Same fixed shape as Modules 1 and 2: <strong>what &amp; why</strong>, <strong>knowledge points</strong>, <strong>in practice</strong>, <strong>anti-patterns</strong>, an <strong>exam lens</strong>, and a gated <strong>knowledge check</strong>, with a capstone link where a lab exercises the idea. Answer every question correctly to unlock the next section.</p>
+    <div class="note">
+      A theme worth holding onto: this domain is largely about <strong>getting the right context to
+      Claude at the right moment</strong> &mdash; not too much, not too little, and scoped to who needs
+      it. Hierarchy, path rules, skills, and plan mode are all answers to that same question.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ 3.1 ============ -->
+  <section class="stage" id="s3-1">
+    <div class="stage-head">
+      <span class="stage-num">Section 3.1</span>
+      <h2>Configure CLAUDE.md files with hierarchy, scoping, and modular organization</h2>
+      <span class="domain-tag">Task Statement 3.1</span>
+    </div>
+    <p class="lede">CLAUDE.md is how you tell Claude Code about your project once, instead of every session. The catch is <em>where</em> you put it: the same instructions in the wrong file reach only you, or reach every project you touch. Hierarchy is the whole game here.</p>
+
+    <h3>What &amp; why</h3>
+    <p>There are three levels. <strong>User-level</strong> (<code>~/.claude/CLAUDE.md</code>) applies to you across all your projects &mdash; and critically, it is <em>not</em> shared with teammates via version control. <strong>Project-level</strong> (<code>.claude/CLAUDE.md</code> or a root <code>CLAUDE.md</code>) is committed, so the whole team gets it. <strong>Directory-level</strong> CLAUDE.md files apply to work in that subdirectory. As the file grows, you keep it modular with the <strong><code>@import</code> syntax</strong> to reference external standards files, or split it into topic-specific files under <strong><code>.claude/rules/</code></strong>.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The hierarchy: <strong>user-level</strong> (<code>~/.claude/CLAUDE.md</code>), <strong>project-level</strong> (<code>.claude/CLAUDE.md</code> or root <code>CLAUDE.md</code>), <strong>directory-level</strong> (subdirectory files).</li>
+        <li><strong>User-level settings apply only to that user</strong> &mdash; instructions in <code>~/.claude/CLAUDE.md</code> are not shared with teammates via version control.</li>
+        <li>The <strong><code>@import</code> syntax</strong> for referencing external files to keep CLAUDE.md modular.</li>
+        <li><strong><code>.claude/rules/</code></strong> as an alternative to a monolithic CLAUDE.md, organizing topic-specific rule files.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li><strong>Diagnose hierarchy issues</strong> &mdash; e.g. a new team member not getting instructions because they live in user-level rather than project-level config.</li>
+        <li>Use <strong><code>@import</code> to selectively include relevant standards files</strong> in each package's CLAUDE.md.</li>
+        <li><strong>Split large CLAUDE.md files</strong> into focused files in <code>.claude/rules/</code> (<code>testing.md</code>, <code>api-conventions.md</code>, <code>deployment.md</code>).</li>
+        <li>Use the <strong><code>/memory</code> command</strong> to verify which memory files are loaded and diagnose inconsistent behavior across sessions.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Putting <strong>team conventions in <code>~/.claude/CLAUDE.md</code></strong> and wondering why teammates don't follow them &mdash; user-level isn't shared.</li>
+        <li>Letting CLAUDE.md grow into a <strong>monolithic wall of instructions</strong> instead of using <code>@import</code> or <code>.claude/rules/</code>.</li>
+        <li>Guessing at <strong>why behavior differs between sessions</strong> instead of running <code>/memory</code> to see what's actually loaded.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The signature scenario: a developer's conventions work for them but a <strong>new team member
+      doesn't get them</strong>. The answer is always the hierarchy &mdash; the instructions are in
+      user-level config and need to move to <strong>project-level</strong> so version control shares
+      them. If a question mentions inconsistent behavior across sessions, <strong><code>/memory</code></strong>
+      is how you diagnose it.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code Development Workflow</strong> lab starts by building the CLAUDE.md
+        hierarchy for a real project &mdash; deciding what belongs at which level and why.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-3-1">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="User-level config applies only to you and never travels with the repo. Team conventions belong in project-level config so version control shares them." data-why-no="This is the signature hierarchy bug: instructions in &lt;code&gt;~/.claude/CLAUDE.md&lt;/code&gt; are user-level — they apply only to you and are not shared with teammates via version control.">
+          <p class="qtext"><span class="qnum">Q1</span>You've documented your team's coding conventions and Claude follows them perfectly for you. A new team member clones the repo and Claude ignores every convention. Where are your instructions?</p>
+          <label class="opt"><input type="radio" name="sec-3-1-q1" value="a"><span>In a directory-level CLAUDE.md that wasn't committed</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q1" value="b"><span>In <code>~/.claude/CLAUDE.md</code> — user-level config, which isn't shared via version control</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q1" value="c"><span>In <code>.claude/rules/</code> with the wrong glob pattern</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q1" value="d"><span>In a skill that the new member hasn't invoked</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="&lt;code&gt;.claude/rules/&lt;/code&gt; and &lt;code&gt;@import&lt;/code&gt; both exist to keep configuration modular instead of monolithic." data-why-no="The named approaches are splitting into topic-specific files under &lt;code&gt;.claude/rules/&lt;/code&gt; (testing.md, api-conventions.md, deployment.md) or using &lt;code&gt;@import&lt;/code&gt; to reference external files.">
+          <p class="qtext"><span class="qnum">Q2</span>Your project CLAUDE.md has grown into a 600-line wall covering testing, API conventions, and deployment. What's the recommended way to organize it?</p>
+          <label class="opt"><input type="radio" name="sec-3-1-q2" value="a"><span>Move it all to user-level config so it loads faster</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q2" value="b"><span>Split it into topic-specific files in <code>.claude/rules/</code>, or use <code>@import</code> to reference external standards files</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q2" value="c"><span>Delete the least-used sections</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q2" value="d"><span>Convert the whole file into a slash command</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="&lt;code&gt;/memory&lt;/code&gt; shows what&#x27;s actually loaded — the direct way to diagnose inconsistent behavior rather than guessing." data-why-no="The &lt;code&gt;/memory&lt;/code&gt; command exists precisely to verify which memory files are loaded and diagnose inconsistent behavior across sessions.">
+          <p class="qtext"><span class="qnum">Q3</span>Claude Code is behaving inconsistently across sessions and you suspect a memory file issue. What do you use to diagnose it?</p>
+          <label class="opt"><input type="radio" name="sec-3-1-q3" value="a"><span>The <code>/memory</code> command, to verify which memory files are loaded</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q3" value="b"><span>Delete all CLAUDE.md files and rebuild from scratch</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q3" value="c"><span>Check the git history of the config files</span></label>
+          <label class="opt"><input type="radio" name="sec-3-1-q3" value="d"><span>Run with <code>--verbose</code> and read the logs</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-3-1">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-3-1">
+      <a class="btn-next locked" href="#s3-2" data-label="Continue to Section 3.2"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 3.2</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+  </section>
+
+  <!-- ============ 3.2 ============ -->
+  <section class="stage" id="s3-2">
+    <div class="stage-head">
+      <span class="stage-num">Section 3.2</span>
+      <h2>Create and configure custom slash commands and skills</h2>
+      <span class="domain-tag">Task Statement 3.2</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-3-1">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 3.1 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s3-1">Go to Section 3.1</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-3-2">
+    <p class="lede">Slash commands and skills are how you package a repeatable workflow so it's one invocation instead of a paragraph of instructions. The design decisions: who gets it (project vs personal), what tools it may touch, and whether its output should pollute your main conversation.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Slash commands</strong> live in <code>.claude/commands/</code> (project-scoped, shared via version control) or <code>~/.claude/commands/</code> (personal). <strong>Skills</strong> live in <code>.claude/skills/</code> with a <code>SKILL.md</code> that supports frontmatter: <code>context: fork</code>, <code>allowed-tools</code>, and <code>argument-hint</code>. The one to understand deeply is <strong><code>context: fork</code></strong> &mdash; it runs the skill in an isolated sub-agent context so its output doesn't pollute the main conversation, which matters enormously for verbose work. And the choice between skills and CLAUDE.md is about <em>when</em> the content is needed: skills are on-demand for task-specific workflows; CLAUDE.md is always-loaded universal standards.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Project-scoped commands</strong> in <code>.claude/commands/</code> (shared via version control) vs <strong>user-scoped</strong> in <code>~/.claude/commands/</code> (personal).</li>
+        <li>Skills in <code>.claude/skills/</code> with <strong>SKILL.md frontmatter</strong>: <code>context: fork</code>, <code>allowed-tools</code>, <code>argument-hint</code>.</li>
+        <li><strong><code>context: fork</code></strong> runs a skill in an isolated sub-agent context, preventing skill output from polluting the main conversation.</li>
+        <li><strong>Personal skill customization</strong>: create variants in <code>~/.claude/skills/</code> with different names to avoid affecting teammates.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Create <strong>project-scoped slash commands</strong> in <code>.claude/commands/</code> for team-wide availability.</li>
+        <li>Use <strong><code>context: fork</code> to isolate verbose skills</strong> &mdash; codebase analysis, or exploratory brainstorming &mdash; from the main session.</li>
+        <li>Configure <strong><code>allowed-tools</code> in frontmatter</strong> to restrict tool access during skill execution (e.g. limiting to file writes to prevent destructive actions).</li>
+        <li>Use <strong><code>argument-hint</code></strong> to prompt developers for required parameters when they invoke a skill without arguments.</li>
+        <li><strong>Choose skills vs CLAUDE.md</strong>: on-demand task workflows vs always-loaded universal standards.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Putting <strong>universal standards in a skill</strong> (never loaded unless invoked) or a <strong>one-off workflow in CLAUDE.md</strong> (loaded always, wasting context).</li>
+        <li>Running a <strong>verbose analysis skill without <code>context: fork</code></strong> &mdash; its output floods the main conversation.</li>
+        <li><strong>Editing a shared team skill</strong> to suit yourself instead of making a personal variant in <code>~/.claude/skills/</code>.</li>
+        <li>Leaving <strong><code>allowed-tools</code> unset</strong> on a skill that shouldn't be able to run destructive commands.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Two reliable items. One: a skill produces pages of output that derails the session &mdash; the
+      answer is <strong><code>context: fork</code></strong>. Two: skills-vs-CLAUDE.md &mdash; ask
+      <em>&ldquo;is this always relevant, or only for a specific task?&rdquo;</em> Always &rarr; CLAUDE.md.
+      Task-specific &rarr; skill. Also know that customizing a shared skill for yourself means a
+      <strong>personal variant with a different name</strong>, not editing the team's copy.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code Development Workflow</strong> lab builds custom slash commands and a
+        skill with frontmatter &mdash; including deciding what gets <code>context: fork</code>.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-3-2">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="&lt;code&gt;context: fork&lt;/code&gt; isolates the skill&#x27;s execution so its verbose output never pollutes the main conversation." data-why-no="&lt;code&gt;context: fork&lt;/code&gt; is the named frontmatter option for exactly this: running a skill in an isolated sub-agent context so its output doesn&#x27;t pollute the main session.">
+          <p class="qtext"><span class="qnum">Q1</span>You have a codebase-analysis skill that produces pages of verbose output, and running it derails your main conversation. What's the fix?</p>
+          <label class="opt"><input type="radio" name="sec-3-2-q1" value="a"><span>Shorten the skill's output with a summary instruction</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q1" value="b"><span>Add <code>context: fork</code> to the skill's frontmatter so it runs in an isolated sub-agent context</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q1" value="c"><span>Move the skill to <code>~/.claude/skills/</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q1" value="d"><span>Set <code>allowed-tools</code> to restrict what it can read</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="CLAUDE.md is always-loaded universal standards; skills are on-demand task-specific workflows. Always relevant → CLAUDE.md." data-why-no="The distinction is &lt;em&gt;when&lt;/em&gt; it&#x27;s needed. CLAUDE.md = always-loaded universal standards. Skills = on-demand, task-specific workflows. Only the universal standards belong in CLAUDE.md.">
+          <p class="qtext"><span class="qnum">Q2</span>Which belongs in CLAUDE.md rather than a skill?</p>
+          <label class="opt"><input type="radio" name="sec-3-2-q2" value="a"><span>A multi-step release checklist you run once a month</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q2" value="b"><span>A codebase-analysis workflow invoked on demand</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q2" value="c"><span>Universal coding standards that apply to every session</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q2" value="d"><span>An exploratory brainstorming routine</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Personal customization goes in your user-scoped skills directory under a different name, so teammates are unaffected." data-why-no="Editing the shared skill changes it for everyone. The named practice is a personal variant in &lt;code&gt;~/.claude/skills/&lt;/code&gt; with a different name to avoid affecting teammates.">
+          <p class="qtext"><span class="qnum">Q3</span>A shared team skill almost fits your workflow, but you want a tweak. What's the right move?</p>
+          <label class="opt"><input type="radio" name="sec-3-2-q3" value="a"><span>Edit the team's skill in <code>.claude/skills/</code> — it's version-controlled, so it's revertible</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q3" value="b"><span>Create a personal variant in <code>~/.claude/skills/</code> with a different name</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q3" value="c"><span>Copy it into CLAUDE.md and modify it there</span></label>
+          <label class="opt"><input type="radio" name="sec-3-2-q3" value="d"><span>Fork the repository</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-3-2">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-3-2">
+      <a class="btn-next locked" href="#s3-3" data-label="Continue to Section 3.3"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 3.3</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.3 ============ -->
+  <section class="stage" id="s3-3">
+    <div class="stage-head">
+      <span class="stage-num">Section 3.3</span>
+      <h2>Apply path-specific rules for conditional convention loading</h2>
+      <span class="domain-tag">Task Statement 3.3</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-3-2">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 3.2 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s3-2">Go to Section 3.2</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-3-3">
+    <p class="lede">Not every convention applies everywhere. Terraform rules matter in <code>terraform/</code>; test conventions matter for test files wherever they live. Path-specific rules load only when you're editing matching files &mdash; less irrelevant context, fewer tokens, sharper behavior.</p>
+
+    <h3>What &amp; why</h3>
+    <p>Files in <code>.claude/rules/</code> can carry <strong>YAML frontmatter with a <code>paths</code> field</strong> containing glob patterns. The rule activates only when the file being edited matches. That does two things: it cuts irrelevant context and token usage, and &mdash; the part the exam cares about &mdash; it handles conventions that <strong>span multiple directories</strong>, which a directory-level CLAUDE.md fundamentally can't. Test files scattered across a codebase are the canonical case: <code>**/*.test.tsx</code> catches them all regardless of location.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><code>.claude/rules/</code> files with <strong>YAML frontmatter <code>paths</code> fields</strong> containing glob patterns for conditional activation.</li>
+        <li><strong>Path-scoped rules load only when editing matching files</strong>, reducing irrelevant context and token usage.</li>
+        <li>The advantage of <strong>glob-pattern rules over directory-level CLAUDE.md</strong> for conventions spanning multiple directories (e.g. test files spread throughout).</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Create rules with <strong>path scoping</strong> — e.g. <code>paths: ["terraform/**/*"]</code> — so they load only for matching files.</li>
+        <li>Use <strong>glob patterns to apply conventions by file type regardless of directory</strong> (<code>**/*.test.tsx</code> for all test files).</li>
+        <li><strong>Choose path-specific rules over subdirectory CLAUDE.md</strong> when conventions must apply to files spread across the codebase.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Using <strong>directory-level CLAUDE.md for cross-cutting conventions</strong> — you'd have to duplicate it into every directory that contains a test file.</li>
+        <li>Putting <strong>narrow, path-specific conventions in the root CLAUDE.md</strong> — loaded always, relevant rarely, wasting context on every session.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The tell is <em>&ldquo;spread across the codebase.&rdquo;</em> Conventions confined to one directory
+      &rarr; a directory CLAUDE.md is fine. Conventions that follow a <em>file type</em> wherever it
+      lives (tests, migrations, <code>.tf</code> files) &rarr; <strong>path-specific rules with glob
+      frontmatter</strong>. The distractor is duplicating a directory-level file everywhere.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code Development Workflow</strong> lab adds path-scoped rules and shows them
+        activating only for matching files.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-3-3">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="c" data-why-ok="Glob-pattern path rules apply conventions by file type regardless of directory — exactly the cross-cutting case directory CLAUDE.md can&#x27;t handle." data-why-no="This is the named advantage of glob-pattern rules over directory-level CLAUDE.md: conventions that follow a &lt;em&gt;file type&lt;/em&gt; across directories. Duplicating a CLAUDE.md into every directory is the anti-pattern.">
+          <p class="qtext"><span class="qnum">Q1</span>Your test files live all over the codebase — <code>src/</code>, <code>lib/</code>, <code>packages/*/</code> — and you want test conventions to apply to all of them. What's the right mechanism?</p>
+          <label class="opt"><input type="radio" name="sec-3-3-q1" value="a"><span>A directory-level CLAUDE.md in each directory containing tests</span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q1" value="b"><span>A root CLAUDE.md section describing test conventions</span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q1" value="c"><span>A <code>.claude/rules/</code> file with <code>paths: ["**/*.test.tsx"]</code> frontmatter</span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q1" value="d"><span>A slash command developers run before writing tests</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="Conditional loading is the point: irrelevant conventions never enter context, saving tokens and keeping behavior focused." data-why-no="The stated benefit is conditional loading — path-scoped rules activate only when the file being edited matches, which reduces irrelevant context and token usage.">
+          <p class="qtext"><span class="qnum">Q2</span>What's the practical benefit of path-scoped rules beyond organization?</p>
+          <label class="opt"><input type="radio" name="sec-3-3-q2" value="a"><span>They load only when editing matching files, reducing irrelevant context and token usage</span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q2" value="b"><span>They override user-level configuration</span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q2" value="c"><span>They execute faster than CLAUDE.md instructions</span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q2" value="d"><span>They can restrict which tools Claude may use</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="A glob pattern matching everything beneath the directory — the documented form for path scoping." data-why-no="Path scoping uses glob patterns in the &lt;code&gt;paths&lt;/code&gt; frontmatter field, e.g. &lt;code&gt;paths: [&quot;terraform/**/*&quot;]&lt;/code&gt;.">
+          <p class="qtext"><span class="qnum">Q3</span>You have conventions that apply only to files under <code>terraform/</code>. Which frontmatter scopes them correctly?</p>
+          <label class="opt"><input type="radio" name="sec-3-3-q3" value="a"><span><code>paths: ["terraform"]</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q3" value="b"><span><code>paths: ["terraform/**/*"]</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q3" value="c"><span><code>scope: terraform</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-3-q3" value="d"><span><code>directory: terraform/</code></span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-3-3">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-3-3">
+      <a class="btn-next locked" href="#s3-4" data-label="Continue to Section 3.4"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 3.4</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.4 ============ -->
+  <section class="stage" id="s3-4">
+    <div class="stage-head">
+      <span class="stage-num">Section 3.4</span>
+      <h2>Determine when to use plan mode vs direct execution</h2>
+      <span class="domain-tag">Task Statement 3.4</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-3-3">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 3.3 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s3-3">Go to Section 3.3</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-3-4">
+    <p class="lede">Plan mode explores and designs before touching anything; direct execution just does the work. Using plan mode for a one-line fix is friction; skipping it on a 45-file migration is how you get expensive rework. Knowing which is which is the skill.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Plan mode</strong> is for complex tasks: large-scale changes, multiple valid approaches, architectural decisions, multi-file modifications. It enables safe codebase exploration and design <em>before</em> committing to changes, which prevents costly rework. <strong>Direct execution</strong> suits simple, well-scoped changes — a single validation check, a one-file bug fix with a clear stack trace. They also combine well: plan the investigation, then execute the planned approach directly. Separately, the <strong>Explore subagent</strong> isolates verbose discovery output and returns a summary, preserving your main conversation's context.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Plan mode</strong> is designed for large-scale changes, multiple valid approaches, architectural decisions, and multi-file modifications.</li>
+        <li><strong>Direct execution</strong> is appropriate for simple, well-scoped changes (adding a single validation check to one function).</li>
+        <li>Plan mode enables <strong>safe exploration and design before committing</strong>, preventing costly rework.</li>
+        <li>The <strong>Explore subagent</strong> isolates verbose discovery output and returns summaries to preserve main-conversation context.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Select <strong>plan mode for architectural implications</strong> — microservice restructuring, a library migration affecting 45+ files, choosing between integration approaches with different infrastructure requirements.</li>
+        <li>Select <strong>direct execution for well-understood changes</strong> — a single-file bug fix with a clear stack trace, adding a date validation conditional.</li>
+        <li>Use the <strong>Explore subagent for verbose discovery</strong> to prevent context exhaustion during multi-phase tasks.</li>
+        <li><strong>Combine both</strong>: plan mode for investigation, direct execution for implementation.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Plan mode for a trivial, well-scoped fix</strong> — needless ceremony on a one-line change.</li>
+        <li><strong>Direct execution on a 45-file migration</strong> with several viable approaches — you commit before you understand, and pay in rework.</li>
+        <li>Running <strong>verbose discovery in the main session</strong> instead of delegating to the Explore subagent, exhausting context before the real work starts.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Scenarios give you a task and ask which mode. The signals: <strong>multiple valid approaches,
+      architectural stakes, many files</strong> &rarr; plan mode. <strong>Clear scope, one file, an
+      obvious fix</strong> &rarr; direct execution. And when a question mentions <em>verbose
+      exploration eating context</em>, the answer is the <strong>Explore subagent</strong> — isolate the
+      noise, return a summary.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code Development Workflow</strong> lab has you make this call on real tasks;
+        the <strong>Developer Productivity</strong> lab uses the Explore subagent on a large codebase.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-3-4">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Multiple valid approaches + architectural implications + many files is the textbook plan-mode case. Committing before understanding is how you pay in rework." data-why-no="Plan mode is designed for exactly this: large-scale changes, multiple valid approaches, architectural decisions, multi-file modifications. Direct execution here risks costly rework.">
+          <p class="qtext"><span class="qnum">Q1</span>You're migrating a library across 45+ files, and there are two viable approaches with different infrastructure implications. Plan mode or direct execution?</p>
+          <label class="opt"><input type="radio" name="sec-3-4-q1" value="a"><span>Direct execution — the change is mechanical once you start</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q1" value="b"><span>Plan mode — multiple valid approaches and architectural implications across many files</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q1" value="c"><span>Direct execution, with a rollback plan</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q1" value="d"><span>Neither — split it into 45 separate sessions</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Simple, well-understood, clearly scoped changes are the direct-execution case. Plan mode here is friction with no payoff." data-why-no="Direct execution is appropriate for simple, well-scoped changes — a single-file bug fix with a clear stack trace is the canonical example.">
+          <p class="qtext"><span class="qnum">Q2</span>A stack trace points at one function; you need to add a null check. Plan mode or direct execution?</p>
+          <label class="opt"><input type="radio" name="sec-3-4-q2" value="a"><span>Plan mode — every change deserves a plan</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q2" value="b"><span>Plan mode, to check for similar bugs elsewhere</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q2" value="c"><span>Direct execution — simple, well-scoped, clear stack trace</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q2" value="d"><span>Plan mode, then direct execution</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="The Explore subagent isolates verbose discovery output and returns a summary, preserving the main conversation&#x27;s context for the actual work." data-why-no="The Explore subagent exists for this: isolating verbose discovery output and returning summaries, so the main conversation&#x27;s context survives for the real task.">
+          <p class="qtext"><span class="qnum">Q3</span>A multi-phase task keeps exhausting your context during the discovery phase, before the real work begins. What's the recommended tool?</p>
+          <label class="opt"><input type="radio" name="sec-3-4-q3" value="a"><span>The Explore subagent, to isolate verbose discovery and return summaries</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q3" value="b"><span>Plan mode, which uses less context</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q3" value="c"><span>Run <code>/compact</code> repeatedly during discovery</span></label>
+          <label class="opt"><input type="radio" name="sec-3-4-q3" value="d"><span>Split the task into separate sessions</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-3-4">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-3-4">
+      <a class="btn-next locked" href="#s3-5" data-label="Continue to Section 3.5"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 3.5</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.5 ============ -->
+  <section class="stage" id="s3-5">
+    <div class="stage-head">
+      <span class="stage-num">Section 3.5</span>
+      <h2>Apply iterative refinement techniques for progressive improvement</h2>
+      <span class="domain-tag">Task Statement 3.5</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-3-4">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 3.4 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s3-4">Go to Section 3.4</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-3-5">
+    <p class="lede">Prose is a lossy way to describe a transformation. Examples aren't. This section is a set of techniques for closing the gap between what you meant and what you got — and for knowing when to fix things all at once versus one at a time.</p>
+
+    <h3>What &amp; why</h3>
+    <p>When a prose description gets interpreted inconsistently, <strong>concrete input/output examples</strong> are the most effective fix — they communicate the expected transformation exactly. <strong>Test-driven iteration</strong> writes the test suite first, then iterates by sharing failures. The <strong>interview pattern</strong> has Claude ask <em>you</em> questions to surface considerations you hadn't thought of, before implementing. And there's a judgment call on batching fixes: <strong>interacting problems go in a single message</strong> (fixing one affects another), while <strong>independent problems iterate sequentially</strong>.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Concrete input/output examples</strong> as the most effective way to communicate expected transformations when prose is interpreted inconsistently.</li>
+        <li><strong>Test-driven iteration</strong>: write test suites first, then iterate by sharing test failures.</li>
+        <li>The <strong>interview pattern</strong>: having Claude ask questions to surface considerations you may not have anticipated before implementing.</li>
+        <li>When to provide <strong>all issues in a single message</strong> (interacting problems) versus <strong>fixing them sequentially</strong> (independent problems).</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Provide <strong>2–3 concrete input/output examples</strong> when natural-language descriptions produce inconsistent results.</li>
+        <li>Write test suites covering <strong>expected behavior, edge cases, and performance</strong> before implementation, then iterate by sharing failures.</li>
+        <li>Use the <strong>interview pattern</strong> to surface design considerations (cache invalidation strategy, failure modes) before implementing in an unfamiliar domain.</li>
+        <li>Provide <strong>specific test cases with example input and expected output</strong> to fix edge-case handling (null values in a migration script).</li>
+        <li><strong>Batch interacting fixes</strong> in one detailed message; iterate sequentially on independent ones.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Re-describing a transformation in more prose</strong> when it keeps coming out wrong — examples communicate what words can't.</li>
+        <li><strong>Fixing interacting issues one at a time</strong> — each fix disturbs the others; they need to be addressed together.</li>
+        <li><strong>Implementing in an unfamiliar domain without an interview</strong>, then discovering the unasked questions in production.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      &ldquo;I explained it three times and it still gets it wrong&rdquo; &rarr; <strong>concrete
+      input/output examples</strong>, not a fourth explanation. &ldquo;Several bugs, and fixing one breaks
+      another&rdquo; &rarr; <strong>one message with all of them</strong>, because they interact.
+      Independent bugs &rarr; sequential. The interview pattern shows up as &ldquo;unfamiliar domain,
+      unclear requirements.&rdquo;
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code Development Workflow</strong> lab practices test-driven iteration and
+        example-led refinement on a real feature.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-3-5">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Concrete examples are the named most-effective technique when prose descriptions are interpreted inconsistently." data-why-no="When prose keeps getting interpreted inconsistently, more prose won&#x27;t fix it. Concrete input/output examples communicate the transformation exactly.">
+          <p class="qtext"><span class="qnum">Q1</span>You've described a data transformation three times in prose and Claude keeps interpreting it differently. What works better?</p>
+          <label class="opt"><input type="radio" name="sec-3-5-q1" value="a"><span>A longer, more precise prose description</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q1" value="b"><span>2–3 concrete input/output examples showing the expected transformation</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q1" value="c"><span>Breaking the description into numbered steps</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q1" value="d"><span>Asking Claude to restate its understanding first</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Interacting problems need to be seen together — fixing them sequentially means each fix disturbs the others." data-why-no="The rule: interacting problems go in a single detailed message; independent problems iterate sequentially. These interact, so they go together.">
+          <p class="qtext"><span class="qnum">Q2</span>Your code review surfaces four bugs, and fixing any one of them changes how the others behave. How do you hand them over?</p>
+          <label class="opt"><input type="radio" name="sec-3-5-q2" value="a"><span>One at a time, verifying each fix before the next</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q2" value="b"><span>All four in a single detailed message, since they interact</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q2" value="c"><span>The two most severe first, then the others</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q2" value="d"><span>As four separate sessions to keep context clean</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="The interview pattern surfaces the considerations you didn&#x27;t know to raise — cache invalidation, failure modes — before implementation locks them in." data-why-no="The interview pattern is designed for exactly this: having Claude ask questions to surface design considerations you may not have anticipated, before implementing.">
+          <p class="qtext"><span class="qnum">Q3</span>You're implementing in a domain you don't know well and you're unsure what questions to even ask. Which technique fits?</p>
+          <label class="opt"><input type="radio" name="sec-3-5-q3" value="a"><span>Test-driven iteration — write tests first</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q3" value="b"><span>The interview pattern — have Claude ask you questions to surface considerations you hadn't anticipated</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q3" value="c"><span>Provide input/output examples</span></label>
+          <label class="opt"><input type="radio" name="sec-3-5-q3" value="d"><span>Plan mode</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-3-5">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-3-5">
+      <a class="btn-next locked" href="#s3-6" data-label="Continue to Section 3.6"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 3.6</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 3.6 ============ -->
+  <section class="stage" id="s3-6">
+    <div class="stage-head">
+      <span class="stage-num">Section 3.6</span>
+      <h2>Integrate Claude Code into CI/CD pipelines</h2>
+      <span class="domain-tag">Task Statement 3.6</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-3-5">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 3.5 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s3-5">Go to Section 3.5</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-3-6">
+    <p class="lede">Claude Code in a pipeline is Claude Code without a human to answer its questions. That single fact drives everything here: the flag that makes it non-interactive, the output format a script can parse, and the context it needs because nobody's there to supply it.</p>
+
+    <h3>What &amp; why</h3>
+    <p>The <strong><code>-p</code> (or <code>--print</code>) flag</strong> runs Claude Code non-interactively — without it, a pipeline job hangs waiting for input that never comes. <strong><code>--output-format json</code></strong> with <strong><code>--json-schema</code></strong> produces machine-parseable structured findings you can post as inline PR comments. <strong>CLAUDE.md</strong> is how you give CI-invoked Claude the project context a human reviewer would already have. And one subtle but heavily-tested point: <strong>session context isolation</strong> — the same session that generated code is less effective at reviewing its own changes than an independent review instance.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The <strong><code>-p</code> / <code>--print</code> flag</strong> for non-interactive mode in automated pipelines.</li>
+        <li><strong><code>--output-format json</code> and <code>--json-schema</code></strong> for enforcing structured output in CI.</li>
+        <li><strong>CLAUDE.md as the mechanism for providing project context</strong> (testing standards, fixture conventions, review criteria) to CI-invoked Claude Code.</li>
+        <li><strong>Session context isolation</strong>: the session that generated code is less effective at reviewing its own changes than an independent instance.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Run Claude Code in CI with <strong><code>-p</code> to prevent interactive input hangs</strong>.</li>
+        <li>Use <strong><code>--output-format json</code> with <code>--json-schema</code></strong> to produce machine-parseable findings for automated posting as inline PR comments.</li>
+        <li><strong>Include prior review findings in context</strong> when re-running after new commits, instructing Claude to report only new or still-unaddressed issues — avoiding duplicate comments.</li>
+        <li><strong>Provide existing test files in context</strong> so test generation doesn't duplicate scenarios already covered.</li>
+        <li><strong>Document testing standards, valuable test criteria, and available fixtures in CLAUDE.md</strong> to improve test generation and reduce low-value output.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li>Running <strong><code>claude</code> without <code>-p</code></strong> in a pipeline — the job hangs on interactive input. (Invented alternatives like a <code>CLAUDE_HEADLESS</code> env var or a <code>--batch</code> flag are not real.)</li>
+        <li><strong>Reviewing generated code in the same session that generated it</strong> — it retains the generation reasoning and won't question its own decisions.</li>
+        <li><strong>Re-running reviews without prior findings</strong> — the same issues get posted again as duplicate comments.</li>
+        <li><strong>Generating tests without the existing suite in context</strong> — you get duplicates of scenarios already covered.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Three near-certain items. <strong>A hanging pipeline &rarr; add <code>-p</code></strong> (the other
+      options are invented flags). <strong>Machine-parseable findings &rarr;
+      <code>--output-format json</code> with <code>--json-schema</code></strong>. <strong>Self-review is
+      weaker than an independent instance</strong> — and the fix is a separate Claude invocation, not a
+      &ldquo;review your own work carefully&rdquo; instruction or extended thinking.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Claude Code in CI/CD</strong> lab is this section end to end — headless mode, JSON
+        output, CLAUDE.md as CI config, and independent review instances.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-3-6">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="c" data-why-ok="&lt;code&gt;-p&lt;/code&gt; / &lt;code&gt;--print&lt;/code&gt; is what makes Claude Code non-interactive. The other options aren&#x27;t real Claude Code features." data-why-no="The fix is one flag: &lt;code&gt;-p&lt;/code&gt; (or &lt;code&gt;--print&lt;/code&gt;). &lt;code&gt;CLAUDE_HEADLESS&lt;/code&gt;, stdin redirection, and &lt;code&gt;--batch&lt;/code&gt; are not real Claude Code features — this is a known exam item.">
+          <p class="qtext"><span class="qnum">Q1</span>Your CI job runs <code>claude "review this PR"</code> and hangs indefinitely. The logs show it waiting for input. What's the fix?</p>
+          <label class="opt"><input type="radio" name="sec-3-6-q1" value="a"><span>Set <code>CLAUDE_HEADLESS=true</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q1" value="b"><span>Redirect stdin from <code>/dev/null</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q1" value="c"><span>Add the <code>-p</code> (<code>--print</code>) flag for non-interactive mode</span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q1" value="d"><span>Add the <code>--batch</code> flag</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="&lt;code&gt;--output-format json&lt;/code&gt; plus &lt;code&gt;--json-schema&lt;/code&gt; enforces structured output a script can reliably parse." data-why-no="The named CLI flags are &lt;code&gt;--output-format json&lt;/code&gt; with &lt;code&gt;--json-schema&lt;/code&gt; — they enforce structured output rather than hoping the prose parses.">
+          <p class="qtext"><span class="qnum">Q2</span>You want CI findings posted as inline PR comments by a script. What produces machine-parseable output?</p>
+          <label class="opt"><input type="radio" name="sec-3-6-q2" value="a"><span><code>--output-format json</code> with <code>--json-schema</code></span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q2" value="b"><span>Piping stdout through a markdown parser</span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q2" value="c"><span>Asking Claude in the prompt to return valid JSON</span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q2" value="d"><span><code>--verbose</code> combined with grep</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Self-review is weaker because the generating session carries its own reasoning forward. An independent instance without that context catches more." data-why-no="This is session context isolation: the generating session retains its reasoning and won&#x27;t question its own decisions. An independent review instance — not a bigger model or more thinking — is the fix.">
+          <p class="qtext"><span class="qnum">Q3</span>The same Claude Code session that generated a feature is asked to review it, and misses issues an independent reviewer catches. Why?</p>
+          <label class="opt"><input type="radio" name="sec-3-6-q3" value="a"><span>The session ran out of context</span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q3" value="b"><span>It retains reasoning context from generation, making it less likely to question its own decisions</span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q3" value="c"><span>Review requires a larger model</span></label>
+          <label class="opt"><input type="radio" name="sec-3-6-q3" value="d"><span>Extended thinking wasn't enabled</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-3-6">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-3-6">
+      <a class="btn-next locked" href="#close" data-label="Continue to the wrap-up"><span class="lockicn">&#128274;</span><span class="btxt">Continue to the wrap-up</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ WRAP-UP ============ -->
+  <div class="mod-done" id="mod-done">
+    <h3>&#10003; Module 3 complete</h3>
+    <p>You've cleared every section's knowledge check. Your progress is saved in this browser.
+    Next up: <strong>Module 4 — Prompt Engineering &amp; Structured Output</strong>. The evaluation
+    unlocks once all five modules are done.</p>
+  </div>
+
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Module 3 · Wrap-up</span>
+      <h2>What this domain comes down to</h2>
+    </div>
+    <p>Claude Code Configuration &amp; Workflows is about giving Claude the right context at the right time: instructions placed at the right level of the hierarchy (3.1), packaged into commands and skills with the right scope and isolation (3.2), rules that load only when they're relevant (3.3), the judgment to plan or just execute (3.4), techniques that close the gap between intent and result (3.5), and the configuration that makes it work unattended in a pipeline (3.6).</p>
+    <p>One thread ties the anti-patterns together: <strong>scope and timing beat volume</strong>. Team conventions belong where the team gets them, not in your personal config. Narrow rules load on matching paths, not always. Verbose skills fork so they don't flood the session. A reviewer works better <em>without</em> the generator's context. More context in the wrong place is worse than less context in the right one.</p>
+    <div class="capstone" style="margin-top:22px">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Your capstones for this domain</span>
+        <strong>Claude Code Development Workflow</strong> (3.1&ndash;3.5) &middot;
+        <strong>Claude Code in CI/CD</strong> (3.6) &middot;
+        <strong>Developer Productivity</strong> (3.4). The Workflow lab covers most of this domain in one build.
+      </div>
+    </div>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>Next in the track.</strong> Module 4 &mdash; Prompt Engineering &amp; Structured Output &mdash;
+        moves to the craft of the prompts themselves: explicit criteria, few-shot examples, JSON
+        schemas, and validation loops. The evaluation comes after all five modules, drawn from the
+        capstone scenarios.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA Knowledge Track &middot; Module 3: Claude Code Configuration &amp; Workflows<br>
+  <button class="reset-link" id="kt-reset">reset my progress for this module</button>
+  <p class="disclaimer">
+    Part of the Claude Certified Architect &mdash; Knowledge Track, the structured-knowledge companion
+    to the CCA capstone labs. A recommended preparatory resource &mdash; not affiliated with or endorsed
+    by Anthropic, not a substitute for the official exam or its prerequisites. Flags, file paths, and
+    configuration shapes reflect the toolchain as of mid-2026 and carry a real shelf-life; verify
+    against current documentation before relying on specifics.
+  </p>
+</footer>
+
+<script>
+  window.KT_MODULE_ID       = 'module-3-claude-code-config';
+  window.KT_CONTENT_VERSION = '1';
+  window.KT_TOTAL_SECTIONS  = 6;
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CCA Knowledge Track — section gate engine
+   ---------------------------------------------------------------------------
+   Section-level progress  →  localStorage (survives refresh, timeout, breaks)
+   Module-level completion →  Firestore courseProgress  [WIRING PASS — see below]
+
+   Storage key: ccaKT_<MODULE_ID>_<uid>_v<CONTENT_VERSION>
+     · keyed by uid so shared browsers don't collide
+     · versioned so changed questions invalidate stale "complete" state
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var MODULE_ID      = window.KT_MODULE_ID || 'module-x';
+  var CONTENT_VERSION = window.KT_CONTENT_VERSION || '1';
+  var TOTAL_SECTIONS  = window.KT_TOTAL_SECTIONS || 0;
+
+  function uid() {
+    return (window._learnerUid) || (window.sessionStorage && sessionStorage.getItem('_learnerUid')) || 'anon';
+  }
+  var KEY = 'ccaKT_' + MODULE_ID + '_' + uid() + '_v' + CONTENT_VERSION;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { /* storage disabled/full — gate still works in-session */ }
+  }
+
+  var state = load();
+
+  function isSectionComplete(id) { return state[id] === true; }
+
+  /* ── SEAM: module completion ──────────────────────────────────────────────
+     Today: records locally + reveals the module-complete panel.
+     WIRING PASS: add the Firestore courseProgress v2 write here — this is the
+     only function that needs to change. moduleKey = filename minus .html.   */
+  function markModuleComplete() {
+    state.__moduleComplete = true;
+    save(state);
+    var panel = document.getElementById('mod-done');
+    if (panel) panel.classList.add('show');
+    // TODO(wiring): writeCourseProgress(CP_COURSE_ID, MODULE_ID, {complete:true})
+  }
+
+  function completedCount() {
+    return Object.keys(state).filter(function (k) {
+      return k.indexOf('sec-') === 0 && state[k] === true;
+    }).length;
+  }
+
+  function markSectionComplete(id) {
+    state[id] = true;
+    save(state);
+    unlockNext(id);
+    if (TOTAL_SECTIONS && completedCount() >= TOTAL_SECTIONS) markModuleComplete();
+  }
+
+  function unlockNext(id) {
+    var gate = document.querySelector('.sect-gate[data-for="' + id + '"]');
+    if (gate) {
+      var btn  = gate.querySelector('.btn-next');
+      var note = gate.querySelector('.gate-note');
+      if (btn) {
+        btn.classList.remove('locked');
+        btn.classList.add('unlocked');
+        var ic = btn.querySelector('.lockicn');
+        if (ic) ic.innerHTML = '&#10003;';
+      }
+      if (note) { note.textContent = 'Section complete — next section unlocked.'; note.classList.add('unlocked'); }
+    }
+    revealFor(id);
+  }
+
+  /* reveal the section whose prerequisite is `id` */
+  function revealFor(id) {
+    var shade = document.querySelector('.lock-shade[data-locked-for="' + id + '"]');
+    if (!shade) return;
+    shade.classList.add('hidden');
+    var sec = shade.closest('.stage');
+    if (sec) sec.classList.remove('is-locked');
+    var body = sec ? sec.querySelector('.sect-body') : null;
+    if (body) body.classList.add('open');
+  }
+
+  /* ── quiz rendering / grading ─────────────────────────────────────────── */
+  function gradeQuestion(qEl) {
+    var picked = qEl.querySelector('input[type=radio]:checked');
+    if (!picked) return null;
+    return picked.value === qEl.getAttribute('data-answer');
+  }
+
+  function lockQuestion(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.add('disabled');
+      var r = o.querySelector('input'); if (r) r.disabled = true;
+    });
+  }
+
+  function resetQuestionStyles(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.remove('correct', 'wrong');
+    });
+  }
+
+  function checkSection(secId) {
+    var kc = document.querySelector('.kcheck[data-section="' + secId + '"]');
+    if (!kc) return;
+    var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+    var allAnswered = qs.every(function (q) { return q.querySelector('input:checked'); });
+    if (!allAnswered) return;
+
+    var allRight = true;
+    qs.forEach(function (q) {
+      resetQuestionStyles(q);
+      var ok  = gradeQuestion(q);
+      var fb  = q.querySelector('.kfb');
+      var sel = q.querySelector('input:checked');
+      var selOpt = sel ? sel.closest('.opt') : null;
+
+      if (ok) {
+        if (selOpt) selOpt.classList.add('correct');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      } else {
+        allRight = false;
+        if (selOpt) selOpt.classList.add('wrong');
+        if (fb) { fb.className = 'kfb no show'; fb.innerHTML = '<strong>Not quite.</strong> ' + (q.getAttribute('data-why-no') || '') + ' <em>Try again.</em>'; }
+        // wrong answers stay open for retry — clear the selection
+        if (sel) sel.checked = false;
+      }
+    });
+
+    var status = kc.querySelector('.kc-status');
+    if (allRight) {
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      markSectionComplete(secId);
+    } else if (status) {
+      status.textContent = 'Some answers need another look';
+      status.classList.remove('done');
+    }
+  }
+
+  /* ── restore prior progress on load ───────────────────────────────────── */
+  function restore() {
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      if (!isSectionComplete(secId)) return;
+      kc.querySelectorAll('.kq').forEach(function (q) {
+        var ans = q.getAttribute('data-answer');
+        var input = q.querySelector('input[value="' + ans + '"]');
+        if (input) { input.checked = true; var o = input.closest('.opt'); if (o) o.classList.add('correct'); }
+        var fb = q.querySelector('.kfb');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      });
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      var status = kc.querySelector('.kc-status');
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      unlockNext(secId);
+    });
+    if (state.__moduleComplete) {
+      var panel = document.getElementById('mod-done');
+      if (panel) panel.classList.add('show');
+    }
+    // reveal any section whose prerequisite is already complete; lock the rest
+    document.querySelectorAll('.lock-shade').forEach(function (shade) {
+      var prereq = shade.getAttribute('data-locked-for');
+      var sec = shade.closest('.stage');
+      if (isSectionComplete(prereq)) {
+        revealFor(prereq);
+      } else if (sec) {
+        sec.classList.add('is-locked');
+      }
+    });
+  }
+
+  /* ── wire up ──────────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-check').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        checkSection(btn.getAttribute('data-section'));
+      });
+    });
+    // enable the check button only once every question in that block has a pick
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      kc.addEventListener('change', function () {
+        var btn = kc.querySelector('.btn-check');
+        if (!btn || isSectionComplete(secId)) return;   // completed sections stay locked-done
+        var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+        var all = qs.every(function (q) { return q.querySelector('input:checked'); });
+        btn.disabled = !all;                            // enable once every question answered
+      });
+      var btn0 = kc.querySelector('.btn-check');
+      if (btn0) btn0.disabled = true;
+    });
+    var reset = document.getElementById('kt-reset');
+    if (reset) reset.addEventListener('click', function () {
+      if (confirm('Clear your saved progress for this module?')) {
+        localStorage.removeItem(KEY); location.reload();
+      }
+    });
+    restore();
+  });
+})();
+</script>
+</body>
+</html>
