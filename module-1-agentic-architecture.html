@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071404 -->
+<!-- build: 2026071407 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -325,7 +325,7 @@
   <hr class="rule">
 
   <!-- ============ 1.1 ============ -->
-  <section class="stage" id="s1-1">
+  <section class="stage" id="s1-1">s1-1
     <div class="stage-head">
       <span class="stage-num">Section 1.1</span>
       <h2>Agentic loops for autonomous task execution</h2>
@@ -382,18 +382,47 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-1">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>Can you state the exact condition that continues the loop, and the one that ends it?</li>
-        <li>Can you name three things that must <em>not</em> be used to decide the loop is complete?</li>
-        <li>Why must tool results be appended to history before the next request?</li>
-      </ul>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="a" data-why-ok="&lt;code&gt;stop_reason&lt;/code&gt; is the API&#x27;s own signal: &lt;code&gt;&quot;tool_use&quot;&lt;/code&gt; means keep going, &lt;code&gt;&quot;end_turn&quot;&lt;/code&gt; means Claude is finished." data-why-no="Only &lt;code&gt;stop_reason&lt;/code&gt; reliably signals completion. Parsing text, capping iterations, and checking for text content are all named anti-patterns — a response can contain text &lt;em&gt;and&lt;/em&gt; a tool call.">
+          <p class="qtext"><span class="qnum">Q1</span>Your agent loop needs to know when to stop. Which condition correctly terminates it?</p>
+          <label class="opt"><input type="radio" name="sec-1-1-q1" value="a"><span>When <code>stop_reason</code> is <code>"end_turn"</code></span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q1" value="b"><span>When the response text contains a completion phrase like "done" or "finished"</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q1" value="c"><span>When the loop reaches a preset maximum of 10 iterations</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q1" value="d"><span>When the response contains any assistant text content</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Tool results are appended to conversation history so the model can reason about the next action with that new information in context." data-why-no="Claude has no memory between API calls. The tool result must be appended to the conversation history, or the model can&#x27;t incorporate it into its next decision.">
+          <p class="qtext"><span class="qnum">Q2</span>After you execute a tool Claude requested, what must happen before the next API request?</p>
+          <label class="opt"><input type="radio" name="sec-1-1-q2" value="a"><span>The tool result is logged and the conversation is restarted fresh</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q2" value="b"><span>The tool result is appended to the conversation history</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q2" value="c"><span>The tool result is summarized into the system prompt</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q2" value="d"><span>Nothing — Claude retains tool results automatically between calls</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Model-driven decision-making is the point: Claude picks the next tool from context. A fixed sequence isn&#x27;t an agent, it&#x27;s a script." data-why-no="The distinction is &lt;em&gt;who decides&lt;/em&gt;. In an agentic loop, Claude reasons about the next tool from context; a decision tree hardcodes the sequence in advance.">
+          <p class="qtext"><span class="qnum">Q3</span>What distinguishes a true agentic loop from a pre-configured decision tree?</p>
+          <label class="opt"><input type="radio" name="sec-1-1-q3" value="a"><span>The agentic loop runs faster because it skips validation</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q3" value="b"><span>The decision tree can call tools; the agentic loop only reasons</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q3" value="c"><span>Claude reasons about which tool to call next based on context, rather than following a hardcoded sequence</span></label>
+          <label class="opt"><input type="radio" name="sec-1-1-q3" value="d"><span>The agentic loop requires fewer tools to be defined</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-1">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-1">
+      <a class="btn-next locked" href="#s1-2">Continue to Section 1.2</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <!-- ============ 1.2 ============ -->
-  <section class="stage" id="s1-2">
+  <section class="stage" id="s1-2">s1-2
     <div class="stage-head">
       <span class="stage-num">Section 1.2</span>
       <h2>Orchestrate multi-agent systems with coordinator&ndash;subagent patterns</h2>
@@ -453,19 +482,48 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-2">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>Why does all subagent communication route through the coordinator rather than agent-to-agent?</li>
-        <li>What does &ldquo;dynamic selection&rdquo; buy you over always running the full pipeline?</li>
-        <li>How does a coordinator recover from overly narrow decomposition?</li>
-      </ul>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Centralizing communication at the hub is what gives you one place to observe, handle errors consistently, and govern what flows where." data-why-no="It&#x27;s an architectural choice, not a technical limit. Routing through the coordinator buys observability, consistent error handling, and controlled information flow.">
+          <p class="qtext"><span class="qnum">Q1</span>In a hub-and-spoke multi-agent system, why does all subagent communication route through the coordinator?</p>
+          <label class="opt"><input type="radio" name="sec-1-2-q1" value="a"><span>Because subagents are technically unable to send messages</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q1" value="b"><span>For observability, consistent error handling, and controlled information flow</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q1" value="c"><span>To reduce the total token cost of the system</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q1" value="d"><span>Because the API forbids agent-to-agent calls</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Over-narrow decomposition leaves coverage holes. The fix is an iterative refinement loop: evaluate output for gaps, re-delegate, re-synthesize until coverage is sufficient." data-why-no="The named risk here is &lt;em&gt;overly narrow decomposition&lt;/em&gt;. More agents or bigger windows don&#x27;t fix a bad partition — an iterative gap-check-and-re-delegate loop does.">
+          <p class="qtext"><span class="qnum">Q2</span>Your research coordinator produces reports that consistently miss whole subtopics of broad queries. What's the most likely cause and fix?</p>
+          <label class="opt"><input type="radio" name="sec-1-2-q2" value="a"><span>Too few subagents — add more specialists to the pipeline</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q2" value="b"><span>Overly narrow task decomposition — have the coordinator evaluate synthesis for gaps and re-delegate targeted queries</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q2" value="c"><span>The subagents need larger context windows</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q2" value="d"><span>The coordinator should let subagents talk to each other to fill gaps</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="The coordinator&#x27;s job includes deciding &lt;em&gt;which&lt;/em&gt; subagents to invoke based on query complexity — not routing everything through the whole pipeline." data-why-no="Always running the full pipeline regardless of the query is the anti-pattern. The coordinator should analyze requirements and dynamically select which subagents to invoke.">
+          <p class="qtext"><span class="qnum">Q3</span>A user asks your multi-agent system a simple factual question. What should a well-designed coordinator do?</p>
+          <label class="opt"><input type="radio" name="sec-1-2-q3" value="a"><span>Always run the full pipeline so every query gets consistent treatment</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q3" value="b"><span>Analyze the query and dynamically select only the subagents needed</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q3" value="c"><span>Refuse and ask the user to use a simpler tool</span></label>
+          <label class="opt"><input type="radio" name="sec-1-2-q3" value="d"><span>Spawn all subagents in parallel to answer fastest</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-2">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-2">
+      <a class="btn-next locked" href="#s1-3">Continue to Section 1.3</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <hr class="rule">
   <!-- ============ 1.3 ============ -->
-  <section class="stage" id="s1-3">
+  <section class="stage" id="s1-3">s1-3
     <div class="stage-head">
       <span class="stage-num">Section 1.3</span>
       <h2>Configure subagent invocation, context passing, and spawning</h2>
@@ -526,18 +584,47 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-3">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>What single <code>allowedTools</code> entry makes delegation possible, and what happens without it?</li>
-        <li>How do you spawn subagents in parallel rather than serially?</li>
-        <li>Why must source metadata travel as structured data across the handoff?</li>
-      </ul>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="a" data-why-ok="The Task tool is the spawning mechanism. Without &lt;code&gt;&quot;Task&quot;&lt;/code&gt; in &lt;code&gt;allowedTools&lt;/code&gt;, delegation is blocked and the coordinator quietly runs as a single agent." data-why-no="This is the classic silent failure: the Task tool must be in &lt;code&gt;allowedTools&lt;/code&gt; for a coordinator to spawn subagents at all.">
+          <p class="qtext"><span class="qnum">Q1</span>Your coordinator is defined with subagents, but at runtime it does all the work itself and never delegates. What's the most likely cause?</p>
+          <label class="opt"><input type="radio" name="sec-1-3-q1" value="a"><span><code>"Task"</code> is missing from the coordinator's <code>allowedTools</code></span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q1" value="b"><span>The subagents' system prompts are too long</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q1" value="c"><span>The coordinator's model is too small to delegate</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q1" value="d"><span>Subagents must be defined in a separate file to be discoverable</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Subagents have isolated context and inherit nothing. The prompt is the only channel — findings and their metadata must be passed explicitly." data-why-no="Subagents don&#x27;t inherit parent context or share memory. Anything the synthesis agent needs — including source metadata — must be in its prompt.">
+          <p class="qtext"><span class="qnum">Q2</span>Your synthesis subagent produces output with no source attribution, even though the searcher returned cited results. What's the fix?</p>
+          <label class="opt"><input type="radio" name="sec-1-3-q2" value="a"><span>Increase the synthesis subagent's temperature</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q2" value="b"><span>Instruct the synthesis subagent to remember the earlier searches</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q2" value="c"><span>Pass the searcher's complete findings, with source metadata, directly in the synthesis subagent's prompt</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q2" value="d"><span>Have the searcher write results to the coordinator's memory for synthesis to read</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="Multiple Task calls in one response spawn concurrently. Spreading them across turns serializes the work." data-why-no="Parallel spawning means multiple Task calls in a &lt;em&gt;single&lt;/em&gt; coordinator response. Across separate turns is serial — and subagents can&#x27;t spawn their own subagents.">
+          <p class="qtext"><span class="qnum">Q3</span>You want three subagents to investigate independently at the same time. How do you spawn them in parallel?</p>
+          <label class="opt"><input type="radio" name="sec-1-3-q3" value="a"><span>Emit multiple Task tool calls in a single coordinator response</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q3" value="b"><span>Emit one Task call per turn across three consecutive turns</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q3" value="c"><span>Set a <code>parallel: true</code> flag in each AgentDefinition</span></label>
+          <label class="opt"><input type="radio" name="sec-1-3-q3" value="d"><span>Spawn one subagent and let it spawn the other two</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-3">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-3">
+      <a class="btn-next locked" href="#s1-4">Continue to Section 1.4</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <!-- ============ 1.4 ============ -->
-  <section class="stage" id="s1-4">
+  <section class="stage" id="s1-4">s1-4
     <div class="stage-head">
       <span class="stage-num">Section 1.4</span>
       <h2>Implement multi-step workflows with enforcement and handoff patterns</h2>
@@ -594,18 +681,39 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-4">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>Why is a prompt instruction insufficient for &ldquo;verify identity before refund&rdquo;?</li>
-        <li>What belongs in a mid-process escalation handoff, and why?</li>
-        <li>How do you handle a request that raises three separate issues at once?</li>
-      </ul>
+      <p class="kc-sub">Answer all 2 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="c" data-why-ok="When compliance must be deterministic, a prerequisite gate in code is the answer. Prompt instructions have a non-zero failure rate — unacceptable for financial operations." data-why-no="Prompt instructions are probabilistic no matter how they&#x27;re worded. A rule that must hold every time needs programmatic enforcement — a gate that blocks the tool until the prerequisite completes.">
+          <p class="qtext"><span class="qnum">Q1</span>Your support agent's system prompt says "always verify the customer before issuing a refund," but it occasionally refunds without verifying. What's the correct fix?</p>
+          <label class="opt"><input type="radio" name="sec-1-4-q1" value="a"><span>Rewrite the instruction in stronger, more emphatic language</span></label>
+          <label class="opt"><input type="radio" name="sec-1-4-q1" value="b"><span>Add the instruction again at the end of the prompt for recency</span></label>
+          <label class="opt"><input type="radio" name="sec-1-4-q1" value="c"><span>Implement a programmatic prerequisite that blocks <code>process_refund</code> until <code>get_customer</code> returns a verified ID</span></label>
+          <label class="opt"><input type="radio" name="sec-1-4-q1" value="d"><span>Switch to a larger model that follows instructions more reliably</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="A structured handoff gives the human what they need to act — identity, diagnosis, amounts, and a recommendation — without reading a transcript they can&#x27;t see." data-why-no="The human lacks the transcript, so the handoff must &lt;em&gt;compile&lt;/em&gt; the case: customer ID, root cause analysis, amounts, and a recommended action.">
+          <p class="qtext"><span class="qnum">Q2</span>Your agent escalates a case to a human who has no access to the conversation transcript. What should the handoff include?</p>
+          <label class="opt"><input type="radio" name="sec-1-4-q2" value="a"><span>A short note asking the human to review the case</span></label>
+          <label class="opt"><input type="radio" name="sec-1-4-q2" value="b"><span>The full raw transcript, unprocessed</span></label>
+          <label class="opt"><input type="radio" name="sec-1-4-q2" value="c"><span>A structured summary: customer ID, root cause, refund amount, recommended action</span></label>
+          <label class="opt"><input type="radio" name="sec-1-4-q2" value="d"><span>Only the customer's last message, for context</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-4">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-4">
+      <a class="btn-next locked" href="#s1-5">Continue to Section 1.5</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <!-- ============ 1.5 ============ -->
-  <section class="stage" id="s1-5">
+  <section class="stage" id="s1-5">s1-5
     <div class="stage-head">
       <span class="stage-num">Section 1.5</span>
       <h2>Apply Agent SDK hooks for tool-call interception and data normalization</h2>
@@ -662,19 +770,48 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-5">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>Which hook transforms a tool result, and which blocks a tool call?</li>
-        <li>Why normalize data formats in a hook rather than in the prompt?</li>
-        <li>State the one-line rule for choosing a hook over a prompt instruction.</li>
-      </ul>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="PostToolUse intercepts the tool &lt;em&gt;result&lt;/em&gt; and can transform it before the model ever sees it — normalize once, deterministically." data-why-no="This is exactly what PostToolUse hooks are for: intercepting results and normalizing heterogeneous formats before the model reasons over them.">
+          <p class="qtext"><span class="qnum">Q1</span>Different MCP tools return timestamps in inconsistent formats (Unix epoch, ISO 8601, numeric codes), and your agent keeps misreading them. What's the cleanest fix?</p>
+          <label class="opt"><input type="radio" name="sec-1-5-q1" value="a"><span>Add a prompt instruction explaining each format the agent might see</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q1" value="b"><span>A PostToolUse hook that normalizes the formats before the model processes the result</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q1" value="c"><span>Ask each tool's owner to change their API</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q1" value="d"><span>Have the agent call a conversion tool after every lookup</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Hooks give deterministic guarantees. An interception hook blocks the policy-violating call and redirects to the human-escalation workflow — every time." data-why-no="A hard business rule needs guaranteed compliance, which prompts and descriptions can&#x27;t provide. An interception hook blocks the call deterministically and redirects.">
+          <p class="qtext"><span class="qnum">Q2</span>Company policy: no refund above $500 without human approval. Where does that rule belong?</p>
+          <label class="opt"><input type="radio" name="sec-1-5-q2" value="a"><span>In the system prompt, as a clearly stated business rule</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q2" value="b"><span>In the refund tool's description, so the model sees it at selection time</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q2" value="c"><span>In a tool-call interception hook that blocks the call and redirects to escalation</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q2" value="d"><span>In the CLAUDE.md file for the project</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="That&#x27;s the whole distinction, and it&#x27;s why anything that must hold every time goes in a hook." data-why-no="The difference is the &lt;em&gt;guarantee&lt;/em&gt;. A hook&#x27;s behavior is deterministic; a prompt instruction is followed probabilistically and will eventually fail.">
+          <p class="qtext"><span class="qnum">Q3</span>What's the essential difference between a hook and a prompt instruction?</p>
+          <label class="opt"><input type="radio" name="sec-1-5-q3" value="a"><span>Hooks are faster to execute than prompt instructions</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q3" value="b"><span>Hooks give deterministic guarantees; prompt instructions give probabilistic compliance</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q3" value="c"><span>Hooks work only with MCP tools; prompts work with built-in tools</span></label>
+          <label class="opt"><input type="radio" name="sec-1-5-q3" value="d"><span>There is no functional difference — it's a style preference</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-5">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-5">
+      <a class="btn-next locked" href="#s1-6">Continue to Section 1.6</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <hr class="rule">
   <!-- ============ 1.6 ============ -->
-  <section class="stage" id="s1-6">
+  <section class="stage" id="s1-6">s1-6
     <div class="stage-head">
       <span class="stage-num">Section 1.6</span>
       <h2>Design task decomposition strategies for complex workflows</h2>
@@ -731,18 +868,47 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-6">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>What property of a task pushes you toward adaptive rather than fixed decomposition?</li>
-        <li>Why split a large review into per-file plus cross-file passes?</li>
-        <li>How would you decompose &ldquo;add tests to a legacy codebase&rdquo;?</li>
-      </ul>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Per-file passes catch local issues without dilution; a dedicated cross-file pass catches integration problems. That&#x27;s the prompt-chaining pattern for large reviews." data-why-no="A single giant pass dilutes attention and produces contradictory findings. The pattern is per-file local passes plus a separate cross-file integration pass.">
+          <p class="qtext"><span class="qnum">Q1</span>You're reviewing a 40-file pull request. What decomposition avoids attention dilution and contradictory findings?</p>
+          <label class="opt"><input type="radio" name="sec-1-6-q1" value="a"><span>One review pass over the whole diff at once</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q1" value="b"><span>Per-file local analysis passes, plus a separate cross-file integration pass</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q1" value="c"><span>Review only the largest three files and extrapolate</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q1" value="d"><span>One pass per issue category across all files simultaneously</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Open-ended work can&#x27;t be fully planned in advance — the plan has to grow from what each step discovers." data-why-no="This is open-ended investigation: you don&#x27;t know what matters until you look. Adaptive decomposition generates subtasks from intermediate findings; a fixed pipeline can&#x27;t.">
+          <p class="qtext"><span class="qnum">Q2</span>The task is "add comprehensive tests to a legacy codebase." Which decomposition strategy fits?</p>
+          <label class="opt"><input type="radio" name="sec-1-6-q2" value="a"><span>A fixed sequential pipeline defined completely up front</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q2" value="b"><span>Dynamic adaptive decomposition: map structure, identify high-impact areas, then build a prioritized plan that adapts as dependencies surface</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q2" value="c"><span>Prompt chaining with one step per file, ordered alphabetically</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q2" value="d"><span>A single prompt asking for all tests at once</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Predictability is the tell. Known aspects → chain them. Unknown territory → let the plan adapt." data-why-no="Size, file count, and risk don&#x27;t decide it — &lt;em&gt;predictability&lt;/em&gt; does. Known, multi-aspect work suits prompt chaining; open-ended discovery needs adaptive decomposition.">
+          <p class="qtext"><span class="qnum">Q3</span>What property of a task pushes you toward fixed prompt chaining rather than adaptive decomposition?</p>
+          <label class="opt"><input type="radio" name="sec-1-6-q3" value="a"><span>The task is large</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q3" value="b"><span>The task involves multiple files</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q3" value="c"><span>The aspects to cover are known and predictable in advance</span></label>
+          <label class="opt"><input type="radio" name="sec-1-6-q3" value="d"><span>The task is high-risk</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-6">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-6">
+      <a class="btn-next locked" href="#s1-7">Continue to Section 1.7</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <!-- ============ 1.7 ============ -->
-  <section class="stage" id="s1-7">
+  <section class="stage" id="s1-7">s1-7
     <div class="stage-head">
       <span class="stage-num">Section 1.7</span>
       <h2>Manage session state, resumption, and forking</h2>
@@ -801,18 +967,54 @@
       </div>
     </div>
 
-    <div class="checkpoint">
+    <div class="kcheck" data-section="sec-1-7">
       <span class="lbl">Check your understanding</span>
-      <ul>
-        <li>When is starting fresh with a summary better than <code>--resume</code>?</li>
-        <li>What must you tell a resumed agent after files have changed?</li>
-        <li>What does <code>fork_session</code> give you that a linear session can&rsquo;t?</li>
-      </ul>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Stale tool results are the trap. Either start fresh with an injected summary, or resume &lt;em&gt;and&lt;/em&gt; tell the agent exactly what changed for targeted re-analysis." data-why-no="The prior tool results are stale — the agent is reasoning over outdated file reads. Starting fresh with a structured summary, or resuming with an explicit list of what changed, is the fix.">
+          <p class="qtext"><span class="qnum">Q1</span>You resume a three-day-old investigation session, but the codebase was refactored yesterday. The agent answers using the old structure. What's the best response?</p>
+          <label class="opt"><input type="radio" name="sec-1-7-q1" value="a"><span>Resume again — the session will refresh itself</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q1" value="b"><span>Recognize the tool results are stale: start fresh with a structured summary, or resume and explicitly inform the agent which files changed</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q1" value="c"><span>Increase the agent's context window and resume</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q1" value="d"><span>Fork the session to get a clean branch</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Forking gives you divergent branches from one shared analysis — no re-exploration, no cross-contamination." data-why-no="&lt;code&gt;fork_session&lt;/code&gt; exists precisely for this: independent branches from a shared analysis baseline, so divergent approaches don&#x27;t interfere.">
+          <p class="qtext"><span class="qnum">Q2</span>You want to compare two refactoring approaches from the same codebase analysis, without the branches contaminating each other. What do you use?</p>
+          <label class="opt"><input type="radio" name="sec-1-7-q2" value="a"><span> <code>--resume</code> with two different session names</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q2" value="b"><span>Two separate sessions, each re-analyzing the codebase from scratch</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q2" value="c"><span><code>fork_session</code> to create independent branches from the shared baseline</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q2" value="d"><span>One session, exploring both approaches in sequence</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Resume when prior context is mostly valid; start fresh with a summary when the tool results have gone stale. It&#x27;s a judgment call about validity." data-why-no="It&#x27;s a judgment, not a rule. Resume when prior context is &lt;em&gt;mostly valid&lt;/em&gt;; start fresh with an injected summary when prior tool results are stale.">
+          <p class="qtext"><span class="qnum">Q3</span>When is resuming a session the <em>right</em> call?</p>
+          <label class="opt"><input type="radio" name="sec-1-7-q3" value="a"><span>Always — resuming is cheaper than starting fresh</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q3" value="b"><span>When the prior context is mostly still valid</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q3" value="c"><span>Only when no files have changed at all</span></label>
+          <label class="opt"><input type="radio" name="sec-1-7-q3" value="d"><span>Never — a structured summary is always more reliable</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-1-7">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-1-7">
+      <a class="btn-next locked" href="#close">Continue to the wrap-up</a>
+      <span class="gate-note">Answer the questions above to unlock.</span>
     </div>
   </section>
 
   <!-- ============ WRAP-UP ============ -->
-  <section class="stage" id="close">
+  <div class="mod-done" id="mod-done">
+    <h3>&#10003; Module 1 complete</h3>
+    <p>You've cleared every section's knowledge check. Your progress is saved in this browser.
+    Next up: <strong>Module 2 — Tool Design &amp; MCP Integration</strong>. The evaluation unlocks
+    once all five modules are done.</p>
+  </div>
+
+  <section class="stage" id="close">close
     <div class="stage-head">
       <span class="stage-num">Module 1 · Wrap-up</span>
       <h2>What this domain comes down to</h2>
@@ -843,7 +1045,8 @@
 </main>
 
 <footer>
-  <strong>SF Knowledge Hub</strong> &middot; CCA Knowledge Track &middot; Module 1: Agentic Architecture &amp; Orchestration
+  <strong>SF Knowledge Hub</strong> &middot; CCA Knowledge Track &middot; Module 1: Agentic Architecture &amp; Orchestration<br>
+  <button class="reset-link" id="kt-reset">reset my progress for this module</button>
   <p class="disclaimer">
     Part of the Claude Certified Architect &mdash; Knowledge Track, the structured-knowledge companion
     to the CCA capstone labs. A recommended preparatory resource &mdash; not affiliated with or endorsed
@@ -852,6 +1055,196 @@
     against current documentation before relying on specifics.
   </p>
 </footer>
+
+<script>
+  window.KT_MODULE_ID       = 'module-1-agentic-architecture';
+  window.KT_CONTENT_VERSION = '1';
+  window.KT_TOTAL_SECTIONS  = 7;
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CCA Knowledge Track — section gate engine
+   ---------------------------------------------------------------------------
+   Section-level progress  →  localStorage (survives refresh, timeout, breaks)
+   Module-level completion →  Firestore courseProgress  [WIRING PASS — see below]
+
+   Storage key: ccaKT_<MODULE_ID>_<uid>_v<CONTENT_VERSION>
+     · keyed by uid so shared browsers don't collide
+     · versioned so changed questions invalidate stale "complete" state
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var MODULE_ID      = window.KT_MODULE_ID || 'module-x';
+  var CONTENT_VERSION = window.KT_CONTENT_VERSION || '1';
+  var TOTAL_SECTIONS  = window.KT_TOTAL_SECTIONS || 0;
+
+  function uid() {
+    return (window._learnerUid) || (window.sessionStorage && sessionStorage.getItem('_learnerUid')) || 'anon';
+  }
+  var KEY = 'ccaKT_' + MODULE_ID + '_' + uid() + '_v' + CONTENT_VERSION;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { /* storage disabled/full — gate still works in-session */ }
+  }
+
+  var state = load();
+
+  function isSectionComplete(id) { return state[id] === true; }
+
+  /* ── SEAM: module completion ──────────────────────────────────────────────
+     Today: records locally + reveals the module-complete panel.
+     WIRING PASS: add the Firestore courseProgress v2 write here — this is the
+     only function that needs to change. moduleKey = filename minus .html.   */
+  function markModuleComplete() {
+    state.__moduleComplete = true;
+    save(state);
+    var panel = document.getElementById('mod-done');
+    if (panel) panel.classList.add('show');
+    // TODO(wiring): writeCourseProgress(CP_COURSE_ID, MODULE_ID, {complete:true})
+  }
+
+  function completedCount() {
+    return Object.keys(state).filter(function (k) {
+      return k.indexOf('sec-') === 0 && state[k] === true;
+    }).length;
+  }
+
+  function markSectionComplete(id) {
+    state[id] = true;
+    save(state);
+    unlockNext(id);
+    if (TOTAL_SECTIONS && completedCount() >= TOTAL_SECTIONS) markModuleComplete();
+  }
+
+  function unlockNext(id) {
+    var gate = document.querySelector('.sect-gate[data-for="' + id + '"]');
+    if (!gate) return;
+    var btn  = gate.querySelector('.btn-next');
+    var note = gate.querySelector('.gate-note');
+    if (btn)  btn.classList.remove('locked');
+    if (note) { note.textContent = 'Section complete — next section unlocked.'; note.classList.add('unlocked'); }
+  }
+
+  /* ── quiz rendering / grading ─────────────────────────────────────────── */
+  function gradeQuestion(qEl) {
+    var picked = qEl.querySelector('input[type=radio]:checked');
+    if (!picked) return null;
+    return picked.value === qEl.getAttribute('data-answer');
+  }
+
+  function lockQuestion(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.add('disabled');
+      var r = o.querySelector('input'); if (r) r.disabled = true;
+    });
+  }
+
+  function resetQuestionStyles(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.remove('correct', 'wrong');
+    });
+  }
+
+  function checkSection(secId) {
+    var kc = document.querySelector('.kcheck[data-section="' + secId + '"]');
+    if (!kc) return;
+    var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+    var allAnswered = qs.every(function (q) { return q.querySelector('input:checked'); });
+    if (!allAnswered) return;
+
+    var allRight = true;
+    qs.forEach(function (q) {
+      resetQuestionStyles(q);
+      var ok  = gradeQuestion(q);
+      var fb  = q.querySelector('.kfb');
+      var sel = q.querySelector('input:checked');
+      var selOpt = sel ? sel.closest('.opt') : null;
+
+      if (ok) {
+        if (selOpt) selOpt.classList.add('correct');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      } else {
+        allRight = false;
+        if (selOpt) selOpt.classList.add('wrong');
+        if (fb) { fb.className = 'kfb no show'; fb.innerHTML = '<strong>Not quite.</strong> ' + (q.getAttribute('data-why-no') || '') + ' <em>Try again.</em>'; }
+        // wrong answers stay open for retry — clear the selection
+        if (sel) sel.checked = false;
+      }
+    });
+
+    var status = kc.querySelector('.kc-status');
+    if (allRight) {
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      markSectionComplete(secId);
+    } else if (status) {
+      status.textContent = 'Some answers need another look';
+      status.classList.remove('done');
+    }
+  }
+
+  /* ── restore prior progress on load ───────────────────────────────────── */
+  function restore() {
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      if (!isSectionComplete(secId)) return;
+      kc.querySelectorAll('.kq').forEach(function (q) {
+        var ans = q.getAttribute('data-answer');
+        var input = q.querySelector('input[value="' + ans + '"]');
+        if (input) { input.checked = true; var o = input.closest('.opt'); if (o) o.classList.add('correct'); }
+        var fb = q.querySelector('.kfb');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      });
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      var status = kc.querySelector('.kc-status');
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      unlockNext(secId);
+    });
+    if (state.__moduleComplete) {
+      var panel = document.getElementById('mod-done');
+      if (panel) panel.classList.add('show');
+    }
+  }
+
+  /* ── wire up ──────────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-check').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        checkSection(btn.getAttribute('data-section'));
+      });
+    });
+    // enable the check button only once every question in that block has a pick
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      kc.addEventListener('change', function () {
+        var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+        var all = qs.every(function (q) { return q.querySelector('input:checked'); });
+        var btn = kc.querySelector('.btn-check');
+        if (btn && !btn.disabled) btn.disabled = !all;
+      });
+      var btn0 = kc.querySelector('.btn-check');
+      if (btn0) btn0.disabled = true;
+    });
+    var reset = document.getElementById('kt-reset');
+    if (reset) reset.addEventListener('click', function () {
+      if (confirm('Clear your saved progress for this module?')) {
+        localStorage.removeItem(KEY); location.reload();
+      }
+    });
+    restore();
+  });
+})();
+</script>
 
 </body>
 </html>
