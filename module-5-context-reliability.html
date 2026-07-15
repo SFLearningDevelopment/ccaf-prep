@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<!-- build: 2026071506 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA Knowledge Track · Module 5 · Context Management &amp; Reliability</title>
+<style>
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* ---- module-specific ---- */
+.antipattern{background:#fbeeee;border:1px solid #e3b7b0;border-left:3px solid #b0432f;border-radius:8px;padding:16px 20px;margin:22px 0;font-size:15px}
+.antipattern .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#b0432f;margin-bottom:8px;font-weight:600}
+.antipattern ul{margin:8px 0 0;padding-left:20px}
+.antipattern li{margin:5px 0}
+.capstone{background:#eaf1ee;border:1px solid #bcd6cb;border-radius:10px;padding:16px 20px;margin:22px 0;display:flex;gap:14px;align-items:flex-start}
+.capstone .icn{color:var(--accent);font-size:20px;line-height:1;flex-shrink:0;margin-top:1px}
+.capstone .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:600}
+.capstone a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(47,111,94,.35)}
+.capstone a:hover{border-bottom-color:var(--accent)}
+.kpoints{margin:16px 0}
+.kpoints .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+.taskref{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+.in-practice{margin:16px 0}
+.in-practice .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+
+/* ---- knowledge check MCQ ---- */
+.kcheck{background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-radius:12px;padding:24px 26px;margin:28px 0 0}
+.kcheck > .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;font-weight:600}
+.kcheck .kc-sub{font-size:13.5px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5}
+.kq{margin:0 0 20px;padding:0 0 20px;border-bottom:1px dashed #c5d8d0}
+.kcheck .kq:last-of-type{border-bottom:none;padding-bottom:6px;margin-bottom:10px}
+.kq .qtext{display:block;font-weight:600;font-size:15.5px;margin:0 0 14px;color:var(--ink);line-height:1.5}
+.kq .qnum{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--accent);background:#dfeae5;border-radius:4px;padding:2px 6px;margin-right:9px;vertical-align:2px}
+.kq .opt{display:flex!important;width:100%;box-sizing:border-box;gap:11px;align-items:flex-start;padding:11px 14px;margin:0 0 8px;background:var(--card);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14.5px;line-height:1.55;transition:border-color .12s,background .12s}
+.kq .opt:hover{border-color:var(--accent);background:#fbfaf7}
+.kq .opt input{margin:3px 0 0;flex:0 0 auto;cursor:pointer;accent-color:var(--accent)}
+.kq .opt > span{flex:1 1 auto}
+.kq .opt.correct{background:#e5efe9;border-color:var(--accent)}
+.kq .opt.wrong{background:#fbeeee;border-color:#c98374}
+.kq .opt.disabled{cursor:default}
+.kq .opt.disabled:hover{border-color:var(--line);background:var(--card)}
+.kq .opt.correct.disabled{border-color:var(--accent);background:#e5efe9}
+.kfb{display:none;margin:12px 0 0;padding:12px 15px;border-radius:8px;font-size:14px;line-height:1.6}
+.kfb.show{display:block}
+.kfb.ok{background:#e5efe9;border:1px solid #bcd6cb;color:#245244}
+.kfb.no{background:#fbeeee;border:1px solid #e3b7b0;color:#8f3a2b}
+.kfb strong{font-weight:600}
+.kc-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.btn-check{font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:8px;padding:11px 22px;cursor:pointer;transition:opacity .15s}
+.btn-check:hover:not(:disabled){opacity:.88}
+.btn-check:disabled{background:#bfcbc6;cursor:not-allowed}
+.kc-status{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+.kc-status.done{color:var(--accent);font-weight:600}
+
+/* section gate — toggle button */
+.sect-gate{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 8px;padding:18px 26px 26px;background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-top:none;border-radius:0 0 12px 12px}
+.btn-next{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-size:15px;font-weight:600;text-decoration:none;border:none;border-radius:8px;padding:12px 24px;transition:background .18s,color .18s,opacity .15s}
+.btn-next .lockicn{font-size:13px;line-height:1}
+.btn-next.locked{background:#d3dbd8;color:#7d8a85;cursor:not-allowed;pointer-events:none}
+.btn-next.unlocked{background:var(--accent);color:#fff;cursor:pointer}
+.btn-next.unlocked:hover{opacity:.88}
+.gate-note{font-size:13.5px;color:var(--ink-soft)}
+.gate-note.unlocked{color:var(--accent);font-weight:600}
+
+.mod-done{background:#e5efe9;border:1px solid #bcd6cb;border-radius:12px;padding:24px 26px;margin:28px 0;display:none}
+.mod-done.show{display:block}
+.mod-done h3{margin:0 0 8px;font-size:19px;color:var(--accent)}
+.mod-done p{margin:0;font-size:15px;color:var(--ink-soft);line-height:1.6}
+.reset-link{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0}
+.reset-link:hover{color:var(--accent)}
+
+/* ---- section locking ---- */
+.lock-shade{display:flex;align-items:center;gap:16px;background:var(--paper-2);border:1px dashed #c8bfa9;border-radius:12px;padding:20px 24px;margin:20px 0 8px}
+.lock-shade .lock-ic{font-size:22px;line-height:1;opacity:.55;flex-shrink:0}
+.lock-shade strong{display:block;font-size:15px;color:var(--ink);margin-bottom:3px}
+.lock-shade p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.lock-shade > div{flex:1 1 auto}
+.lock-jump{flex-shrink:0;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid #bcd6cb;background:#eef3f1;border-radius:7px;padding:9px 15px;transition:background .15s}
+.lock-jump:hover{background:#e0ebe6}
+.lock-shade.hidden{display:none}
+.sect-body{display:none}
+.sect-body.open{display:block}
+.stage.is-locked .stage-head h2{opacity:.5}
+.stage.is-locked .domain-tag{opacity:.5}
+</style>
+</head><body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub · CCA Knowledge Track</p>
+    <h1 class="title">Module 5<br><em>Context Management</em> &amp; Reliability</h1>
+    <p class="standfirst">
+      The final domain, and the one that decides whether a system holds up in production. What
+      survives a long conversation, when to escalate to a human, how errors travel between agents,
+      keeping your footing in a large codebase, calibrating confidence for human review, and never
+      losing track of where a fact came from. Six task statements.
+    </p>
+    <div class="prep-banner">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>This is a recommended preparatory step, not a certification course.</strong>
+        Completing this module does not grant a certificate and is not the CCA exam. The exam is
+        booked separately through Anthropic and has its own prerequisites. This track is the
+        structured-knowledge companion to the hands-on capstone labs &mdash; use both.
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="roadmap">
+    <h2>This module, in six sections</h2>
+    <p class="sub">One per task statement in the Context Management &amp; Reliability domain. Each pairs the knowledge the exam tests with the anti-patterns it probes &mdash; and links to the capstone lab where you build it.</p>
+    <ol>
+      <li><div class="rm-body"><a href="#s5-1">5.1 · Preserving context across long interactions</a><small>summarization risk, lost-in-the-middle, case facts</small></div><span class="rm-domain">Task 5.1</span></li>
+      <li><div class="rm-body"><a href="#s5-2">5.2 · Escalation &amp; ambiguity resolution</a><small>real triggers vs unreliable proxies</small></div><span class="rm-domain">Task 5.2</span></li>
+      <li><div class="rm-body"><a href="#s5-3">5.3 · Error propagation across agents</a><small>structured context, access failure vs empty</small></div><span class="rm-domain">Task 5.3</span></li>
+      <li><div class="rm-body"><a href="#s5-4">5.4 · Context in large codebase exploration</a><small>degradation, scratchpads, state manifests</small></div><span class="rm-domain">Task 5.4</span></li>
+      <li><div class="rm-body"><a href="#s5-5">5.5 · Human review &amp; confidence calibration</a><small>aggregate metrics lie; stratified sampling</small></div><span class="rm-domain">Task 5.5</span></li>
+      <li><div class="rm-body"><a href="#s5-6">5.6 · Provenance &amp; multi-source synthesis</a><small>claim-source mappings, conflicts, dates</small></div><span class="rm-domain">Task 5.6</span></li>
+    </ol>
+  </div>
+
+  <div class="prereqs">
+    <h3>How to use this module</h3>
+    <p>Same fixed shape as the previous modules: <strong>what &amp; why</strong>, <strong>knowledge points</strong>, <strong>in practice</strong>, <strong>anti-patterns</strong>, an <strong>exam lens</strong>, and a gated <strong>knowledge check</strong>, with capstone links. Answer every question correctly to unlock the next section.</p>
+    <div class="note">
+      The thread here: <strong>information degrades unless you deliberately protect it</strong>.
+      Summaries lose numbers, middles get skipped, errors flatten into &ldquo;failed,&rdquo; sources detach
+      from claims, and aggregate metrics hide the segments that are broken. Every section is a
+      countermeasure.
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- ============ 5.1 ============ -->
+  <section class="stage" id="s5-1">
+    <div class="stage-head">
+      <span class="stage-num">Section 5.1</span>
+      <h2>Manage conversation context to preserve critical information across long interactions</h2>
+      <span class="domain-tag">Task Statement 5.1</span>
+    </div>
+    <p class="lede">Long conversations lose things &mdash; and they lose the <em>specific</em> things first. Amounts become &ldquo;a refund,&rdquo; dates become &ldquo;recently,&rdquo; and the customer&rsquo;s exact expectation becomes a vague sense of dissatisfaction. This section is about protecting the facts that matter.</p>
+
+    <h3>What &amp; why</h3>
+    <p>Three failure modes to know. <strong>Progressive summarization</strong> condenses numerical values, percentages, dates, and customer-stated expectations into vague summaries &mdash; the precise details are exactly what gets lost. The <strong>&ldquo;lost in the middle&rdquo; effect</strong> means models reliably process information at the beginning and end of long inputs but may omit findings from the middle. And <strong>tool results accumulate</strong>, consuming tokens disproportionately to their relevance &mdash; 40+ fields per order lookup when 5 matter. The countermeasure to the first is a <strong>persistent &ldquo;case facts&rdquo; block</strong> carried in each prompt, outside the summarized history.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Progressive summarization risks</strong>: condensing numerical values, percentages, dates, and customer-stated expectations into vague summaries.</li>
+        <li>The <strong>&ldquo;lost in the middle&rdquo; effect</strong>: models reliably process the beginning and end of long inputs but may omit middle sections.</li>
+        <li><strong>Tool results accumulate</strong> and consume tokens disproportionately to their relevance (40+ fields per lookup when only 5 are relevant).</li>
+        <li>The importance of <strong>passing complete conversation history</strong> in subsequent API requests to maintain coherence.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Extract <strong>transactional facts into a persistent &ldquo;case facts&rdquo; block</strong> (amounts, dates, order numbers, statuses) included in each prompt, outside summarized history.</li>
+        <li><strong>Trim verbose tool outputs to relevant fields</strong> before they accumulate.</li>
+        <li><strong>Place key findings at the beginning</strong> of aggregated inputs and organize details with explicit section headers, mitigating position effects.</li>
+        <li>Require <strong>subagents to include metadata</strong> (dates, source locations, methodological context) in structured outputs for accurate downstream synthesis.</li>
+        <li>Modify upstream agents to <strong>return structured data rather than verbose content</strong> when downstream agents have limited context budgets.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Relying on progressive summarization to carry exact figures</strong> &mdash; amounts and dates are precisely what it degrades.</li>
+        <li><strong>Burying key findings in the middle</strong> of a long aggregated input &mdash; that's where omission happens.</li>
+        <li>Letting <strong>raw 40-field tool results pile up</strong> in context instead of trimming to what's relevant.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      &ldquo;The agent forgot the refund amount after a long conversation&rdquo; &rarr; a <strong>case-facts
+      block</strong> carried outside the summarized history, not a better summarizer. &ldquo;Findings from
+      the middle of the report are missing&rdquo; &rarr; <strong>lost-in-the-middle</strong>; put key
+      findings at the start and use explicit headers. Context bloat from tool results &rarr;
+      <strong>trim to relevant fields</strong>.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Customer Support Resolution Agent</strong> lab builds the case-facts block; the
+        <strong>Multi-Agent Research System</strong> lab handles position effects when aggregating
+        subagent findings.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-5-1">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Progressive summarization degrades exactly these details. A case-facts block carried outside the summary protects them." data-why-no="Progressive summarization condenses numerical values and dates into vague summaries — that&#x27;s the named risk. The countermeasure is a persistent case-facts block outside the summarized history.">
+          <p class="qtext"><span class="qnum">Q1</span>After a long support conversation, your agent has forgotten the exact refund amount and order date, describing them vaguely instead. What's the fix?</p>
+          <label class="opt"><input type="radio" name="sec-5-1-q1" value="a"><span>Increase the context window size</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q1" value="b"><span>Extract transactional facts into a persistent "case facts" block included in each prompt, outside the summarized history</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q1" value="c"><span>Instruct the summarizer to be more detailed</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q1" value="d"><span>Re-run the order lookup tool every turn</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="Lost-in-the-middle is the named effect. Mitigate by placing key findings at the beginning and using explicit section headers." data-why-no="This is the &quot;lost in the middle&quot; effect: models reliably process information at the beginning and end of long inputs but may omit findings from middle sections.">
+          <p class="qtext"><span class="qnum">Q2</span>Your synthesis agent consistently omits findings that appeared in the middle of a long aggregated input. What's happening?</p>
+          <label class="opt"><input type="radio" name="sec-5-1-q2" value="a"><span>The "lost in the middle" effect — models reliably process the beginning and end of long inputs but may omit middle sections</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q2" value="b"><span>The input exceeded the context window and was truncated</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q2" value="c"><span>The middle sections were malformed</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q2" value="d"><span>The model deprioritizes lower-relevance content automatically</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Tool results accumulate and consume tokens disproportionately to their relevance. Trimming to relevant fields is the named practice." data-why-no="The named skill: trim verbose tool outputs to only relevant fields before they accumulate — e.g. keeping only return-relevant fields from order lookups.">
+          <p class="qtext"><span class="qnum">Q3</span>Each order lookup returns 40+ fields, but only about 5 matter for a return request. What should you do?</p>
+          <label class="opt"><input type="radio" name="sec-5-1-q3" value="a"><span>Nothing — extra fields might be useful later</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q3" value="b"><span>Trim verbose tool outputs to only the relevant fields before they accumulate in context</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q3" value="c"><span>Summarize the tool output with a second model call</span></label>
+          <label class="opt"><input type="radio" name="sec-5-1-q3" value="d"><span>Store the full output in a file and reference it</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-5-1">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-5-1">
+      <a class="btn-next locked" href="#s5-2" data-label="Continue to Section 5.2"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 5.2</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+  </section>
+
+  <!-- ============ 5.2 ============ -->
+  <section class="stage" id="s5-2">
+    <div class="stage-head">
+      <span class="stage-num">Section 5.2</span>
+      <h2>Design effective escalation and ambiguity resolution patterns</h2>
+      <span class="domain-tag">Task Statement 5.2</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-5-1">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 5.1 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s5-1">Go to Section 5.1</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-5-2">
+    <p class="lede">Knowing when to hand off to a human is a design decision, not a vibe. The traps here are seductive: escalating because the customer sounds upset, or because the model says it isn&rsquo;t confident. Neither correlates with whether a human is actually needed.</p>
+
+    <h3>What &amp; why</h3>
+    <p>There are three legitimate escalation triggers: the <strong>customer explicitly asks for a human</strong>, the <strong>policy has a gap or exception</strong> (not merely a complex case), or the agent <strong>can&rsquo;t make meaningful progress</strong>. What are <em>not</em> reliable triggers: <strong>sentiment</strong> and <strong>self-reported confidence scores</strong> &mdash; neither is a good proxy for actual case complexity. A frustrated customer with a simple problem should get it solved, not shunted to a queue. But an explicit request for a human is honored <em>immediately</em>, without first attempting an investigation. And when a lookup returns multiple matches, the agent asks for another identifier rather than guessing heuristically.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>Appropriate triggers: <strong>customer requests a human</strong>, <strong>policy exceptions/gaps</strong> (not just complex cases), <strong>inability to make meaningful progress</strong>.</li>
+        <li>The distinction between <strong>escalating immediately on explicit demand</strong> versus offering to resolve when the issue is straightforward.</li>
+        <li>Why <strong>sentiment-based escalation and self-reported confidence scores are unreliable proxies</strong> for actual case complexity.</li>
+        <li>How <strong>multiple customer matches require clarification</strong> (requesting additional identifiers) rather than heuristic selection.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Add <strong>explicit escalation criteria with few-shot examples</strong> to the system prompt showing when to escalate versus resolve autonomously.</li>
+        <li><strong>Honor explicit requests for a human immediately</strong>, without first attempting investigation.</li>
+        <li><strong>Acknowledge frustration while offering resolution</strong> when the issue is within capability &mdash; escalating only if the customer reiterates.</li>
+        <li><strong>Escalate when policy is ambiguous or silent</strong> on the request (competitor price matching when policy only addresses own-site adjustments).</li>
+        <li>Instruct the agent to <strong>ask for additional identifiers on multiple matches</strong> rather than selecting heuristically.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Sentiment-triggered escalation</strong> &mdash; an angry customer with a simple issue doesn't need a human, they need their issue fixed.</li>
+        <li><strong>Confidence-score-triggered escalation</strong> &mdash; self-reported confidence isn't a reliable complexity signal.</li>
+        <li><strong>Investigating first when the customer explicitly asked for a human</strong> &mdash; honor it immediately.</li>
+        <li><strong>Picking the most likely match heuristically</strong> when a lookup is ambiguous &mdash; ask for another identifier.</li>
+        <li>Escalating <strong>merely because a case is complex</strong> &mdash; complexity isn't a policy gap.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Sort the triggers cleanly: <strong>explicit request, policy gap, no progress</strong> are real;
+      <strong>sentiment and self-reported confidence</strong> are the named unreliable proxies and
+      appear as distractors. &ldquo;Customer is angry but the issue is simple&rdquo; &rarr; acknowledge and
+      resolve, escalate only if they insist. &ldquo;Customer says get me a human&rdquo; &rarr; immediately, no
+      investigation first.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Customer Support Resolution Agent</strong> lab implements exactly these triggers,
+        including the structured escalation handoff.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-5-2">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Sentiment isn&#x27;t a reliable proxy for complexity. Acknowledge the feeling, solve the problem, and escalate only if they insist." data-why-no="Sentiment-based escalation is a named unreliable proxy for actual case complexity. Acknowledge frustration while offering resolution when the issue is within capability.">
+          <p class="qtext"><span class="qnum">Q1</span>A customer is clearly frustrated, but their issue is a straightforward return your agent can process. What should it do?</p>
+          <label class="opt"><input type="radio" name="sec-5-2-q1" value="a"><span>Escalate immediately — frustration indicates the case needs a human</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q1" value="b"><span>Acknowledge the frustration while offering resolution, escalating only if the customer reiterates their preference</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q1" value="c"><span>Process the return without acknowledging the tone</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q1" value="d"><span>Ask the customer to rate their frustration level</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Policy gaps and exceptions are a legitimate trigger. Note it&#x27;s the policy being silent, not the case merely being complex." data-why-no="The appropriate triggers are: explicit customer request for a human, policy exceptions/gaps, and inability to make progress. Sentiment and self-reported confidence are named unreliable proxies; complexity alone isn&#x27;t a trigger.">
+          <p class="qtext"><span class="qnum">Q2</span>Which of these IS an appropriate escalation trigger?</p>
+          <label class="opt"><input type="radio" name="sec-5-2-q2" value="a"><span>The model's self-reported confidence score is below 0.7</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q2" value="b"><span>The customer's message has negative sentiment</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q2" value="c"><span>The policy is silent on the customer's specific request — e.g. competitor price matching when policy only covers own-site adjustments</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q2" value="d"><span>The case involves more than three separate issues</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Multiple matches require clarification — asking for another identifier — rather than heuristic selection." data-why-no="Multiple matches require clarification (requesting additional identifiers) rather than heuristic selection. Guessing risks acting on the wrong customer&#x27;s account.">
+          <p class="qtext"><span class="qnum">Q3</span>A customer lookup returns three matching customers. What should the agent do?</p>
+          <label class="opt"><input type="radio" name="sec-5-2-q3" value="a"><span>Select the most recently active match</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q3" value="b"><span>Select the closest name match</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q3" value="c"><span>Ask for an additional identifier to disambiguate</span></label>
+          <label class="opt"><input type="radio" name="sec-5-2-q3" value="d"><span>Escalate to a human immediately</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-5-2">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-5-2">
+      <a class="btn-next locked" href="#s5-3" data-label="Continue to Section 5.3"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 5.3</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.3 ============ -->
+  <section class="stage" id="s5-3">
+    <div class="stage-head">
+      <span class="stage-num">Section 5.3</span>
+      <h2>Implement error propagation strategies across multi-agent systems</h2>
+      <span class="domain-tag">Task Statement 5.3</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-5-2">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 5.2 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s5-2">Go to Section 5.2</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-5-3">
+    <p class="lede">When a subagent fails, what the coordinator learns determines what it can do about it. &ldquo;Search unavailable&rdquo; tells it nothing. Structured error context &mdash; what failed, what was tried, what came back anyway &mdash; lets it recover intelligently.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Structured error context</strong> (failure type, attempted query, partial results, alternative approaches) is what enables intelligent coordinator recovery. Two anti-patterns sit at the extremes: <strong>silently suppressing errors</strong> (returning empty results as success) hides the problem, and <strong>terminating the entire workflow on a single failure</strong> throws away everything else that worked. Both are wrong. And the recurring distinction from Module 2 returns here: an <strong>access failure</strong> (a timeout needing a retry decision) is not a <strong>valid empty result</strong> (a successful query with no matches). Conflating them makes the coordinator retry things that already worked, or treat real failures as data.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Structured error context</strong> (failure type, attempted query, partial results, alternative approaches) enables intelligent coordinator recovery.</li>
+        <li>The distinction between <strong>access failures</strong> (timeouts needing retry decisions) and <strong>valid empty results</strong> (successful queries with no matches).</li>
+        <li>Why <strong>generic error statuses</strong> (&ldquo;search unavailable&rdquo;) hide valuable context from the coordinator.</li>
+        <li>Why <strong>silently suppressing errors</strong> and <strong>terminating entire workflows on single failures</strong> are both anti-patterns.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Return <strong>structured error context</strong>: failure type, what was attempted, partial results, potential alternatives.</li>
+        <li><strong>Distinguish access failures from valid empty results</strong> in reporting so the coordinator decides appropriately.</li>
+        <li>Have subagents <strong>implement local recovery for transient failures</strong>, propagating only what they can't resolve &mdash; with what was attempted and any partial results.</li>
+        <li>Structure synthesis output with <strong>coverage annotations</strong> indicating which findings are well-supported and which topic areas have gaps from unavailable sources.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Generic error statuses</strong> that strip the context the coordinator needs to recover.</li>
+        <li><strong>Silently returning empty results as success</strong> when a source actually failed &mdash; the gap becomes invisible.</li>
+        <li><strong>Terminating the whole workflow</strong> because one subagent failed &mdash; discards all the work that succeeded.</li>
+        <li>Presenting synthesis <strong>without coverage annotations</strong>, so gaps from unavailable sources look like genuine absence of findings.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      Both extremes are wrong: <strong>swallow the error</strong> and <strong>kill the workflow</strong>
+      are named anti-patterns, and they'll both appear as options. The right answer returns
+      <strong>structured context with partial results</strong> so the coordinator decides. And watch
+      the empty-vs-failure distinction &mdash; it recurs across Modules 2 and 5 because it's heavily
+      tested.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Multi-Agent Research System</strong> lab propagates structured errors with partial
+        results and annotates coverage gaps in synthesis.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-5-3">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="c" data-why-ok="Structured error context is what lets the coordinator make an intelligent recovery decision rather than guessing." data-why-no="Generic statuses hide context; silently returning empty results and terminating the whole workflow are both named anti-patterns. Structured error context enables recovery.">
+          <p class="qtext"><span class="qnum">Q1</span>A search subagent times out. Which response best enables coordinator recovery?</p>
+          <label class="opt"><input type="radio" name="sec-5-3-q1" value="a"><span>Return "search unavailable"</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q1" value="b"><span>Return empty results so the workflow continues smoothly</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q1" value="c"><span>Return structured context: failure type, what was attempted, partial results, and potential alternatives</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q1" value="d"><span>Terminate the workflow so the failure is visible</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Silently suppressing errors makes a coverage gap look like a real finding of nothing — the coordinator can&#x27;t tell the difference." data-why-no="Silently suppressing errors (returning empty results as success) is a named anti-pattern: it hides the failure, so a coverage gap is indistinguishable from a genuine empty result.">
+          <p class="qtext"><span class="qnum">Q2</span>Why is silently returning empty results when a source failed an anti-pattern?</p>
+          <label class="opt"><input type="radio" name="sec-5-3-q2" value="a"><span>It wastes tokens</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q2" value="b"><span>It hides the failure — the gap becomes invisible and gets treated as genuine absence of findings</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q2" value="c"><span>It causes the coordinator to retry indefinitely</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q2" value="d"><span>It violates the MCP specification</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Coverage annotations tell the reader what&#x27;s well-supported and where the gaps are — honest and actionable." data-why-no="The named skill: structure synthesis output with coverage annotations indicating which findings are well-supported versus which topic areas have gaps due to unavailable sources.">
+          <p class="qtext"><span class="qnum">Q3</span>Your synthesis agent produces a report, but two of five sources were unavailable. How should the output reflect that?</p>
+          <label class="opt"><input type="radio" name="sec-5-3-q3" value="a"><span>Omit any mention — report only what was found</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q3" value="b"><span>Include coverage annotations indicating which findings are well-supported and which topic areas have gaps due to unavailable sources</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q3" value="c"><span>Mark the entire report as unreliable</span></label>
+          <label class="opt"><input type="radio" name="sec-5-3-q3" value="d"><span>Retry the whole workflow until all sources respond</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-5-3">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-5-3">
+      <a class="btn-next locked" href="#s5-4" data-label="Continue to Section 5.4"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 5.4</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.4 ============ -->
+  <section class="stage" id="s5-4">
+    <div class="stage-head">
+      <span class="stage-num">Section 5.4</span>
+      <h2>Manage context effectively in large codebase exploration</h2>
+      <span class="domain-tag">Task Statement 5.4</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-5-3">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 5.3 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s5-3">Go to Section 5.3</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-5-4">
+    <p class="lede">Extended exploration sessions degrade in a specific, recognizable way: the agent stops citing the classes it actually found and starts describing "typical patterns." That's the tell &mdash; and there are concrete countermeasures.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Context degradation</strong> in long sessions shows up as inconsistent answers and references to <em>typical</em> patterns rather than the specific classes discovered earlier. The countermeasures: <strong>scratchpad files</strong> that persist key findings across context boundaries; <strong>subagent delegation</strong> to isolate verbose exploration while the main agent coordinates high-level understanding; and <strong>structured state persistence</strong> for crash recovery, where each agent exports state to a known location and the coordinator loads a manifest on resume. <code>/compact</code> reduces context usage when discovery output fills the window.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li><strong>Context degradation</strong> in extended sessions: inconsistent answers, referencing &ldquo;typical patterns&rdquo; rather than specific classes discovered earlier.</li>
+        <li>The role of <strong>scratchpad files</strong> for persisting key findings across context boundaries.</li>
+        <li><strong>Subagent delegation</strong> for isolating verbose exploration output while the main agent coordinates.</li>
+        <li><strong>Structured state persistence for crash recovery</strong>: agents export state to a known location; the coordinator loads a manifest on resume.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li><strong>Spawn subagents to investigate specific questions</strong> (&ldquo;find all test files,&rdquo; &ldquo;trace refund flow dependencies&rdquo;) while the main agent preserves high-level coordination.</li>
+        <li>Have agents <strong>maintain scratchpad files recording key findings</strong>, referencing them for subsequent questions to counteract degradation.</li>
+        <li><strong>Summarize key findings from one exploration phase</strong> before spawning subagents for the next, injecting summaries into initial context.</li>
+        <li>Design <strong>crash recovery using structured state exports (manifests)</strong> the coordinator loads on resume and injects into agent prompts.</li>
+        <li>Use <strong><code>/compact</code></strong> to reduce context usage during extended exploration.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Ignoring the degradation signal</strong> &mdash; when answers turn generic ("typical patterns"), the context has degraded; pushing on produces worse answers.</li>
+        <li>Running <strong>verbose exploration in the main session</strong> rather than delegating to subagents.</li>
+        <li><strong>Keeping findings only in conversation context</strong> instead of a scratchpad file that survives boundaries.</li>
+        <li><strong>No state export</strong>, so a crash means re-exploring everything from scratch.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      The recognizable symptom: <strong>"the agent started referencing typical patterns instead of
+      the specific classes it found"</strong> &mdash; that's context degradation, and the answers are
+      scratchpad files, subagent delegation, and phase summaries. For crash recovery, the expected
+      design is <strong>structured state exports plus a manifest</strong> the coordinator loads on resume.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Developer Productivity</strong> lab explores a large legacy codebase with scratchpads
+        and subagent delegation &mdash; this section under real conditions.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-5-4">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="That exact symptom — generic &quot;typical patterns&quot; instead of specific discovered classes — is the named signature of context degradation." data-why-no="This is the named signature of context degradation in extended sessions: inconsistent answers and references to &quot;typical patterns&quot; rather than specific classes discovered earlier.">
+          <p class="qtext"><span class="qnum">Q1</span>Deep into a long codebase exploration, the agent starts giving inconsistent answers and referencing "typical patterns" rather than the specific classes it found earlier. What is this?</p>
+          <label class="opt"><input type="radio" name="sec-5-4-q1" value="a"><span>The model hitting its knowledge cutoff</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q1" value="b"><span>Context degradation in an extended session</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q1" value="c"><span>A tool permission failure</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q1" value="d"><span>Normal variation — re-ask the question</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Scratchpad files persist findings outside the conversation, so they survive context boundaries and counteract degradation." data-why-no="The named role of scratchpad files: persisting key findings across context boundaries, referenced for subsequent questions to counteract context degradation.">
+          <p class="qtext"><span class="qnum">Q2</span>What's the recommended countermeasure for preserving key findings across context boundaries during long exploration?</p>
+          <label class="opt"><input type="radio" name="sec-5-4-q2" value="a"><span>Increase max_tokens</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q2" value="b"><span>Scratchpad files that record key findings, referenced for subsequent questions</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q2" value="c"><span>Re-read the same files periodically</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q2" value="d"><span>Restart the session every hour</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="Structured state exports plus a coordinator-loaded manifest is the named crash-recovery design." data-why-no="The named design: structured agent state exports (manifests) that the coordinator loads on resume and injects into agent prompts.">
+          <p class="qtext"><span class="qnum">Q3</span>You're designing crash recovery for a multi-agent exploration. What's the recommended pattern?</p>
+          <label class="opt"><input type="radio" name="sec-5-4-q3" value="a"><span>Each agent exports state to a known location; the coordinator loads a manifest on resume and injects it into agent prompts</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q3" value="b"><span>Save the full conversation transcript and replay it</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q3" value="c"><span>Checkpoint the context window to disk</span></label>
+          <label class="opt"><input type="radio" name="sec-5-4-q3" value="d"><span>Run every agent twice for redundancy</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-5-4">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-5-4">
+      <a class="btn-next locked" href="#s5-5" data-label="Continue to Section 5.5"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 5.5</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.5 ============ -->
+  <section class="stage" id="s5-5">
+    <div class="stage-head">
+      <span class="stage-num">Section 5.5</span>
+      <h2>Design human review workflows and confidence calibration</h2>
+      <span class="domain-tag">Task Statement 5.5</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-5-4">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 5.4 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s5-4">Go to Section 5.4</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-5-5">
+    <p class="lede">97% accuracy sounds like a system ready to automate. It might also be 99% on the easy document type and 61% on the one that matters. Aggregate metrics hide exactly the failures you most need to see.</p>
+
+    <h3>What &amp; why</h3>
+    <p>The core risk: <strong>aggregate accuracy metrics may mask poor performance on specific document types or fields</strong>. Before reducing human review, you validate accuracy <em>by segment</em> &mdash; document type and field &mdash; not in aggregate. <strong>Stratified random sampling</strong> of high-confidence extractions measures ongoing error rates and detects novel error patterns that would otherwise go unnoticed. And <strong>field-level confidence scores</strong>, calibrated against labeled validation sets, let you route reviewer attention where it pays &mdash; low confidence or contradictory sources go to humans; the rest doesn't.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>The risk that <strong>aggregate accuracy metrics (97% overall) mask poor performance</strong> on specific document types or fields.</li>
+        <li><strong>Stratified random sampling</strong> for measuring error rates in high-confidence extractions and detecting novel error patterns.</li>
+        <li><strong>Field-level confidence scores calibrated using labeled validation sets</strong> for routing review attention.</li>
+        <li>The importance of <strong>validating accuracy by document type and field segment</strong> before automating high-confidence extractions.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Implement <strong>stratified random sampling of high-confidence extractions</strong> for ongoing error-rate measurement and novel pattern detection.</li>
+        <li><strong>Analyze accuracy by document type and field</strong> to verify consistent performance across all segments before reducing human review.</li>
+        <li>Have models <strong>output field-level confidence scores</strong>, then calibrate review thresholds using labeled validation sets.</li>
+        <li><strong>Route low-confidence or ambiguous/contradictory extractions to human review</strong>, prioritizing limited reviewer capacity.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Automating based on aggregate accuracy</strong> without segment analysis &mdash; the 97% may hide a broken document type.</li>
+        <li><strong>Never sampling high-confidence extractions</strong> &mdash; novel error patterns go undetected because nobody looks.</li>
+        <li><strong>Uncalibrated confidence thresholds</strong> &mdash; a self-reported score means nothing until validated against labeled data.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      &ldquo;97% accurate &mdash; can we drop human review?&rdquo; &rarr; <strong>not until you've analyzed
+      accuracy by document type and field</strong>. The aggregate is the trap. Expect
+      <strong>stratified random sampling</strong> as the ongoing-measurement answer, and
+      <strong>calibration against labeled validation sets</strong> as what makes confidence scores
+      trustworthy enough to route on.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Structured Data Extraction</strong> lab routes low-confidence records to human review
+        and surfaces per-field uncertainty rather than hiding it.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-5-5">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="The aggregate can hide a document type performing at 61%. Segment analysis by type and field comes before automating." data-why-no="The named risk: aggregate accuracy metrics (e.g. 97% overall) may mask poor performance on specific document types or fields. Validate by segment before reducing review.">
+          <p class="qtext"><span class="qnum">Q1</span>Your extraction pipeline reports 97% aggregate accuracy. Is that sufficient basis to reduce human review?</p>
+          <label class="opt"><input type="radio" name="sec-5-5-q1" value="a"><span>Yes — 97% exceeds most quality bars</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q1" value="b"><span>No — aggregate metrics may mask poor performance on specific document types or fields; analyze by segment first</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q1" value="c"><span>Yes, if the 3% errors are low-severity</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q1" value="d"><span>No — you need 99% before any automation</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Stratified random sampling is the named technique — it measures error rates and surfaces patterns nobody thought to look for." data-why-no="The named skill: stratified random sampling of high-confidence extractions for ongoing error rate measurement and novel pattern detection.">
+          <p class="qtext"><span class="qnum">Q2</span>How do you detect novel error patterns in extractions the model marked high-confidence?</p>
+          <label class="opt"><input type="radio" name="sec-5-5-q2" value="a"><span>Wait for downstream systems to report problems</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q2" value="b"><span>Stratified random sampling of high-confidence extractions for ongoing error-rate measurement</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q2" value="c"><span>Re-run every extraction with a second model</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q2" value="d"><span>Lower the confidence threshold until errors appear</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="b" data-why-ok="Calibration against labeled data is what turns a self-reported number into a usable routing signal." data-why-no="The named practice: field-level confidence scores calibrated using labeled validation sets — that&#x27;s what makes review thresholds meaningful.">
+          <p class="qtext"><span class="qnum">Q3</span>What makes a field-level confidence score trustworthy enough to route review decisions on?</p>
+          <label class="opt"><input type="radio" name="sec-5-5-q3" value="a"><span>Using a larger model to generate it</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q3" value="b"><span>Calibrating it against a labeled validation set</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q3" value="c"><span>Averaging scores across multiple runs</span></label>
+          <label class="opt"><input type="radio" name="sec-5-5-q3" value="d"><span>Asking the model to explain its confidence</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-5-5">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-5-5">
+      <a class="btn-next locked" href="#s5-6" data-label="Continue to Section 5.6"><span class="lockicn">&#128274;</span><span class="btxt">Continue to Section 5.6</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ 5.6 ============ -->
+  <section class="stage" id="s5-6">
+    <div class="stage-head">
+      <span class="stage-num">Section 5.6</span>
+      <h2>Preserve information provenance and handle uncertainty in multi-source synthesis</h2>
+      <span class="domain-tag">Task Statement 5.6</span>
+    </div>
+    <div class="lock-shade" data-locked-for="sec-5-5">
+      <span class="lock-ic">&#128274;</span>
+      <div>
+        <strong>This section is locked.</strong>
+        <p>Complete the knowledge check in Section 5.5 to unlock it.</p>
+      </div>
+      <a class="lock-jump" href="#s5-5">Go to Section 5.5</a>
+    </div>
+    <div class="sect-body" data-body-for="sec-5-6">
+    <p class="lede">Synthesis is where sources go to die. Compress five agents&rsquo; findings into one report and the claims survive but their origins don&rsquo;t &mdash; leaving you with confident assertions nobody can trace. Provenance has to be carried deliberately.</p>
+
+    <h3>What &amp; why</h3>
+    <p><strong>Source attribution is lost during summarization</strong> when findings are compressed without preserving claim-source mappings. The fix is <strong>structured claim-source mappings</strong> that the synthesis agent must preserve and merge rather than flatten. Related judgment calls: <strong>conflicting statistics from credible sources</strong> get <em>annotated with attribution</em>, not arbitrarily resolved by picking one; and <strong>temporal data</strong> needs publication or collection dates in structured outputs, or a 2023 figure and a 2025 figure look like a contradiction rather than a change over time. Finally, different content types should be <strong>rendered appropriately</strong> &mdash; financial data as tables, news as prose, technical findings as structured lists &mdash; rather than flattened into one uniform format.</p>
+
+    <div class="kpoints">
+      <span class="lbl">Knowledge points</span>
+      <ul>
+        <li>How <strong>source attribution is lost during summarization</strong> when findings are compressed without preserving claim-source mappings.</li>
+        <li>The importance of <strong>structured claim-source mappings</strong> that synthesis must preserve and merge.</li>
+        <li>How to handle <strong>conflicting statistics from credible sources</strong>: annotate conflicts with attribution rather than arbitrarily selecting one value.</li>
+        <li><strong>Temporal data</strong>: requiring publication/collection dates to prevent temporal differences being misread as contradictions.</li>
+      </ul>
+    </div>
+
+    <div class="in-practice">
+      <span class="lbl">In practice</span>
+      <ul>
+        <li>Require subagents to output <strong>structured claim-source mappings</strong> (source URLs, document names, relevant excerpts) that downstream agents preserve through synthesis.</li>
+        <li>Structure reports with <strong>explicit sections distinguishing well-established findings from contested ones</strong>, preserving original source characterizations and methodological context.</li>
+        <li>Complete document analysis with <strong>conflicting values included and explicitly annotated</strong>, letting the coordinator decide how to reconcile.</li>
+        <li>Require subagents to include <strong>publication or data collection dates</strong> for correct temporal interpretation.</li>
+        <li><strong>Render content types appropriately</strong> &mdash; financial data as tables, news as prose, technical findings as structured lists.</li>
+      </ul>
+    </div>
+
+    <div class="antipattern">
+      <span class="lbl">Anti-patterns the exam tests</span>
+      <ul>
+        <li><strong>Summarizing findings without carrying claim-source mappings</strong> &mdash; the report makes claims nobody can trace.</li>
+        <li><strong>Picking one value when credible sources conflict</strong> &mdash; annotate the conflict with attribution instead.</li>
+        <li><strong>Omitting dates</strong>, so a change over time reads as a contradiction between sources.</li>
+        <li><strong>Flattening every content type into uniform prose</strong> &mdash; financial data belongs in a table.</li>
+      </ul>
+    </div>
+
+    <div class="exam-lens">
+      <span class="lbl">Exam lens</span>
+      &ldquo;The final report has no citations&rdquo; &rarr; <strong>structured claim-source mappings</strong>
+      carried through synthesis, not a prompt asking for citations at the end. &ldquo;Two credible sources
+      disagree&rdquo; &rarr; <strong>annotate both with attribution</strong>; picking one is the distractor.
+      &ldquo;Sources seem to contradict&rdquo; &rarr; check for <strong>missing dates</strong> before assuming conflict.
+    </div>
+
+    <div class="capstone">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Build it in a capstone</span>
+        The <strong>Multi-Agent Research System</strong> lab carries source metadata through synthesis and
+        annotates conflicts; the <strong>Structured Data Extraction</strong> lab preserves provenance for
+        downstream consumers.
+      </div>
+    </div>
+
+    <div class="kcheck" data-section="sec-5-6">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">Answer all 3 correctly to unlock the next section. Wrong answers give feedback — retry until right.</p>
+        <div class="kq" data-answer="b" data-why-ok="Attribution is lost during summarization steps when findings are compressed without carrying claim-source mappings through." data-why-no="The named failure: source attribution is lost during summarization when findings are compressed without preserving claim-source mappings. Subagents must output them and synthesis must preserve and merge them.">
+          <p class="qtext"><span class="qnum">Q1</span>Your research system's final report makes solid claims but has lost all source attribution. Where did it go wrong?</p>
+          <label class="opt"><input type="radio" name="sec-5-6-q1" value="a"><span>The searcher didn't collect sources</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q1" value="b"><span>Findings were compressed during summarization without preserving claim-source mappings</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q1" value="c"><span>The report template omitted a citations section</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q1" value="d"><span>The synthesis model has no citation capability</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="c" data-why-ok="Annotating the conflict with attribution preserves the disagreement for the reader (or coordinator) to judge." data-why-no="The named practice: annotate conflicts with source attribution rather than arbitrarily selecting one value. Picking or averaging destroys real information.">
+          <p class="qtext"><span class="qnum">Q2</span>Two credible sources report different figures for the same statistic. What should the synthesis do?</p>
+          <label class="opt"><input type="radio" name="sec-5-6-q2" value="a"><span>Select the value from the more authoritative source</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q2" value="b"><span>Average the two values</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q2" value="c"><span>Annotate the conflict with source attribution, rather than arbitrarily selecting one value</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q2" value="d"><span>Omit the statistic entirely</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-answer="a" data-why-ok="A 2023 figure and a 2025 figure aren&#x27;t contradicting — they&#x27;re describing different moments. Dates are required for correct temporal interpretation." data-why-no="The named requirement: subagents must include publication or data collection dates in structured outputs, precisely so temporal differences aren&#x27;t misinterpreted as contradictions.">
+          <p class="qtext"><span class="qnum">Q3</span>Two sources appear to contradict each other on a market-size figure. What should you check before treating it as a conflict?</p>
+          <label class="opt"><input type="radio" name="sec-5-6-q3" value="a"><span>Whether the sources have publication or data collection dates — temporal differences can be misread as contradictions</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q3" value="b"><span>Whether both sources are peer-reviewed</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q3" value="c"><span>Whether the subagent used the same search query</span></label>
+          <label class="opt"><input type="radio" name="sec-5-6-q3" value="d"><span>Whether the figures use the same currency</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div class="kc-actions">
+        <button class="btn-check" data-section="sec-5-6">Check answers</button>
+        <span class="kc-status"></span>
+      </div>
+    </div>
+
+    <div class="sect-gate" data-for="sec-5-6">
+      <a class="btn-next locked" href="#close" data-label="Continue to the wrap-up"><span class="lockicn">&#128274;</span><span class="btxt">Continue to the wrap-up</span></a>
+      <span class="gate-note">Answer all questions correctly to unlock.</span>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ WRAP-UP ============ -->
+  <div class="mod-done" id="mod-done">
+    <h3>&#10003; Module 5 complete</h3>
+    <p>You've cleared every section's knowledge check. Your progress is saved in this browser.
+    That completes all five modules — the <strong>evaluation</strong> is now unlocked. Its questions are drawn from the capstone lab scenarios.</p>
+  </div>
+
+  <section class="stage" id="close">
+    <div class="stage-head">
+      <span class="stage-num">Module 5 · Wrap-up</span>
+      <h2>What this domain comes down to</h2>
+    </div>
+    <p>Context Management &amp; Reliability is what separates a demo from a system: facts that survive long conversations (5.1), escalation on real triggers rather than sentiment (5.2), errors that travel with enough context to recover from (5.3), exploration that doesn't degrade into vagueness (5.4), confidence calibrated per segment rather than trusted in aggregate (5.5), and claims that never lose their sources (5.6).</p>
+    <p>One thread ties the anti-patterns together: <strong>information degrades by default, and the specific always degrades first</strong>. Summaries lose the amounts. Middles get skipped. Errors flatten to "failed." Sources detach from claims. Aggregate metrics bury the broken segment. Every technique in this domain is a deliberate act against that drift &mdash; a case-facts block, a structured error, a claim-source mapping, a stratified sample. Reliability isn't something a system has; it's something you build in on purpose.</p>
+    <div class="capstone" style="margin-top:22px">
+      <span class="icn">&#9873;</span>
+      <div>
+        <span class="lbl">Your capstones for this domain</span>
+        <strong>Structured Data Extraction</strong> (5.5, 5.6) &middot;
+        <strong>Multi-Agent Research System</strong> (5.3, 5.6) &middot;
+        <strong>Developer Productivity</strong> (5.4) &middot;
+        <strong>Customer Support Resolution Agent</strong> (5.1, 5.2). This domain touches nearly every lab.
+      </div>
+    </div>
+    <div class="prep-banner" style="margin-top:24px">
+      <span class="icn">&#9873;</span>
+      <span>
+        <strong>That's the five domains.</strong> With all five modules complete, the evaluation
+        unlocks &mdash; scenario questions drawn from the capstone labs, testing the judgment this track
+        has been building. Build at least a couple of the capstones first; the exam rewards having
+        done the thing, not just read about it.
+      </span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>SF Knowledge Hub</strong> &middot; CCA Knowledge Track &middot; Module 5: Context Management &amp; Reliability<br>
+  <button class="reset-link" id="kt-reset">reset my progress for this module</button>
+  <p class="disclaimer">
+    Part of the Claude Certified Architect &mdash; Knowledge Track, the structured-knowledge companion
+    to the CCA capstone labs. A recommended preparatory resource &mdash; not affiliated with or endorsed
+    by Anthropic, not a substitute for the official exam or its prerequisites. Mechanisms and
+    commands reflect the toolchain as of mid-2026 and carry a real shelf-life; verify against current
+    documentation before relying on specifics.
+  </p>
+</footer>
+
+<script>
+  window.KT_MODULE_ID       = 'module-5-context-reliability';
+  window.KT_CONTENT_VERSION = '1';
+  window.KT_TOTAL_SECTIONS  = 6;
+  window.KT_CP_COURSE_ID    = 'shkMbPhlwiihZaLXjn6f';  /* courses catalog doc id */
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CCA Knowledge Track — section gate engine
+   ---------------------------------------------------------------------------
+   Section-level progress  →  localStorage (survives refresh, timeout, breaks)
+   Module-level completion →  Firestore courseProgress  [WIRING PASS — see below]
+
+   Storage key: ccaKT_<MODULE_ID>_<uid>_v<CONTENT_VERSION>
+     · keyed by uid so shared browsers don't collide
+     · versioned so changed questions invalidate stale "complete" state
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  var MODULE_ID      = window.KT_MODULE_ID || 'module-x';
+  var CONTENT_VERSION = window.KT_CONTENT_VERSION || '1';
+  var TOTAL_SECTIONS  = window.KT_TOTAL_SECTIONS || 0;
+
+  function uid() {
+    return (window._learnerUid) || (window.sessionStorage && sessionStorage.getItem('_learnerUid')) || 'anon';
+  }
+  var KEY = 'ccaKT_' + MODULE_ID + '_' + uid() + '_v' + CONTENT_VERSION;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { /* storage disabled/full — gate still works in-session */ }
+  }
+
+  var state = load();
+
+  function isSectionComplete(id) { return state[id] === true; }
+
+  /* ── SEAM: module completion ──────────────────────────────────────────────
+     Today: records locally + reveals the module-complete panel.
+     WIRING PASS: add the Firestore courseProgress v2 write here — this is the
+     only function that needs to change. moduleKey = filename minus .html.   */
+  function markModuleComplete() {
+    state.__moduleComplete = true;
+    save(state);
+    var panel = document.getElementById('mod-done');
+    if (panel) panel.classList.add('show');
+    // TODO(wiring): writeCourseProgress(CP_COURSE_ID, MODULE_ID, {complete:true})
+  }
+
+  function completedCount() {
+    return Object.keys(state).filter(function (k) {
+      return k.indexOf('sec-') === 0 && state[k] === true;
+    }).length;
+  }
+
+  function markSectionComplete(id) {
+    state[id] = true;
+    save(state);
+    unlockNext(id);
+    if (TOTAL_SECTIONS && completedCount() >= TOTAL_SECTIONS) markModuleComplete();
+  }
+
+  function unlockNext(id) {
+    var gate = document.querySelector('.sect-gate[data-for="' + id + '"]');
+    if (gate) {
+      var btn  = gate.querySelector('.btn-next');
+      var note = gate.querySelector('.gate-note');
+      if (btn) {
+        btn.classList.remove('locked');
+        btn.classList.add('unlocked');
+        var ic = btn.querySelector('.lockicn');
+        if (ic) ic.innerHTML = '&#10003;';
+      }
+      if (note) { note.textContent = 'Section complete — next section unlocked.'; note.classList.add('unlocked'); }
+    }
+    revealFor(id);
+  }
+
+  /* reveal the section whose prerequisite is `id` */
+  function revealFor(id) {
+    var shade = document.querySelector('.lock-shade[data-locked-for="' + id + '"]');
+    if (!shade) return;
+    shade.classList.add('hidden');
+    var sec = shade.closest('.stage');
+    if (sec) sec.classList.remove('is-locked');
+    var body = sec ? sec.querySelector('.sect-body') : null;
+    if (body) body.classList.add('open');
+  }
+
+  /* ── quiz rendering / grading ─────────────────────────────────────────── */
+  function gradeQuestion(qEl) {
+    var picked = qEl.querySelector('input[type=radio]:checked');
+    if (!picked) return null;
+    return picked.value === qEl.getAttribute('data-answer');
+  }
+
+  function lockQuestion(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.add('disabled');
+      var r = o.querySelector('input'); if (r) r.disabled = true;
+    });
+  }
+
+  function resetQuestionStyles(qEl) {
+    qEl.querySelectorAll('.opt').forEach(function (o) {
+      o.classList.remove('correct', 'wrong');
+    });
+  }
+
+  function checkSection(secId) {
+    var kc = document.querySelector('.kcheck[data-section="' + secId + '"]');
+    if (!kc) return;
+    var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+    var allAnswered = qs.every(function (q) { return q.querySelector('input:checked'); });
+    if (!allAnswered) return;
+
+    var allRight = true;
+    qs.forEach(function (q) {
+      resetQuestionStyles(q);
+      var ok  = gradeQuestion(q);
+      var fb  = q.querySelector('.kfb');
+      var sel = q.querySelector('input:checked');
+      var selOpt = sel ? sel.closest('.opt') : null;
+
+      if (ok) {
+        if (selOpt) selOpt.classList.add('correct');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      } else {
+        allRight = false;
+        if (selOpt) selOpt.classList.add('wrong');
+        if (fb) { fb.className = 'kfb no show'; fb.innerHTML = '<strong>Not quite.</strong> ' + (q.getAttribute('data-why-no') || '') + ' <em>Try again.</em>'; }
+        // wrong answers stay open for retry — clear the selection
+        if (sel) sel.checked = false;
+      }
+    });
+
+    var status = kc.querySelector('.kc-status');
+    if (allRight) {
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      markSectionComplete(secId);
+    } else if (status) {
+      status.textContent = 'Some answers need another look';
+      status.classList.remove('done');
+    }
+  }
+
+  /* ── restore prior progress on load ───────────────────────────────────── */
+  function restore() {
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      if (!isSectionComplete(secId)) return;
+      kc.querySelectorAll('.kq').forEach(function (q) {
+        var ans = q.getAttribute('data-answer');
+        var input = q.querySelector('input[value="' + ans + '"]');
+        if (input) { input.checked = true; var o = input.closest('.opt'); if (o) o.classList.add('correct'); }
+        var fb = q.querySelector('.kfb');
+        if (fb) { fb.className = 'kfb ok show'; fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || ''); }
+        lockQuestion(q);
+      });
+      var btn = kc.querySelector('.btn-check');
+      if (btn) { btn.disabled = true; btn.textContent = 'Section complete'; }
+      var status = kc.querySelector('.kc-status');
+      if (status) { status.textContent = '✓ All correct'; status.classList.add('done'); }
+      unlockNext(secId);
+    });
+    if (state.__moduleComplete) {
+      var panel = document.getElementById('mod-done');
+      if (panel) panel.classList.add('show');
+    }
+    // reveal any section whose prerequisite is already complete; lock the rest
+    document.querySelectorAll('.lock-shade').forEach(function (shade) {
+      var prereq = shade.getAttribute('data-locked-for');
+      var sec = shade.closest('.stage');
+      if (isSectionComplete(prereq)) {
+        revealFor(prereq);
+      } else if (sec) {
+        sec.classList.add('is-locked');
+      }
+    });
+  }
+
+  /* ── wire up ──────────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.btn-check').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        checkSection(btn.getAttribute('data-section'));
+      });
+    });
+    // enable the check button only once every question in that block has a pick
+    document.querySelectorAll('.kcheck').forEach(function (kc) {
+      var secId = kc.getAttribute('data-section');
+      kc.addEventListener('change', function () {
+        var btn = kc.querySelector('.btn-check');
+        if (!btn || isSectionComplete(secId)) return;   // completed sections stay locked-done
+        var qs = Array.prototype.slice.call(kc.querySelectorAll('.kq'));
+        var all = qs.every(function (q) { return q.querySelector('input:checked'); });
+        btn.disabled = !all;                            // enable once every question answered
+      });
+      var btn0 = kc.querySelector('.btn-check');
+      if (btn0) btn0.disabled = true;
+    });
+    var reset = document.getElementById('kt-reset');
+    if (reset) reset.addEventListener('click', function () {
+      if (confirm('Clear your saved progress for this module?')) {
+        localStorage.removeItem(KEY); location.reload();
+      }
+    });
+    restore();
+  });
+})();
+</script>
+</body>
+</html>
