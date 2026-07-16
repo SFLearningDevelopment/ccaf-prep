@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071301 -->
+<!-- build: 2026071611 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -254,9 +254,49 @@
     .roadmap .rm-domain{margin-left:34px;padding-left:0}
   }
   @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* ---- auth gate ---- */
+#ccaf-auth-overlay{position:fixed;inset:0;background:rgba(28,26,23,.93);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px);padding:20px}
+.ccaf-auth-card{background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:14px;padding:44px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.ccaf-auth-card .eyebrow{justify-content:center;margin-bottom:14px}
+.ccaf-auth-card h2{font-size:24px;margin:0 0 8px;font-family:var(--serif);font-weight:600;line-height:1.25}
+.ccaf-auth-card .sub{font-size:14.5px;color:var(--ink-soft);line-height:1.55;margin:0 0 26px}
+.ccaf-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 20px;font-family:var(--sans);font-size:15px;font-weight:600;cursor:pointer;transition:background .15s}
+.ccaf-btn:hover{background:var(--accent-deep)}
+.ccaf-or{margin:16px 0 14px;color:var(--ink-soft);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.ccaf-input{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:11px 13px;font-family:var(--sans);font-size:14.5px;margin-bottom:8px;outline:none;color:var(--ink);background:var(--paper);display:block;box-sizing:border-box}
+.ccaf-input:focus{border-color:var(--accent)}
+#ccaf-auth-error{display:none;font-size:13px;color:#8c2f1c;background:#fbeeee;border:1px solid #e3b7b0;border-radius:6px;padding:8px 12px;margin-top:12px;text-align:left}
+.ccaf-userbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;max-width:var(--maxw);margin:0 auto;padding:14px 24px 0;font-size:13.5px;color:var(--ink-soft);font-family:var(--mono)}
+#ccaf-signout-btn{background:none;border:1px solid var(--line-strong);color:var(--ink-soft);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;cursor:pointer;transition:border-color .15s,color .15s}
+#ccaf-signout-btn:hover{border-color:var(--accent);color:var(--accent-deep)}
 </style>
 </head>
 <body>
+
+<!-- ============ AUTH GATE ============ -->
+<div id="ccaf-auth-overlay">
+  <div class="ccaf-auth-card">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub</p>
+    <h2>Claude Certified Architect<br>Knowledge Track</h2>
+    <p class="sub">Sign in with your SourceFuse account to open this capstone lab.</p>
+    <button id="ccaf-google-btn" class="ccaf-btn">
+      <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="ccaf-or">or</div>
+    <input id="ccaf-ep-email" class="ccaf-input" type="email" placeholder="you@sourcefuse.com" autocomplete="email">
+    <input id="ccaf-ep-password" class="ccaf-input" type="password" placeholder="Password" autocomplete="current-password">
+    <button onclick="ccafEmailSignIn()" class="ccaf-btn" style="margin-top:4px">Sign in with Email</button>
+    <div id="ccaf-auth-error"></div>
+  </div>
+</div>
+
+<div class="ccaf-userbar">
+  <span id="ccaf-welcome"></span>
+  <button id="ccaf-signout-btn" onclick="ccafSignOut()" style="display:none">Sign out</button>
+</div>
+
 
 <header class="masthead">
   <div class="masthead-inner">
@@ -995,5 +1035,86 @@ options = ClaudeAgentOptions(
   </p>
 </footer>
 
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   CCA-F capstone lab — Firebase Auth (SF accounts only)
+
+   Auth only: labs store no progress, so no Firestore and no localStorage here.
+   Firebase persists the session per-origin, so a learner who signed in on a
+   module page is already signed in when they open this lab in a new tab.
+
+   Note: this is a courtesy gate, not security. These are static pages and the
+   content ships in the HTML — anyone can View Source. It keeps the track
+   SF-only in normal use; it does not make lab content secret.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const _CCAF_CONFIG = {
+    apiKey: "AIzaSyC-I-IOCq2fCwa471fsD5xOn6SYQSBDp7Q",
+    authDomain: "sfcertification-grafana.firebaseapp.com",
+    projectId: "sfcertification-grafana",
+    storageBucket: "sfcertification-grafana.firebasestorage.app",
+    messagingSenderId: "227322696511",
+    appId: "1:227322696511:web:12e7ced7dd3d45fa06798a"
+};
+// Reuse the default app if one exists — avoids the duplicate-instance session
+// persistence bug fixed on the Kubernetes dashboard.
+if (!window._ccafApp) window._ccafApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(_CCAF_CONFIG);
+const _ccafAuth = firebase.auth(window._ccafApp);
+
+const _ccafErr = function(msg) {
+    const el = document.getElementById('ccaf-auth-error');
+    el.textContent = msg; el.style.display = 'block';
+};
+
+document.getElementById('ccaf-google-btn').addEventListener('click', function() {
+    document.getElementById('ccaf-auth-error').style.display = 'none';
+    _ccafAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e) {
+        _ccafErr(e.message);
+    });
+});
+
+window.ccafEmailSignIn = function() {
+    const email = (document.getElementById('ccaf-ep-email').value || '').trim().toLowerCase();
+    const pwd   =  document.getElementById('ccaf-ep-password').value || '';
+    document.getElementById('ccaf-auth-error').style.display = 'none';
+    if (!email || !pwd) { _ccafErr('Please enter your email and password.'); return; }
+    if (!email.endsWith('@sourcefuse.com')) { _ccafErr('Only @sourcefuse.com accounts are allowed.'); return; }
+    _ccafAuth.signInWithEmailAndPassword(email, pwd).catch(function(e) {
+        _ccafErr(
+            (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') ? 'Incorrect password.'
+          : (e.code === 'auth/user-not-found') ? 'No account found for this email.'
+          : e.message
+        );
+    });
+};
+
+window.ccafSignOut = function() {
+    _ccafAuth.signOut().catch(function(e) { console.error('Sign out failed', e); });
+};
+
+_ccafAuth.onAuthStateChanged(async function(user) {
+    if (user) {
+        if (!user.email || !user.email.endsWith('@sourcefuse.com')) {
+            _ccafErr('Only @sourcefuse.com accounts are allowed.');
+            await _ccafAuth.signOut(); return;
+        }
+        window._learnerUid   = user.uid;
+        window._learnerEmail = user.email;
+        window._learnerName  = user.displayName || user.email;
+        try { sessionStorage.setItem('_learnerUid', user.uid); } catch(e) {}
+        document.getElementById('ccaf-welcome').textContent = 'Signed in — ' + window._learnerName;
+        document.getElementById('ccaf-signout-btn').style.display = '';
+        document.getElementById('ccaf-auth-overlay').style.display = 'none';
+    } else {
+        window._learnerUid = null; window._learnerEmail = null; window._learnerName = null;
+        try { sessionStorage.removeItem('_learnerUid'); } catch(e) {}
+        document.getElementById('ccaf-welcome').textContent = '';
+        document.getElementById('ccaf-signout-btn').style.display = 'none';
+        document.getElementById('ccaf-auth-overlay').style.display = 'flex';
+    }
+});
+</script>
 </body>
 </html>
