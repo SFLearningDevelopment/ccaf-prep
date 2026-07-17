@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071652 -->
+<!-- build: 2026071653 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -403,7 +403,7 @@
   <div class="wrap">
     <p class="eyebrow"><span class="dot"></span> Claude Certified Architect &mdash; Foundations</p>
     <h1>Practice Question Set 1</h1>
-    <p class="lede">28 questions weighted toward Domains 1 and 3 &mdash; the two heaviest on the
+    <p class="lede">40 questions weighted toward Domains 1 and 3 &mdash; the two heaviest on the
     blueprint, and the two richest in exact-flag recall. Each is tagged with its domain so you can
     score yourself the way the real report does.</p>
   </div>
@@ -415,12 +415,12 @@
     <p>These drill what the modules teach in prose but rarely ask you to retrieve: the exact flag, the
     exact frontmatter key, the exact command name. A wrong answer is a pointer back to the module
     section it came from.</p>
-    <p>Mix: D1 &times;12 &middot; D2 &times;1 &middot; D3 &times;12 &middot; D4 &times;2 &middot; D5 &times;1. Wrong answers explain why and reopen for a retry &mdash; same behaviour as the
+    <p>Mix: D1 &times;12 &middot; D2 &times;1 &middot; D3 &times;24 &middot; D4 &times;2 &middot; D5 &times;1. Wrong answers explain why and reopen for a retry &mdash; same behaviour as the
     module checks. Nothing here is tracked; this page saves no progress.</p>
   </div>
 
   <div class="pq-score">
-    <span>Correct <b id="pq-done">0</b> / 28</span>
+    <span>Correct <b id="pq-done">0</b> / 40</span>
     <span>First-try <b id="pq-first">0</b></span>
     <button class="btn-reveal" onclick="pqReset()">Reset</button>
   </div>
@@ -624,39 +624,137 @@
           <label class="opt"><input type="radio" name="q24" value="d"><span>Generation and review should run on different days</span></label>
           <div class="kfb"></div>
         </div>
+      <p class="dom-head">Domain 3 &middot; Claude Code commands &amp; shortcuts</p>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;code&gt;/context&lt;/code&gt; visualises what is currently loaded into the context window and where it is being spent — the diagnostic you want &lt;em&gt;before&lt;/em&gt; reaching for &lt;code&gt;/compact&lt;/code&gt;." data-why-no="&lt;code&gt;/cost&lt;/code&gt; reports token usage and spend for the session. &lt;code&gt;/usage&lt;/code&gt; reports your plan&amp;rsquo;s limits and rate-limit status. &lt;code&gt;/memory&lt;/code&gt; shows the CLAUDE.md files in scope. None of the three shows the context breakdown.">
+          <p class="qtext"><span class="qnum">Q25</span>You want to see exactly what is occupying your context window right now — which files, which history, where the tokens are going — before deciding whether to compact. Which command shows you that?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q25" value="a"><span><code>/cost</code></span></label>
+          <label class="opt"><input type="radio" name="q25" value="b"><span><code>/context</code></span></label>
+          <label class="opt"><input type="radio" name="q25" value="c"><span><code>/usage</code></span></label>
+          <label class="opt"><input type="radio" name="q25" value="d"><span><code>/memory</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="&lt;code&gt;/rewind&lt;/code&gt; rolls the conversation and/or your code back to an earlier checkpoint. Pressing &lt;kbd&gt;Esc&lt;/kbd&gt; twice opens the same checkpoint menu." data-why-no="&lt;code&gt;/clear&lt;/code&gt; wipes conversation history but does not restore your files. &lt;code&gt;/compact&lt;/code&gt; summarises to free context — it does not undo anything. Exporting saves the transcript; it changes nothing.">
+          <p class="qtext"><span class="qnum">Q26</span>Ten minutes into a session, Claude has taken the work in a direction you do not want and has already edited several files. You want to roll both the conversation and the code back to an earlier point. What do you reach for?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q26" value="a"><span><code>/clear</code></span></label>
+          <label class="opt"><input type="radio" name="q26" value="b"><span><code>/compact</code></span></label>
+          <label class="opt"><input type="radio" name="q26" value="c"><span><code>/rewind</code></span></label>
+          <label class="opt"><input type="radio" name="q26" value="d"><span><code>/export</code> then start fresh</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="a" data-why-ok="&lt;code&gt;/btw&lt;/code&gt; lets you ask a side question without adding it to the main conversation or consuming context — exactly the &amp;ldquo;quick aside&amp;rdquo; case." data-why-no="&lt;code&gt;/clear&lt;/code&gt; (and its alias &lt;code&gt;/new&lt;/code&gt;) wipes the history you are trying to protect. &lt;code&gt;/compact&lt;/code&gt; summarises what is already there rather than keeping something out of it.">
+          <p class="qtext"><span class="qnum">Q27</span>You are deep in a focused session and need to ask an unrelated quick question, but you do not want it polluting the conversation or eating context. Which command is designed for this?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q27" value="a"><span><code>/btw</code></span></label>
+          <label class="opt"><input type="radio" name="q27" value="b"><span><code>/clear</code></span></label>
+          <label class="opt"><input type="radio" name="q27" value="c"><span><code>/compact</code></span></label>
+          <label class="opt"><input type="radio" name="q27" value="d"><span><code>/new</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;kbd&gt;Shift&lt;/kbd&gt;+&lt;kbd&gt;Tab&lt;/kbd&gt; cycles permission mode through default, acceptEdits and plan. It is the fastest way into plan mode, though &lt;code&gt;/plan&lt;/code&gt; enters it directly." data-why-no="The command menu opens with &lt;code&gt;/&lt;/code&gt;. The verbose transcript is &lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;O&lt;/kbd&gt;. There is no single-key diff accept — &lt;code&gt;/diff&lt;/code&gt; opens the viewer.">
+          <p class="qtext"><span class="qnum">Q28</span>What does pressing <kbd>Shift</kbd> + <kbd>Tab</kbd> do in a Claude Code session?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q28" value="a"><span>Accepts the current diff</span></label>
+          <label class="opt"><input type="radio" name="q28" value="b"><span>Cycles the permission mode: default &rarr; acceptEdits &rarr; plan</span></label>
+          <label class="opt"><input type="radio" name="q28" value="c"><span>Opens the command menu</span></label>
+          <label class="opt"><input type="radio" name="q28" value="d"><span>Expands the verbose transcript view</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;kbd&gt;Esc&lt;/kbd&gt; interrupts Claude mid-response so you can type again. Pressing it twice opens the rewind/checkpoint menu." data-why-no="&lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;C&lt;/kbd&gt; cancels the current input, or exits on an empty prompt. &lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;O&lt;/kbd&gt; expands the transcript. &lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;R&lt;/kbd&gt; reverse-searches your prompt history.">
+          <p class="qtext"><span class="qnum">Q29</span>Claude is mid-response and heading somewhere unhelpful. You want to interrupt and redirect it without losing the session. Which key does that?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q29" value="a"><span><kbd>Ctrl</kbd>+<kbd>C</kbd></span></label>
+          <label class="opt"><input type="radio" name="q29" value="b"><span><kbd>Esc</kbd></span></label>
+          <label class="opt"><input type="radio" name="q29" value="c"><span><kbd>Ctrl</kbd>+<kbd>O</kbd></span></label>
+          <label class="opt"><input type="radio" name="q29" value="d"><span><kbd>Ctrl</kbd>+<kbd>R</kbd></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="a" data-why-ok="&lt;code&gt;/add-dir&lt;/code&gt; grants Claude file access to an additional directory for the session — the purpose-built answer." data-why-no="&lt;code&gt;/permissions&lt;/code&gt; governs which tools require approval, not which paths are visible. &lt;code&gt;/config&lt;/code&gt; opens settings such as theme and editor mode. Restarting higher up works but drags in everything else in that tree.">
+          <p class="qtext"><span class="qnum">Q30</span>Your session needs to read files in a directory outside the one you launched <code>claude</code> from. What is the correct way to grant that access for this session?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q30" value="a"><span><code>/add-dir</code></span></label>
+          <label class="opt"><input type="radio" name="q30" value="b"><span><code>/permissions</code></span></label>
+          <label class="opt"><input type="radio" name="q30" value="c"><span><code>/config</code></span></label>
+          <label class="opt"><input type="radio" name="q30" value="d"><span>Restart <code>claude</code> from a parent directory</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;code&gt;/init&lt;/code&gt; explores the codebase and generates a starter &lt;code&gt;CLAUDE.md&lt;/code&gt;. &lt;code&gt;/memory&lt;/code&gt; is then how you view or edit the CLAUDE.md files in scope." data-why-no="&lt;code&gt;/config&lt;/code&gt; opens configuration settings. &lt;code&gt;/status&lt;/code&gt; reports account, model, working directory and version. Neither generates project memory.">
+          <p class="qtext"><span class="qnum">Q31</span>You are joining a repository that has no <code>CLAUDE.md</code>. You want Claude to explore the codebase and generate a starter one rather than writing it from scratch yourself. Which command?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q31" value="a"><span><code>/memory</code></span></label>
+          <label class="opt"><input type="radio" name="q31" value="b"><span><code>/init</code></span></label>
+          <label class="opt"><input type="radio" name="q31" value="c"><span><code>/config</code></span></label>
+          <label class="opt"><input type="radio" name="q31" value="d"><span><code>/status</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;code&gt;/compact&lt;/code&gt; summarises what has happened so far, keeping the thread; &lt;code&gt;/clear&lt;/code&gt; wipes conversation history and starts fresh. In both cases project memory (CLAUDE.md) persists — it is not part of the conversation." data-why-no="The first option inverts the two. Neither command touches CLAUDE.md. They are distinct commands, not aliases — &lt;code&gt;/reset&lt;/code&gt; and &lt;code&gt;/new&lt;/code&gt; are the aliases for &lt;code&gt;/clear&lt;/code&gt;.">
+          <p class="qtext"><span class="qnum">Q32</span>Two commands both free up a filling context window, but they differ in what survives. Which pairing is correct?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q32" value="a"><span><code>/clear</code> summarises the conversation; <code>/compact</code> wipes it</span></label>
+          <label class="opt"><input type="radio" name="q32" value="b"><span><code>/compact</code> summarises the conversation to free context; <code>/clear</code> wipes history entirely, though project memory persists</span></label>
+          <label class="opt"><input type="radio" name="q32" value="c"><span>Both wipe history; <code>/clear</code> also removes CLAUDE.md</span></label>
+          <label class="opt"><input type="radio" name="q32" value="d"><span>Both summarise; <code>/clear</code> is simply the newer alias</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="&lt;code&gt;/agents&lt;/code&gt; lists, creates or edits subagents — the secondary instances the main session spawns to handle focused subtasks in their own context." data-why-no="&lt;code&gt;/skills&lt;/code&gt; lists the skills available in the session. &lt;code&gt;/hooks&lt;/code&gt; shows hook configuration for tool events. &lt;code&gt;/mcp&lt;/code&gt; manages MCP server connections and authentication.">
+          <p class="qtext"><span class="qnum">Q33</span>You want to list, create or edit the subagents available in your setup. Which command?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q33" value="a"><span><code>/skills</code></span></label>
+          <label class="opt"><input type="radio" name="q33" value="b"><span><code>/hooks</code></span></label>
+          <label class="opt"><input type="radio" name="q33" value="c"><span><code>/agents</code></span></label>
+          <label class="opt"><input type="radio" name="q33" value="d"><span><code>/mcp</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="A hook is a shell command that runs automatically at a defined point in Claude&amp;rsquo;s lifecycle — before a tool runs, after an edit, on session start. Auto-formatting and linting are the canonical uses. &lt;code&gt;/hooks&lt;/code&gt; shows the current configuration." data-why-no="A skill must be invoked. A CLAUDE.md instruction is guidance the model may not follow every time — the whole point of a hook is that it is deterministic. Subagents handle delegated subtasks; they do not watch the filesystem.">
+          <p class="qtext"><span class="qnum">Q34</span>Your team wants every edit auto-formatted the moment Claude makes it, without anyone remembering to run the formatter. Which Claude Code mechanism is designed for that?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q34" value="a"><span>A skill invoked after each change</span></label>
+          <label class="opt"><input type="radio" name="q34" value="b"><span>A hook, configured to run at a defined lifecycle point such as after an edit</span></label>
+          <label class="opt"><input type="radio" name="q34" value="c"><span>An instruction in <code>CLAUDE.md</code> telling Claude to always format</span></label>
+          <label class="opt"><input type="radio" name="q34" value="d"><span>A subagent that watches the working directory</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;code&gt;/permissions&lt;/code&gt; views or changes which tools require approval. By default Claude asks about everything that touches your machine." data-why-no="&lt;code&gt;/config&lt;/code&gt; covers settings like theme, defaults and editor mode. &lt;code&gt;/hooks&lt;/code&gt; shows lifecycle hook configuration. &lt;code&gt;/doctor&lt;/code&gt; diagnoses install and environment issues.">
+          <p class="qtext"><span class="qnum">Q35</span>You want to change which tools Claude may use without stopping to ask you each time. Which command opens that?<span class="dombadge">D3</span></p>
+          <label class="opt"><input type="radio" name="q35" value="a"><span><code>/config</code></span></label>
+          <label class="opt"><input type="radio" name="q35" value="b"><span><code>/permissions</code></span></label>
+          <label class="opt"><input type="radio" name="q35" value="c"><span><code>/hooks</code></span></label>
+          <label class="opt"><input type="radio" name="q35" value="d"><span><code>/doctor</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="multi" data-answer="a,b" data-why-ok="&lt;code&gt;/resume&lt;/code&gt; reopens a previous session and continues where you left off, and &lt;code&gt;/continue&lt;/code&gt; is its alias." data-why-no="&lt;code&gt;/rewind&lt;/code&gt; rolls back &lt;em&gt;within&lt;/em&gt; a session to an earlier checkpoint — a different job. &lt;code&gt;/clear&lt;/code&gt; would destroy the history you are trying to recover. &lt;code&gt;/export&lt;/code&gt; saves a conversation to a file; it does not restore one.">
+          <p class="qtext"><span class="qnum">Q36</span>You want to reopen yesterday&rsquo;s session and continue where you left off. Which TWO are true?<span class="multi">SELECT TWO</span><span class="dombadge">D3</span></p>
+          <label class="opt"><input type="checkbox" name="q36" value="a"><span><code>/resume</code> reopens a previous session and continues it</span></label>
+          <label class="opt"><input type="checkbox" name="q36" value="b"><span><code>/continue</code> is an alias for <code>/resume</code></span></label>
+          <label class="opt"><input type="checkbox" name="q36" value="c"><span><code>/rewind</code> is the correct command for reopening a past session</span></label>
+          <label class="opt"><input type="checkbox" name="q36" value="d"><span><code>/clear</code> must be run first to make room</span></label>
+          <label class="opt"><input type="checkbox" name="q36" value="e"><span>Only <code>/export</code> can restore a prior session</span></label>
+          <div class="kfb"></div>
+        </div>
       <p class="dom-head">Domain 5 &middot; Context Management &amp; Reliability</p>
         <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;code&gt;/compact&lt;/code&gt; is the in-session relief valve: it compacts the accumulated conversation so an extended session can continue without the degradation verbose output causes." data-why-no="&lt;code&gt;/memory&lt;/code&gt; shows which memory files loaded — a diagnostic, not cleanup. &lt;code&gt;/rules&lt;/code&gt; reloads rule files. Forking is for divergent branches, not compression.">
-          <p class="qtext"><span class="qnum">Q25</span>Mid-way through a long exploration session, context is filling with verbose discovery output and answers are degrading — but you are not ready to end the session. Which built-in command helps immediately?<span class="dombadge">D5</span></p>
-          <label class="opt"><input type="radio" name="q25" value="a"><span><code>/memory</code></span></label>
-          <label class="opt"><input type="radio" name="q25" value="b"><span><code>/compact</code></span></label>
-          <label class="opt"><input type="radio" name="q25" value="c"><span><code>/fork</code></span></label>
-          <label class="opt"><input type="radio" name="q25" value="d"><span><code>/rules</code></span></label>
+          <p class="qtext"><span class="qnum">Q37</span>Mid-way through a long exploration session, context is filling with verbose discovery output and answers are degrading — but you are not ready to end the session. Which built-in command helps immediately?<span class="dombadge">D5</span></p>
+          <label class="opt"><input type="radio" name="q37" value="a"><span><code>/memory</code></span></label>
+          <label class="opt"><input type="radio" name="q37" value="b"><span><code>/compact</code></span></label>
+          <label class="opt"><input type="radio" name="q37" value="c"><span><code>/fork</code></span></label>
+          <label class="opt"><input type="radio" name="q37" value="d"><span><code>/rules</code></span></label>
           <div class="kfb"></div>
         </div>
       <p class="dom-head">Domain 2 &middot; Tool Design &amp; MCP Integration</p>
         <div class="kq" data-kind="radio" data-answer="b" data-why-ok="MCP &lt;strong&gt;resources&lt;/strong&gt; exist for this: exposing catalogs of available content so agents start informed. Discovery becomes a lookup rather than an exploratory expedition." data-why-no="Raising the budget pays for the inefficiency instead of removing it. A hard-coded inventory goes stale the moment data changes. Removing discovery trades wasted calls for ignorance.">
-          <p class="qtext"><span class="qnum">Q26</span>Subagents burn many tool calls just discovering what data exists — listing document collections, probing for issue summaries, checking which schemas are present — before real work begins. Which MCP capability reduces this?<span class="dombadge">D2</span></p>
-          <label class="opt"><input type="radio" name="q26" value="a"><span>Raise the tool-call budget so exploration is affordable</span></label>
-          <label class="opt"><input type="radio" name="q26" value="b"><span>Expose content catalogs as MCP <strong>resources</strong></span></label>
-          <label class="opt"><input type="radio" name="q26" value="c"><span>Hard-code the current data inventory into every system prompt</span></label>
-          <label class="opt"><input type="radio" name="q26" value="d"><span>Remove discovery capability so agents work blind</span></label>
+          <p class="qtext"><span class="qnum">Q38</span>Subagents burn many tool calls just discovering what data exists — listing document collections, probing for issue summaries, checking which schemas are present — before real work begins. Which MCP capability reduces this?<span class="dombadge">D2</span></p>
+          <label class="opt"><input type="radio" name="q38" value="a"><span>Raise the tool-call budget so exploration is affordable</span></label>
+          <label class="opt"><input type="radio" name="q38" value="b"><span>Expose content catalogs as MCP <strong>resources</strong></span></label>
+          <label class="opt"><input type="radio" name="q38" value="c"><span>Hard-code the current data inventory into every system prompt</span></label>
+          <label class="opt"><input type="radio" name="q38" value="d"><span>Remove discovery capability so agents work blind</span></label>
           <div class="kfb"></div>
         </div>
       <p class="dom-head">Domain 4 &middot; Prompt Engineering &amp; Structured Output</p>
         <div class="kq" data-kind="radio" data-answer="c" data-why-ok="Tool use with a JSON schema is the reliability mechanism: the extraction arrives as schema-conformant tool input, not prose that happens to contain JSON. Syntax errors are eliminated by construction." data-why-no="A stronger prompt improves odds within a text-shaped channel. Regex repair patches symptoms fragilely. XML relocates the same free-text problem to another syntax.">
-          <p class="qtext"><span class="qnum">Q27</span>Your pipeline asks Claude to &ldquo;respond with JSON&rdquo; in plain text. Downstream parsing breaks on markdown fences, trailing commentary and occasional malformed syntax. What is the most reliable <em>structural</em> fix?<span class="dombadge">D4</span></p>
-          <label class="opt"><input type="radio" name="q27" value="a"><span>Strengthen the prompt: &ldquo;respond ONLY with valid JSON&rdquo;</span></label>
-          <label class="opt"><input type="radio" name="q27" value="b"><span>Post-process with regexes that strip fences and repair syntax</span></label>
-          <label class="opt"><input type="radio" name="q27" value="c"><span>Define the extraction as a tool whose input schema is your JSON schema, and read the data from the <code>tool_use</code> block</span></label>
-          <label class="opt"><input type="radio" name="q27" value="d"><span>Switch to XML, which models format more carefully</span></label>
+          <p class="qtext"><span class="qnum">Q39</span>Your pipeline asks Claude to &ldquo;respond with JSON&rdquo; in plain text. Downstream parsing breaks on markdown fences, trailing commentary and occasional malformed syntax. What is the most reliable <em>structural</em> fix?<span class="dombadge">D4</span></p>
+          <label class="opt"><input type="radio" name="q39" value="a"><span>Strengthen the prompt: &ldquo;respond ONLY with valid JSON&rdquo;</span></label>
+          <label class="opt"><input type="radio" name="q39" value="b"><span>Post-process with regexes that strip fences and repair syntax</span></label>
+          <label class="opt"><input type="radio" name="q39" value="c"><span>Define the extraction as a tool whose input schema is your JSON schema, and read the data from the <code>tool_use</code> block</span></label>
+          <label class="opt"><input type="radio" name="q39" value="d"><span>Switch to XML, which models format more carefully</span></label>
           <div class="kfb"></div>
         </div>
         <div class="kq" data-kind="radio" data-answer="a" data-why-ok="Consistency comes from operational definitions: severity levels anchored by concrete examples give the classifier something to match against, turning a vibe into a rubric." data-why-no="Removing severity discards the signal the gate needs. Averaging launders an unanchored judgement. Line count measures size, not impact — a one-line auth bypass outranks a fifty-line comment tweak.">
-          <p class="qtext"><span class="qnum">Q28</span>Your CI reviewer labels near-identical issues &ldquo;critical&rdquo; one day and &ldquo;minor&rdquo; the next, so severity-based merge gates are unreliable. How do you get consistent classification?<span class="dombadge">D4</span></p>
-          <label class="opt"><input type="radio" name="q28" value="a"><span>Define explicit severity criteria with concrete code examples for each level</span></label>
-          <label class="opt"><input type="radio" name="q28" value="b"><span>Remove severity levels and treat all findings equally</span></label>
-          <label class="opt"><input type="radio" name="q28" value="c"><span>Let the model choose freely but average severity over five runs</span></label>
-          <label class="opt"><input type="radio" name="q28" value="d"><span>Map severity to the line count of the affected code</span></label>
+          <p class="qtext"><span class="qnum">Q40</span>Your CI reviewer labels near-identical issues &ldquo;critical&rdquo; one day and &ldquo;minor&rdquo; the next, so severity-based merge gates are unreliable. How do you get consistent classification?<span class="dombadge">D4</span></p>
+          <label class="opt"><input type="radio" name="q40" value="a"><span>Define explicit severity criteria with concrete code examples for each level</span></label>
+          <label class="opt"><input type="radio" name="q40" value="b"><span>Remove severity levels and treat all findings equally</span></label>
+          <label class="opt"><input type="radio" name="q40" value="c"><span>Let the model choose freely but average severity over five runs</span></label>
+          <label class="opt"><input type="radio" name="q40" value="d"><span>Map severity to the line count of the affected code</span></label>
           <div class="kfb"></div>
         </div>
       <div style="margin-top:18px">
@@ -665,6 +763,13 @@
       </div>
     </div>
   </section>
+
+  <div class="morelink">
+    <strong>Claude Code cheatsheet.</strong> Anthropic&rsquo;s own reference for the commands, modes and
+    shortcuts above &mdash; the canonical list, kept current at the source. Worth having open in a tab
+    while you work through the Domain 3 questions:
+    <a href="https://support.claude.com/en/articles/14553413-claude-code-cheatsheet" target="_blank" rel="noopener">the Claude Code cheatsheet</a>.
+  </div>
 
   <div class="morelink">
     <strong>More questions to practice.</strong> Matthew Purcell, who has sat and passed the exam, has
