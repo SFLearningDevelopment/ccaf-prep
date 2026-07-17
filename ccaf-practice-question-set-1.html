@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<!-- build: 2026071650 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA Knowledge Track &middot; Practice Questions</title>
+<style>
+
+  :root{
+    --ink:#1c1a17;
+    --ink-soft:#4a4640;
+    --paper:#f6f3ec;
+    --paper-raised:#fffdf8;
+    --line:#ddd6c8;
+    --line-strong:#c7bfab;
+    --accent:#2f6f5e;      /* deep teal-green: the "pass" signal */
+    --accent-deep:#204b40;
+    --accent-wash:#e5efe9;
+    --amber:#a56a1e;       /* escalation / caution */
+    --amber-wash:#f5ebd9;
+    --code-bg:#20241f;
+    --code-ink:#e7e4d8;
+    --code-key:#9ecb8f;
+    --code-str:#e0b877;
+    --code-dim:#8a877c;
+    --domain:#7a5cc4;      /* domain tag */
+    --domain-wash:#ece7f7;
+    --radius:10px;
+    --maxw:820px;
+    --mono:'DM Mono','SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+    --serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-deep);text-underline-offset:2px}
+
+  /* ---------- Header ---------- */
+  header.masthead{
+    background:linear-gradient(180deg,var(--paper-raised),var(--paper));
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 24px 40px;
+  }
+  .masthead-inner{max-width:var(--maxw);margin:0 auto}
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 18px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1.title{
+    font-family:var(--serif);font-weight:600;font-size:clamp(34px,6vw,52px);
+    line-height:1.05;letter-spacing:-.01em;margin:0 0 20px;color:var(--ink);
+  }
+  h1.title em{font-style:italic;color:var(--accent-deep)}
+  .standfirst{
+    font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink-soft);
+    max-width:64ch;margin:0 0 26px;
+  }
+  .prep-banner{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--accent-wash);border:1px solid #bcd6cb;
+    border-radius:var(--radius);padding:16px 18px;font-size:15px;line-height:1.55;
+    color:var(--accent-deep);
+  }
+  .prep-banner strong{font-weight:600}
+  .prep-banner .icn{flex:0 0 auto;font-family:var(--mono);font-weight:500}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:8px 24px 96px}
+  section.stage{padding-top:52px;scroll-margin-top:20px}
+
+  .stage-head{margin-bottom:8px}
+  .stage-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    letter-spacing:.08em;display:block;margin-bottom:6px;
+  }
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(24px,4vw,32px);
+    line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;
+  }
+  .domain-tag{
+    display:inline-block;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.04em;background:var(--domain-wash);color:var(--domain);
+    border-radius:20px;padding:3px 11px;margin-bottom:14px;
+  }
+  h3{font-family:var(--sans);font-weight:600;font-size:18px;margin:28px 0 8px}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 15px;padding-left:22px}
+  li{margin-bottom:7px}
+  code{
+    font-family:var(--mono);font-size:.87em;background:#eae5da;
+    padding:1px 6px;border-radius:5px;color:var(--accent-deep);
+  }
+  .lede{font-size:18px;color:var(--ink-soft)}
+
+  /* ---------- Code blocks ---------- */
+  .code{
+    background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
+    padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+    line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code .k{color:var(--code-key)}
+  .code .s{color:var(--code-str)}
+  .code .c{color:var(--code-dim);font-style:italic}
+  .code .cmd{color:#e7e4d8}
+  .code-label{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);margin:20px 0 -6px;display:block;
+  }
+
+  /* ---------- Callouts ---------- */
+  .note,.verify,.checkpoint{
+    border-radius:var(--radius);padding:15px 18px;margin:18px 0;font-size:15px;line-height:1.55;
+  }
+  .note{background:var(--paper-raised);border:1px solid var(--line-strong)}
+  .verify{background:var(--amber-wash);border:1px solid #e0c78f;color:#6b4a15}
+  .verify .lbl,.checkpoint .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:500;
+  }
+  .verify .lbl{color:var(--amber)}
+  .checkpoint{background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep)}
+  .checkpoint .lbl{color:var(--accent)}
+  .checkpoint ul{margin:6px 0 0;padding-left:20px}
+  .checkpoint li{margin-bottom:4px}
+
+  /* ---------- Exam-lens ---------- */
+  .exam-lens{
+    border-left:3px solid var(--domain);background:var(--domain-wash);
+    padding:13px 16px 13px 18px;margin:18px 0;border-radius:0 var(--radius) var(--radius) 0;
+    font-size:14.5px;line-height:1.55;color:#3d2f5e;
+  }
+  .exam-lens .lbl{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--domain);display:block;margin-bottom:5px;font-weight:500;
+  }
+
+  /* ---------- Map / TOC ---------- */
+  .roadmap{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:24px;margin:36px 0 8px;
+  }
+  .roadmap h2{font-size:20px;margin:0 0 4px}
+  .roadmap .sub{font-size:14px;color:var(--ink-soft);margin:0 0 18px}
+  .roadmap ol{list-style:none;padding:0;margin:0;counter-reset:rm}
+  .roadmap li{
+    counter-increment:rm;display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-top:1px solid var(--line);margin:0;
+  }
+  .roadmap li:first-child{border-top:none}
+  .roadmap li::before{
+    content:counter(rm,decimal-leading-zero);font-family:var(--mono);font-size:13px;
+    color:var(--accent);flex:0 0 auto;width:24px;
+  }
+  .roadmap li.rm-start{counter-increment:none}
+  .roadmap li.rm-start::before{content:"\2192";font-size:14px}
+  .roadmap a{text-decoration:none;font-weight:500;color:var(--ink)}
+  .roadmap a:hover{color:var(--accent-deep)}
+  .roadmap .rm-domain{
+    font-family:var(--mono);font-size:11px;color:var(--domain);
+    margin-left:auto;flex:0 0 auto;white-space:nowrap;padding-left:12px;
+  }
+  .roadmap .rm-body{display:flex;flex-direction:column}
+  .roadmap .rm-body small{color:var(--ink-soft);font-weight:400;font-size:13.5px}
+
+  hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+  /* ---------- Prereqs box ---------- */
+  .prereqs{
+    background:var(--paper-raised);border:1px dashed var(--line-strong);
+    border-radius:var(--radius);padding:20px 22px;margin:28px 0;
+  }
+  .prereqs h3{margin-top:0}
+  .prereqs code{background:#eae5da}
+
+  /* ---------- Footer ---------- */
+  footer{
+    max-width:var(--maxw);margin:0 auto;padding:40px 24px 80px;
+    border-top:1px solid var(--line-strong);color:var(--ink-soft);font-size:14px;
+  }
+  footer .disclaimer{font-size:13px;line-height:1.6;margin-top:14px}
+
+  .scenario{
+    font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;
+    color:var(--ink-soft);border-left:3px solid var(--accent);
+    padding:4px 0 4px 18px;margin:18px 0;
+  }
+
+  /* ---------- Orientation ---------- */
+  .orient-intro{
+    font-size:18px;line-height:1.6;color:var(--ink-soft);margin:0 0 8px;
+  }
+  .orient-intro strong{color:var(--ink);font-weight:600}
+
+  .build-card{
+    background:var(--paper-raised);border:1px solid var(--line-strong);
+    border-radius:var(--radius);padding:22px 24px;margin:24px 0;
+  }
+  .build-card h3{margin:0 0 12px;font-size:16px}
+  .build-card .reads{
+    display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .build-card .chip{
+    background:var(--accent-wash);border:1px solid #bcd6cb;color:var(--accent-deep);
+    border-radius:20px;padding:4px 12px;
+  }
+
+  /* Flow diagram */
+  .flow-wrap{margin:28px 0 8px}
+  .flow-wrap figcaption{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:12px;text-align:center;
+  }
+  .flow-svg{width:100%;height:auto;display:block;
+    background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:var(--radius);
+  }
+  .flow-svg .box{fill:var(--paper);stroke:var(--line-strong);stroke-width:1.2}
+  .flow-svg .box-accent{fill:var(--accent-wash);stroke:#bcd6cb;stroke-width:1.2}
+  .flow-svg .box-amber{fill:var(--amber-wash);stroke:#e0c78f;stroke-width:1.2}
+  .flow-svg .lbl{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .flow-svg .sub{font-family:var(--mono);font-size:10px;fill:var(--ink-soft)}
+  .flow-svg .stg{font-family:var(--mono);font-size:9.5px;fill:var(--accent);letter-spacing:.05em}
+  .flow-svg .flowline{stroke:var(--line-strong);stroke-width:1.4;fill:none}
+  .flow-svg .flowline-accent{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .flow-svg .loopline{stroke:var(--accent);stroke-width:1.4;fill:none;stroke-dasharray:4 3}
+  .flow-svg .arrowhead{fill:var(--line-strong)}
+  .flow-svg .arrowhead-accent{fill:var(--accent)}
+  .flow-svg .zonelbl{font-family:var(--mono);font-size:10px;fill:var(--ink-soft);letter-spacing:.06em}
+
+  /* Glossary */
+  .glossary{margin:24px 0 8px}
+  .glossary dl{margin:0;border-top:1px solid var(--line)}
+  .glossary dt{
+    font-family:var(--mono);font-size:14px;font-weight:500;color:var(--accent-deep);
+    margin-top:16px;
+  }
+  .glossary dd{margin:4px 0 0;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+  .glossary dd .also{font-family:var(--mono);font-size:12px;color:var(--ink-soft);opacity:.8}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header.masthead{padding:40px 20px 32px}
+    main{padding:8px 20px 72px}
+    .roadmap li{flex-wrap:wrap}
+    .roadmap .rm-domain{margin-left:34px;padding-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* ---- module-specific ---- */
+.antipattern{background:#fbeeee;border:1px solid #e3b7b0;border-left:3px solid #b0432f;border-radius:8px;padding:16px 20px;margin:22px 0;font-size:15px}
+.antipattern .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#b0432f;margin-bottom:8px;font-weight:600}
+.antipattern ul{margin:8px 0 0;padding-left:20px}
+.antipattern li{margin:5px 0}
+.capstone{background:#eaf1ee;border:1px solid #bcd6cb;border-radius:10px;padding:16px 20px;margin:22px 0;display:flex;gap:14px;align-items:flex-start}
+.capstone .icn{color:var(--accent);font-size:20px;line-height:1;flex-shrink:0;margin-top:1px}
+.capstone .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:600}
+.capstone a{color:var(--accent);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(47,111,94,.35)}
+.capstone a:hover{border-bottom-color:var(--accent)}
+.kpoints{margin:16px 0}
+.kpoints .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+.taskref{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+.in-practice{margin:16px 0}
+.in-practice .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+
+/* ---- knowledge check MCQ ---- */
+.kcheck{background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-radius:12px;padding:24px 26px;margin:28px 0 0}
+.kcheck > .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;font-weight:600}
+.kcheck .kc-sub{font-size:13.5px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5}
+.kq{margin:0 0 20px;padding:0 0 20px;border-bottom:1px dashed #c5d8d0}
+.kcheck .kq:last-of-type{border-bottom:none;padding-bottom:6px;margin-bottom:10px}
+.kq .qtext{display:block;font-weight:600;font-size:15.5px;margin:0 0 14px;color:var(--ink);line-height:1.5}
+.kq .qnum{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--accent);background:#dfeae5;border-radius:4px;padding:2px 6px;margin-right:9px;vertical-align:2px}
+.kq .opt{display:flex!important;width:100%;box-sizing:border-box;gap:11px;align-items:flex-start;padding:11px 14px;margin:0 0 8px;background:var(--card);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14.5px;line-height:1.55;transition:border-color .12s,background .12s}
+.kq .opt:hover{border-color:var(--accent);background:#fbfaf7}
+.kq .opt input{margin:3px 0 0;flex:0 0 auto;cursor:pointer;accent-color:var(--accent)}
+.kq .opt > span{flex:1 1 auto}
+.kq .opt.correct{background:#e5efe9;border-color:var(--accent)}
+.kq .opt.wrong{background:#fbeeee;border-color:#c98374}
+.kq .opt.disabled{cursor:default}
+.kq .opt.disabled:hover{border-color:var(--line);background:var(--card)}
+.kq .opt.correct.disabled{border-color:var(--accent);background:#e5efe9}
+.kfb{display:none;margin:12px 0 0;padding:12px 15px;border-radius:8px;font-size:14px;line-height:1.6}
+.kfb.show{display:block}
+.kfb.ok{background:#e5efe9;border:1px solid #bcd6cb;color:#245244}
+.kfb.no{background:#fbeeee;border:1px solid #e3b7b0;color:#8f3a2b}
+.kfb strong{font-weight:600}
+.kc-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.btn-check{font-family:var(--sans);font-size:14px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:8px;padding:11px 22px;cursor:pointer;transition:opacity .15s}
+.btn-check:hover:not(:disabled){opacity:.88}
+.btn-check:disabled{background:#bfcbc6;cursor:not-allowed}
+.kc-status{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+.kc-status.done{color:var(--accent);font-weight:600}
+
+/* section gate — toggle button */
+.sect-gate{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 8px;padding:18px 26px 26px;background:#eef3f1;border:1px solid #bcd6cb;border-left:4px solid var(--accent);border-top:none;border-radius:0 0 12px 12px}
+.btn-next{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-size:15px;font-weight:600;text-decoration:none;border:none;border-radius:8px;padding:12px 24px;transition:background .18s,color .18s,opacity .15s}
+.btn-next .lockicn{font-size:13px;line-height:1}
+.btn-next.locked{background:#d3dbd8;color:#7d8a85;cursor:not-allowed;pointer-events:none}
+.btn-next.unlocked{background:var(--accent);color:#fff;cursor:pointer}
+.btn-next.unlocked:hover{opacity:.88}
+.gate-note{font-size:13.5px;color:var(--ink-soft)}
+.gate-note.unlocked{color:var(--accent);font-weight:600}
+
+.mod-done{background:#e5efe9;border:1px solid #bcd6cb;border-radius:12px;padding:24px 26px;margin:28px 0;display:none}
+.mod-done.show{display:block}
+.mod-done h3{margin:0 0 8px;font-size:19px;color:var(--accent)}
+.mod-done p{margin:0;font-size:15px;color:var(--ink-soft);line-height:1.6}
+.reset-link{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0}
+.reset-link:hover{color:var(--accent)}
+
+/* ---- section locking ---- */
+.lock-shade{display:flex;align-items:center;gap:16px;background:var(--paper-2);border:1px dashed #c8bfa9;border-radius:12px;padding:20px 24px;margin:20px 0 8px}
+.lock-shade .lock-ic{font-size:22px;line-height:1;opacity:.55;flex-shrink:0}
+.lock-shade strong{display:block;font-size:15px;color:var(--ink);margin-bottom:3px}
+.lock-shade p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.5}
+.lock-shade > div{flex:1 1 auto}
+.lock-jump{flex-shrink:0;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid #bcd6cb;background:#eef3f1;border-radius:7px;padding:9px 15px;transition:background .15s}
+.lock-jump:hover{background:#e0ebe6}
+.lock-shade.hidden{display:none}
+.sect-body{display:none}
+.sect-body.open{display:block}
+.stage.is-locked .stage-head h2{opacity:.5}
+.stage.is-locked .domain-tag{opacity:.5}
+
+/* ---- auth gate ---- */
+#ccaf-auth-overlay{position:fixed;inset:0;background:rgba(28,26,23,.93);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px);padding:20px}
+.ccaf-auth-card{background:var(--paper-raised);border:1px solid var(--line-strong);border-radius:14px;padding:44px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.ccaf-auth-card .eyebrow{justify-content:center;margin-bottom:14px}
+.ccaf-auth-card h2{font-size:24px;margin:0 0 8px;font-family:var(--serif);font-weight:600}
+.ccaf-auth-card .sub{font-size:14.5px;color:var(--ink-soft);line-height:1.55;margin:0 0 26px}
+.ccaf-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:13px 20px;font-family:var(--sans);font-size:15px;font-weight:600;cursor:pointer;transition:background .15s}
+.ccaf-btn:hover{background:var(--accent-deep)}
+.ccaf-or{margin:16px 0 14px;color:var(--ink-soft);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.ccaf-input{width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:11px 13px;font-family:var(--sans);font-size:14.5px;margin-bottom:8px;outline:none;color:var(--ink);background:var(--paper);display:block;box-sizing:border-box}
+.ccaf-input:focus{border-color:var(--accent)}
+#ccaf-auth-error{display:none;font-size:13px;color:#8c2f1c;background:#fbeeee;border:1px solid #e3b7b0;border-radius:6px;padding:8px 12px;margin-top:12px;text-align:left}
+.ccaf-userbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:var(--maxw);margin:0 auto;padding:14px 24px 0;font-size:13.5px;color:var(--ink-soft);font-family:var(--mono)}
+.ccaf-userbar .ccaf-auth-side{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-left:auto}
+/* ---- back to course map ---- */
+.ccaf-back{display:inline-flex;align-items:center;gap:8px;background:#1a6eb5;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-family:var(--sans);font-size:13.5px;font-weight:600;letter-spacing:.01em;text-decoration:none;cursor:pointer;transition:background .15s,box-shadow .15s;box-shadow:0 1px 2px rgba(26,110,181,.25)}
+.ccaf-back:hover{background:#155a95;box-shadow:0 2px 6px rgba(26,110,181,.35)}
+.ccaf-back:focus-visible{outline:2px solid #1a6eb5;outline-offset:2px}
+.ccaf-back .arw{font-size:15px;line-height:1}
+@media(max-width:600px){.ccaf-userbar{padding:12px 18px 0}.ccaf-back{width:100%;justify-content:center}.ccaf-userbar .ccaf-auth-side{margin-left:0;width:100%;justify-content:flex-end}}
+#ccaf-signout-btn{background:none;border:1px solid var(--line-strong);color:var(--ink-soft);border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;cursor:pointer;transition:border-color .15s,color .15s}
+#ccaf-signout-btn:hover{border-color:var(--accent);color:var(--accent-deep)}
+
+
+/* ---- practice-set additions ---- */
+.pq-intro{background:var(--paper-raised);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:0 0 30px}
+.pq-intro p{margin:0 0 10px}
+.pq-intro p:last-child{margin:0}
+.srcnote{background:var(--amber-wash);border:1px solid #e0c58f;border-left:4px solid var(--amber);border-radius:10px;padding:16px 18px;margin:22px 0 0;font-size:14px;line-height:1.6}
+.srcnote strong{color:var(--amber)}
+.gapbadge{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--domain);background:var(--domain-wash);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:middle;font-weight:500}
+.multi{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:#8a5a00;background:var(--amber-wash);border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:middle;font-weight:500}
+.pq-score{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 0;margin:0 0 24px;font-family:var(--mono);font-size:13px;color:var(--ink-soft);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.pq-score b{color:var(--accent-deep)}
+.btn-reveal{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--accent-deep);background:none;border:1px solid var(--line-strong);border-radius:8px;padding:8px 16px;cursor:pointer;margin-left:8px}
+.btn-reveal:hover{border-color:var(--accent);background:var(--accent-wash)}
+
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH GATE ============ -->
+<div id="ccaf-auth-overlay">
+  <div class="ccaf-auth-card">
+    <p class="eyebrow"><span class="dot"></span> SF Knowledge Hub</p>
+    <h2>Claude Certified Architect<br>Knowledge Track</h2>
+    <p class="sub">Sign in with your SourceFuse account to open the practice questions.</p>
+    <button id="ccaf-google-btn" class="ccaf-btn">
+      <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="ccaf-or">or</div>
+    <input id="ccaf-ep-email" class="ccaf-input" type="email" placeholder="you@sourcefuse.com" autocomplete="email">
+    <input id="ccaf-ep-password" class="ccaf-input" type="password" placeholder="Password" autocomplete="current-password">
+    <button onclick="ccafEmailSignIn()" class="ccaf-btn" style="margin-top:4px">Sign in with Email</button>
+    <div id="ccaf-auth-error"></div>
+  </div>
+</div>
+
+<div class="ccaf-userbar">
+  <a class="ccaf-back" href="course-map.html"><span class="arw">&larr;</span> Back to Course Map</a>
+  <span class="ccaf-auth-side">
+    <span id="ccaf-welcome"></span>
+    <button id="ccaf-signout-btn" onclick="ccafSignOut()" style="display:none">Sign out</button>
+  </span>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow"><span class="dot"></span> Claude Certified Architect &mdash; Foundations</p>
+    <h1>Practice Questions</h1>
+    <p class="lede">Extra questions covering ground the module checks don&rsquo;t yet test &mdash; weighted toward
+    exact flags, frontmatter keys and command names, which the modules teach in prose but rarely ask you to recall.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="pq-intro">
+    <p>Each question is tagged with the practice-set item that prompted it and its blueprint domain.
+    Wrong answers give feedback and let you retry &mdash; same behaviour as the module checks.</p>
+    <p>This page tracks no progress and is not part of the certification path. It exists purely as
+    extra drilling, and will grow as more sample material surfaces.</p>
+  </div>
+
+  <div class="pq-score">
+    <span>Answered <b id="pq-done">0</b> / 13</span>
+    <span>First-try correct <b id="pq-first">0</b></span>
+    <button class="btn-reveal" onclick="pqReset()">Reset</button>
+  </div>
+
+  <section class="stage">
+    <div class="kcheck" data-section="practice">
+      <span class="lbl">Check your understanding</span>
+      <p class="kc-sub">13 questions. Answer each and press Check &mdash; wrong answers explain why and reopen for a retry.</p>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="&lt;code&gt;/compact&lt;/code&gt; is the in-session relief valve: it compacts the accumulated conversation so an extended session can keep going without the degradation that verbose discovery output causes." data-why-no="&lt;code&gt;/memory&lt;/code&gt; shows which memory files a session loaded — a diagnostic, not cleanup. &lt;code&gt;/rules&lt;/code&gt; reloads rule files. Forking is for divergent branches, not compression.">
+          <p class="qtext"><span class="qnum">Q1</span>Mid-way through a long exploration session, context is filling with verbose discovery output and answers are degrading — but you are not ready to end the session. Which built-in command helps immediately?<span class="gapbadge">PDF 2.9 · gap · D5</span></p>
+          <label class="opt"><input type="radio" name="pq1" value="a"><span><code>/memory</code></span></label>
+          <label class="opt"><input type="radio" name="pq1" value="b"><span><code>/compact</code></span></label>
+          <label class="opt"><input type="radio" name="pq1" value="c"><span><code>/fork</code></span></label>
+          <label class="opt"><input type="radio" name="pq1" value="d"><span><code>/rules</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="&lt;code&gt;allowed-tools&lt;/code&gt; is the enforcement mechanism: frontmatter-declared tool restrictions bound what the skill may invoke at runtime. That is a configuration guarantee, not an instruction the model might not follow." data-why-no="&lt;code&gt;context: fork&lt;/code&gt; isolates where output accumulates. &lt;code&gt;argument-hint&lt;/code&gt; prompts for parameters. &lt;code&gt;paths&lt;/code&gt; scopes rules to matching files. None of the three restricts which tools can run.">
+          <p class="qtext"><span class="qnum">Q2</span>You are writing a <code>/scaffold-component</code> skill that generates boilerplate files. You want a guarantee it can create files but can <em>never</em> run shell commands — regardless of what its instructions say. Which SKILL.md frontmatter key enforces this?<span class="gapbadge">PDF 2.3 · gap · D3</span></p>
+          <label class="opt"><input type="radio" name="pq2" value="a"><span><code>context: fork</code></span></label>
+          <label class="opt"><input type="radio" name="pq2" value="b"><span><code>argument-hint</code></span></label>
+          <label class="opt"><input type="radio" name="pq2" value="c"><span><code>allowed-tools</code></span></label>
+          <label class="opt"><input type="radio" name="pq2" value="d"><span><code>paths</code></span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="a" data-why-ok="&lt;code&gt;argument-hint&lt;/code&gt; is the frontmatter mechanism for exactly this: a skill that needs parameters can prompt for them on bare invocation instead of running underspecified." data-why-no="&lt;code&gt;context: fork&lt;/code&gt; isolates output, not input requirements. &lt;code&gt;allowed-tools&lt;/code&gt; constrains tools. A longer description documents the parameters for whoever reads docs — the bare invocation still runs bare.">
+          <p class="qtext"><span class="qnum">Q3</span>Developers keep invoking your <code>/generate-fixture</code> skill bare, without the entity type and record count it needs, then get confused by the results. Which frontmatter option addresses this?<span class="gapbadge">PDF 4.6 · gap · D3</span></p>
+          <label class="opt"><input type="radio" name="pq3" value="a"><span><code>argument-hint</code></span></label>
+          <label class="opt"><input type="radio" name="pq3" value="b"><span><code>context: fork</code></span></label>
+          <label class="opt"><input type="radio" name="pq3" value="c"><span><code>allowed-tools</code></span></label>
+          <label class="opt"><input type="radio" name="pq3" value="d"><span>A longer <code>description</code> explaining the parameters</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="Command scoping mirrors intent: &lt;code&gt;~/.claude/commands/&lt;/code&gt; holds personal commands visible only to you, outside version control. &lt;code&gt;.claude/commands/&lt;/code&gt; in the repo is shared with everyone who clones it." data-why-no="The repo path publishes a personal tool to the whole team. CLAUDE.md is project context, not a command-definition mechanism. Path-scoped rules condition on edited file paths, not on identity.">
+          <p class="qtext"><span class="qnum">Q4</span>You have a personal <code>/scratch-notes</code> slash command you use constantly, but it reflects your own workflow and should not appear for teammates when they pull the repository. Where does the command file belong?<span class="gapbadge">PDF 2.1 · gap · D3</span></p>
+          <label class="opt"><input type="radio" name="pq4" value="a"><span><code>.claude/commands/</code> in the repository</span></label>
+          <label class="opt"><input type="radio" name="pq4" value="b"><span><code>~/.claude/commands/</code> in your home directory</span></label>
+          <label class="opt"><input type="radio" name="pq4" value="c"><span>The root <code>CLAUDE.md</code> under a <code># Commands</code> heading</span></label>
+          <label class="opt"><input type="radio" name="pq4" value="d"><span><code>.claude/rules/</code> with a <code>paths</code> glob matching your username</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="&lt;code&gt;--resume &amp;lt;session-name&amp;gt;&lt;/code&gt; is the mechanism for continuing specific prior work: it restores that conversation&amp;rsquo;s context so the investigation picks up where it stopped." data-why-no="&lt;code&gt;--continue-all&lt;/code&gt; is not a real flag. &lt;code&gt;-p&lt;/code&gt; starts a fresh non-interactive run with no memory of yesterday. Unstructured scrollback is a poor substitute for the session&amp;rsquo;s actual context.">
+          <p class="qtext"><span class="qnum">Q5</span>Yesterday you ran a long investigation in a session you named <code>leak-hunt</code>. Today you want to continue exactly where it left off, with its context intact. What do you run?<span class="gapbadge">PDF 2.6 · partial · D1</span></p>
+          <label class="opt"><input type="radio" name="pq5" value="a"><span><code>claude --continue-all</code></span></label>
+          <label class="opt"><input type="radio" name="pq5" value="b"><span><code>claude -p "continue the leak investigation"</code></span></label>
+          <label class="opt"><input type="radio" name="pq5" value="c"><span><code>claude --resume leak-hunt</code></span></label>
+          <label class="opt"><input type="radio" name="pq5" value="d"><span>A new session, pasting yesterday&rsquo;s terminal scrollback as the first message</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="MCP &lt;strong&gt;resources&lt;/strong&gt; exist for this: exposing catalogs of available content (document hierarchies, issue summaries, schema listings) so agents start informed. Discovery becomes a lookup instead of a spelunking expedition." data-why-no="Raising the budget pays for the inefficiency rather than removing it. A hard-coded inventory goes stale the moment the data changes. Removing discovery trades wasted calls for ignorance.">
+          <p class="qtext"><span class="qnum">Q6</span>Subagents burn many tool calls just discovering what data exists — listing document collections, probing for issue summaries, checking which schemas are present — before real work begins. Which MCP capability reduces this?<span class="gapbadge">PDF 3.7 · gap · D2</span></p>
+          <label class="opt"><input type="radio" name="pq6" value="a"><span>Increase the tool-call budget so exploration is affordable</span></label>
+          <label class="opt"><input type="radio" name="pq6" value="b"><span>Expose content catalogs as MCP <strong>resources</strong></span></label>
+          <label class="opt"><input type="radio" name="pq6" value="c"><span>Hard-code the current data inventory into every system prompt</span></label>
+          <label class="opt"><input type="radio" name="pq6" value="d"><span>Remove discovery capability so agents work blind</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="Tool use with a JSON schema is the reliability mechanism: the extraction arrives as schema-conformant tool input, not as prose that happens to contain JSON. Syntax errors are eliminated by construction rather than patched afterwards." data-why-no="A stronger prompt improves the odds within a fundamentally text-shaped channel. Regex repair patches symptoms with fragile fixes. XML relocates the same free-text problem to a different syntax.">
+          <p class="qtext"><span class="qnum">Q7</span>Your pipeline asks Claude to &ldquo;respond with JSON&rdquo; in plain text. Downstream parsing breaks on markdown fences, trailing commentary, and occasional malformed syntax. What is the most reliable <em>structural</em> fix?<span class="gapbadge">PDF 6.1 · partial · D4</span></p>
+          <label class="opt"><input type="radio" name="pq7" value="a"><span>Strengthen the prompt: &ldquo;respond ONLY with valid JSON, no exceptions&rdquo;</span></label>
+          <label class="opt"><input type="radio" name="pq7" value="b"><span>Post-process with regexes that strip fences and repair syntax</span></label>
+          <label class="opt"><input type="radio" name="pq7" value="c"><span>Define the extraction as a tool whose input schema is your JSON schema, and read the data from the <code>tool_use</code> block</span></label>
+          <label class="opt"><input type="radio" name="pq7" value="d"><span>Switch to XML output, which models format more carefully</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="a" data-why-ok="Consistency comes from operational definitions: severity levels anchored by concrete examples give the classifier something to match against, turning a vibe into a rubric. That is what makes severity gates dependable." data-why-no="Removing severity discards the signal the merge gate needs. Averaging statistically launders an unanchored judgement. Line count measures size, not impact — a one-line auth bypass outranks a fifty-line comment tweak.">
+          <p class="qtext"><span class="qnum">Q8</span>Your CI reviewer labels near-identical issues &ldquo;critical&rdquo; one day and &ldquo;minor&rdquo; the next, so severity-based merge gates are unreliable. How do you get consistent severity classification?<span class="gapbadge">PDF 5.7 · partial · D4</span></p>
+          <label class="opt"><input type="radio" name="pq8" value="a"><span>Define explicit severity criteria with concrete code examples for each level</span></label>
+          <label class="opt"><input type="radio" name="pq8" value="b"><span>Remove severity levels and treat all findings equally</span></label>
+          <label class="opt"><input type="radio" name="pq8" value="c"><span>Let the model choose severity freely but average it over five runs</span></label>
+          <label class="opt"><input type="radio" name="pq8" value="d"><span>Map severity to the line count of the affected code</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="Duplicate suppression is a context-design problem: give the reviewer its own prior findings plus an explicit instruction to report deltas — new issues and unresolved carryovers — and the noise stops while coverage stays complete." data-why-no="Reviewing the newest diff alone misses issues that emerge from interaction with earlier commits. One review per PR leaves everything after the first push unreviewed. Reformatting disguises the spam developers already muted.">
+          <p class="qtext"><span class="qnum">Q9</span>Reviews re-run after each new commit to a PR, and the bot re-posts the same findings every time. Developers have muted it. How should re-reviews be designed?<span class="gapbadge">PDF 5.3 · gap · D3</span></p>
+          <label class="opt"><input type="radio" name="pq9" value="a"><span>Review only the newest commit&rsquo;s diff in isolation</span></label>
+          <label class="opt"><input type="radio" name="pq9" value="b"><span>Include the prior review&rsquo;s findings in context and instruct Claude to report only new issues, or previously reported ones still unaddressed</span></label>
+          <label class="opt"><input type="radio" name="pq9" value="c"><span>Limit reviews to one per PR regardless of subsequent commits</span></label>
+          <label class="opt"><input type="radio" name="pq9" value="d"><span>Post all findings again but formatted differently so they seem new</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="CI invocations get their project context from &lt;code&gt;CLAUDE.md&lt;/code&gt;. Standards, value criteria, and fixture documentation there raise generation quality directly — the model can only follow conventions it has been shown." data-why-no="More tests scales the reject pile. Temperature reduces variability of output that is uninformed either way. Rewriting institutionalises rework instead of fixing its cause.">
+          <p class="qtext"><span class="qnum">Q10</span>CI-generated tests ignore your team&rsquo;s fixture library, duplicate helper setup, and test trivialities — so developers reject most of them. What is the <em>configuration-level</em> fix?<span class="gapbadge">PDF 5.2 · gap · D3</span></p>
+          <label class="opt"><input type="radio" name="pq10" value="a"><span>Generate three times as many tests so some survive review</span></label>
+          <label class="opt"><input type="radio" name="pq10" value="b"><span>Lower the temperature of the generation call</span></label>
+          <label class="opt"><input type="radio" name="pq10" value="c"><span>Document testing standards, what makes a test valuable, and the available fixtures in <code>CLAUDE.md</code></span></label>
+          <label class="opt"><input type="radio" name="pq10" value="d"><span>Have developers rewrite the generated tests as a standing chore</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="c" data-why-ok="Multi-concern decomposition is the designed pattern: split the request into distinct items, investigate each (in parallel where possible) against shared context, and respond once with a complete resolution — which is what protects first-contact resolution." data-why-no="Resolving only the first concern and bouncing the message back both silently drop work the customer already stated, harming FCR. Escalating hands off work well within capability.">
+          <p class="qtext"><span class="qnum">Q11</span>A customer writes one message containing three concerns: a refund for a damaged item, a shipping address change, and a missing loyalty credit. How should the agent handle this?<span class="gapbadge">PDF 1.4 · gap · D1</span></p>
+          <label class="opt"><input type="radio" name="pq11" value="a"><span>Resolve only the refund, since it was mentioned first, and wait for the customer to raise the others again</span></label>
+          <label class="opt"><input type="radio" name="pq11" value="b"><span>Escalate immediately — multi-issue messages always exceed agent capability</span></label>
+          <label class="opt"><input type="radio" name="pq11" value="c"><span>Decompose into three distinct items, investigate each against the shared customer context, then synthesise one unified resolution</span></label>
+          <label class="opt"><input type="radio" name="pq11" value="d"><span>Ask the customer to resend each issue as a separate message</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="radio" data-answer="b" data-why-ok="Goal-and-criteria prompts preserve subagent adaptability: the coordinator defines success, the subagent chooses the path. That adaptability is why an agent is there rather than a fixed script." data-why-no="Longer procedures are an arms race against topic variety that scripts always lose. Removing instructions discards the goal along with the script. Escalating to a human reintroduces one into a loop designed to run autonomously.">
+          <p class="qtext"><span class="qnum">Q12</span>Your coordinator gives subagents rigid step-by-step procedures (&ldquo;run these exact five queries in this order&rdquo;). Subagents fail whenever a topic does not fit the script. How should coordinator prompts be designed instead?<span class="gapbadge">PDF 3.4 · gap · D1</span></p>
+          <label class="opt"><input type="radio" name="pq12" value="a"><span>Make the procedures longer, covering more contingencies explicitly</span></label>
+          <label class="opt"><input type="radio" name="pq12" value="b"><span>Specify research goals and quality criteria — what a complete answer looks like — and let the subagent adapt to what it discovers</span></label>
+          <label class="opt"><input type="radio" name="pq12" value="c"><span>Remove all instructions and let subagents infer their tasks</span></label>
+          <label class="opt"><input type="radio" name="pq12" value="d"><span>Have subagents ask the human operator whenever the script fails</span></label>
+          <div class="kfb"></div>
+        </div>
+        <div class="kq" data-kind="multi" data-answer="b,d" data-why-ok="Two load-bearing facts: subagents are configured individually (description, system prompt, tool restrictions), and they are isolated — no inherited history, no memory across invocations, so context passing is always explicit." data-why-no="Inheriting history and prompt-only spawning both invert the model: context never flows automatically, and &lt;code&gt;Task&lt;/code&gt; is the spawning mechanism. Tool restrictions are configuration, not suggestion.">
+          <p class="qtext"><span class="qnum">Q13</span>You are writing <code>AgentDefinition</code> configurations for a productivity system&rsquo;s subagents. Which TWO statements about subagents are accurate?<span class="multi">SELECT TWO</span><span class="gapbadge">PDF 4.10 · partial · D1</span></p>
+          <label class="opt"><input type="checkbox" name="pq13" value="a"><span>Subagents automatically inherit the parent agent&rsquo;s full conversation history</span></label>
+          <label class="opt"><input type="checkbox" name="pq13" value="b"><span>Each subagent&rsquo;s <code>AgentDefinition</code> carries its own description, system prompt, and tool restrictions</span></label>
+          <label class="opt"><input type="checkbox" name="pq13" value="c"><span>Subagents can be spawned without the <code>Task</code> tool if the prompt describes them clearly</span></label>
+          <label class="opt"><input type="checkbox" name="pq13" value="d"><span>Subagents do not share memory between invocations — whatever context a subagent needs must be provided explicitly in its prompt</span></label>
+          <label class="opt"><input type="checkbox" name="pq13" value="e"><span>Subagent tool restrictions are advisory and not enforced at runtime</span></label>
+          <div class="kfb"></div>
+        </div>
+      <div style="margin-top:18px">
+        <button class="btn-check" onclick="pqCheck()">Check answers</button>
+        <span class="kc-status" style="margin-left:12px"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="srcnote">
+    <strong>On the source.</strong> These questions were written against an independent practice set by
+    Matthew Purcell, produced from the public CCA-F exam guide &mdash; not from live exam content, as the
+    author states himself. Treat it as evidence about the published blueprint, not about the real item bank.
+    Anthropic&rsquo;s own exam guide and hands-on practice remain the primary preparation.
+  </div>
+
+</main>
+
+<footer class="wrap" style="padding-top:30px;padding-bottom:50px">
+  <p style="font-size:13px;color:var(--ink-soft)">SF Knowledge Hub &middot; CCA-F Knowledge Track &middot; practice set</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+/* CCA-F practice questions — auth only. No progress, no Firestore writes. */
+const _CCAF_CONFIG = {
+    apiKey: "AIzaSyC-I-IOCq2fCwa471fsD5xOn6SYQSBDp7Q",
+    authDomain: "sfcertification-grafana.firebaseapp.com",
+    projectId: "sfcertification-grafana",
+    storageBucket: "sfcertification-grafana.firebasestorage.app",
+    messagingSenderId: "227322696511",
+    appId: "1:227322696511:web:12e7ced7dd3d45fa06798a"
+};
+if (!window._ccafApp) window._ccafApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(_CCAF_CONFIG);
+const _ccafAuth = firebase.auth(window._ccafApp);
+
+const _ccafErr = function(msg) {
+    const el = document.getElementById('ccaf-auth-error');
+    el.textContent = msg; el.style.display = 'block';
+};
+
+document.getElementById('ccaf-google-btn').addEventListener('click', function() {
+    document.getElementById('ccaf-auth-error').style.display = 'none';
+    _ccafAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e) { _ccafErr(e.message); });
+});
+
+window.ccafEmailSignIn = function() {
+    const email = (document.getElementById('ccaf-ep-email').value || '').trim().toLowerCase();
+    const pwd   =  document.getElementById('ccaf-ep-password').value || '';
+    document.getElementById('ccaf-auth-error').style.display = 'none';
+    if (!email || !pwd) { _ccafErr('Please enter your email and password.'); return; }
+    if (!email.endsWith('@sourcefuse.com')) { _ccafErr('Only @sourcefuse.com accounts are allowed.'); return; }
+    _ccafAuth.signInWithEmailAndPassword(email, pwd).catch(function(e) {
+        _ccafErr(
+            (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') ? 'Incorrect password.'
+          : (e.code === 'auth/user-not-found') ? 'No account found for this email.'
+          : e.message
+        );
+    });
+};
+
+window.ccafSignOut = function() { _ccafAuth.signOut().catch(function(e) { console.error('Sign out failed', e); }); };
+
+_ccafAuth.onAuthStateChanged(async function(user) {
+    if (user) {
+        if (!user.email || !user.email.endsWith('@sourcefuse.com')) {
+            _ccafErr('Only @sourcefuse.com accounts are allowed.');
+            await _ccafAuth.signOut(); return;
+        }
+        window._learnerUid = user.uid; window._learnerEmail = user.email;
+        window._learnerName = user.displayName || user.email;
+        try { sessionStorage.setItem('_learnerUid', user.uid); } catch(e) {}
+        document.getElementById('ccaf-welcome').textContent = 'Signed in — ' + window._learnerName;
+        document.getElementById('ccaf-signout-btn').style.display = '';
+        document.getElementById('ccaf-auth-overlay').style.display = 'none';
+    } else {
+        window._learnerUid = null;
+        document.getElementById('ccaf-welcome').textContent = '';
+        document.getElementById('ccaf-signout-btn').style.display = 'none';
+        document.getElementById('ccaf-auth-overlay').style.display = 'flex';
+    }
+});
+</script>
+
+<script>
+/* ── practice grader ──────────────────────────────────────────────────────
+   Mirrors the module engine's check/feedback/retry behaviour, with one
+   addition: the module engine grades radios only, and the real exam has
+   "select TWO" items — so multi-select grading is added here. */
+(function () {
+  'use strict';
+  var firstTry = {};   // qid -> true if right on first attempt
+
+  function optsOf(q) { return Array.prototype.slice.call(q.querySelectorAll('.opt')); }
+
+  function picked(q) {
+    return Array.prototype.slice.call(q.querySelectorAll('input:checked')).map(function (i) { return i.value; });
+  }
+
+  function grade(q) {
+    var want = (q.getAttribute('data-answer') || '').split(',').map(function (s) { return s.trim(); }).sort();
+    var got  = picked(q).sort();
+    if (!got.length) return null;
+    if (q.getAttribute('data-kind') === 'multi' && got.length !== want.length) return 'count';
+    return want.join(',') === got.join(',');
+  }
+
+  function clearStyles(q) {
+    optsOf(q).forEach(function (o) { o.classList.remove('correct', 'wrong'); });
+  }
+
+  function lock(q) {
+    optsOf(q).forEach(function (o) {
+      o.classList.add('disabled');
+      var i = o.querySelector('input'); if (i) i.disabled = true;
+    });
+  }
+
+  window.pqCheck = function () {
+    var qs = Array.prototype.slice.call(document.querySelectorAll('.kq'));
+    var answered = 0, allRight = true;
+
+    qs.forEach(function (q) {
+      var fb = q.querySelector('.kfb');
+      var res = grade(q);
+      if (res === null) { allRight = false; return; }
+      answered++;
+      clearStyles(q);
+
+      if (res === 'count') {
+        allRight = false;
+        fb.className = 'kfb no show';
+        fb.innerHTML = '<strong>Not quite.</strong> This one asks for exactly two selections. <em>Try again.</em>';
+        return;
+      }
+
+      if (res === true) {
+        if (!(q.id in firstTry)) firstTry[q.id] = true;
+        q.querySelectorAll('input:checked').forEach(function (i) { i.closest('.opt').classList.add('correct'); });
+        fb.className = 'kfb ok show';
+        fb.innerHTML = '<strong>Correct.</strong> ' + (q.getAttribute('data-why-ok') || '');
+        lock(q);
+      } else {
+        firstTry[q.id] = false;
+        allRight = false;
+        q.querySelectorAll('input:checked').forEach(function (i) {
+          i.closest('.opt').classList.add('wrong'); i.checked = false;
+        });
+        fb.className = 'kfb no show';
+        fb.innerHTML = '<strong>Not quite.</strong> ' + (q.getAttribute('data-why-no') || '') + ' <em>Try again.</em>';
+      }
+    });
+
+    var done = qs.filter(function (q) { return q.querySelector('.kfb.ok'); }).length;
+    document.getElementById('pq-done').textContent = done;
+    document.getElementById('pq-first').textContent =
+      Object.keys(firstTry).filter(function (k) { return firstTry[k]; }).length;
+
+    var status = document.querySelector('.kc-status');
+    if (allRight && done === qs.length) {
+      status.textContent = '\u2713 All correct';
+      status.classList.add('done');
+      var b = document.querySelector('.btn-check');
+      b.disabled = true; b.textContent = 'All correct';
+    } else {
+      status.textContent = answered ? 'Some answers need another look' : 'Answer at least one question first';
+      status.classList.remove('done');
+    }
+  };
+
+  window.pqReset = function () {
+    firstTry = {};
+    document.querySelectorAll('.kq').forEach(function (q) {
+      clearStyles(q);
+      q.querySelectorAll('input').forEach(function (i) { i.checked = false; i.disabled = false; });
+      optsOf(q).forEach(function (o) { o.classList.remove('disabled'); });
+      var fb = q.querySelector('.kfb'); fb.className = 'kfb'; fb.innerHTML = '';
+    });
+    document.getElementById('pq-done').textContent = '0';
+    document.getElementById('pq-first').textContent = '0';
+    var b = document.querySelector('.btn-check');
+    b.disabled = false; b.textContent = 'Check answers';
+    var s = document.querySelector('.kc-status'); s.textContent = ''; s.classList.remove('done');
+  };
+
+  /* give each .kq a stable id for first-try scoring */
+  document.querySelectorAll('.kq').forEach(function (q, i) { if (!q.id) q.id = 'kq' + i; });
+})();
+</script>
+</body>
+</html>
