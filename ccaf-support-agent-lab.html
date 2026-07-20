@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026072010 -->
+<!-- build: 2026072020 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -344,7 +344,13 @@
     <p>You should be comfortable in a terminal and reading code &mdash; this lab assumes the developer experience the exam itself assumes (roughly 6+ months building with Claude). It does not stop to explain package managers or async functions.</p>
     <ul>
       <li><strong>Python 3.10+</strong> or <strong>Node 18+</strong> &mdash; the Agent SDK ships for both. Examples lead in Python; the shape is identical in TypeScript.</li>
-      <li>An <strong>Anthropic API key</strong> exported as <code>ANTHROPIC_API_KEY</code>. (Bedrock or Vertex auth also works.)</li>
+      <li>An <strong>Anthropic API key</strong> exported as <code>ANTHROPIC_API_KEY</code> &mdash; the SDK reads it from the environment of the shell you run in. Export it in the same terminal session, before running your script:
+        <div class="code"><span class="c"># macOS / Linux</span>
+<span class="cmd">export ANTHROPIC_API_KEY=sk-ant-...</span>
+
+<span class="c"># Windows (PowerShell)</span>
+<span class="cmd">$env:ANTHROPIC_API_KEY = "sk-ant-..."</span></div>
+        It lasts only for that session &mdash; to avoid re-exporting each time, add the line to your shell profile (<code>~/.zshrc</code>, <code>~/.bashrc</code>). (Bedrock or Vertex auth also works instead of a key.)</li>
       <li>No real backend needed &mdash; you&rsquo;ll build the four tools against a small <strong>in-memory fake dataset</strong> (a few customers and orders). That&rsquo;s deliberate: it keeps <code>process_refund</code> safe to run while you learn to guard it.</li>
     </ul>
     <div class="verify">
@@ -598,6 +604,25 @@ SYSTEM = <span class="s">"""You are a customer support resolution agent.</span>
             print(message.result)
 
 asyncio.run(main())</div>
+    <div class="note">
+      <span class="lbl">Putting it together</span>
+      The install line is a one-time terminal command; the block above is the whole program. You don&rsquo;t paste them into different places &mdash; the lab splits them only to explain each part.
+      <ul>
+        <li><strong>Install</strong> (terminal, once), inside your activated 3.10+ venv: <code>pip install claude-agent-sdk</code>.</li>
+        <li><strong>Write one file</strong> &mdash; call it <code>agent.py</code>. Everything from the block above goes in it, top to bottom, exactly as shown: the imports, the <code>SYSTEM</code> prompt string, the <code>async def main()</code>, and <code>asyncio.run(main())</code> at the very bottom. That last line is what actually kicks it off.</li>
+        <li><strong>Run it</strong> (terminal): <code>python agent.py</code> &mdash; in the same shell where you exported <code>ANTHROPIC_API_KEY</code>.</li>
+      </ul>
+    </div>
+
+    <span class="code-label">What it prints</span>
+    <div class="code"><span class="cmd">$ python agent.py</span>
+<span class="c"># the agent replies to the cracked-order message — no tools yet, so it can</span>
+<span class="c"># only talk about what it would do, not actually look up order 4471:</span>
+I&#x27;m sorry to hear order 4471 arrived cracked. To process a refund I&#x27;ll need to
+verify your account and pull up that order first. Could you confirm the email or
+phone number on the account? Once I&#x27;ve checked the order details against our
+returns policy, I can either issue the refund or escalate it to a specialist.</div>
+
     <p>You did not hand-write the loop. <code>query()</code> runs the full model&ndash;tool&ndash;result cycle and streams every message back, ending with a result message. Right now the agent has no tools &mdash; it can only talk. Stage 2 gives it the four it needs.</p>
 
     <h3>1b &middot; Cap the run and handle failure</h3>
