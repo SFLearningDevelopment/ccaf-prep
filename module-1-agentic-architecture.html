@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071631 -->
+<!-- build: 2026072001 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -444,7 +444,112 @@
     <p class="lede">An agent isn&rsquo;t a single call &mdash; it&rsquo;s a loop. Claude decides it needs a tool, you run the tool, you feed the result back, and Claude decides what to do next. Getting the loop&rsquo;s control flow right &mdash; and knowing what <em>not</em> to base it on &mdash; is the foundation the whole domain rests on.</p>
 
     <h3>What &amp; why</h3>
-    <p>The agentic loop is the cycle that lets Claude execute a multi-step task on its own. Each turn, you send the conversation to Claude and inspect the response&rsquo;s <code>stop_reason</code>. If it&rsquo;s <code>"tool_use"</code>, Claude is asking you to run a tool &mdash; you execute it, append the result to the conversation, and loop again. If it&rsquo;s <code>"end_turn"</code>, Claude is done &mdash; you stop. That single signal, <code>stop_reason</code>, is the correct control-flow mechanism, and building the loop around anything else is where most agent bugs come from.</p>
+    <p>Most Claude calls are one-shot: you ask, Claude answers, done. An <strong>agentic loop</strong> is what you build when a single answer isn&rsquo;t enough &mdash; when the task needs Claude to look something up, act on what it finds, then decide what to do next. Claude can&rsquo;t reach into your systems itself; it can only <em>ask</em> for a tool to be run and wait for the result. The loop is the harness <em>you</em> write around the API that runs those tools and feeds the results back, turn after turn, until Claude signals it has everything it needs. That&rsquo;s the whole idea: Claude drives, your code does the fetching, and the two take turns until the work is finished.</p>
+
+    <figure class="flow-wrap">
+      <svg class="flow-svg" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The agentic loop: send the conversation to Claude, inspect stop_reason, and either run a tool and loop back or finish.">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path class="arrowhead-accent" d="M0,0 L6,3 L0,6 Z"/></marker>
+          <marker id="ahg" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path class="arrowhead" d="M0,0 L6,3 L0,6 Z"/></marker>
+        </defs>
+
+        <!-- start -->
+        <text class="stg" x="60" y="34">START</text>
+        <rect class="box-accent" x="30" y="44" width="150" height="52" rx="8"/>
+        <text class="lbl" x="105" y="66" text-anchor="middle">Build the request</text>
+        <text class="sub" x="105" y="84" text-anchor="middle">messages + tools</text>
+
+        <!-- send to Claude -->
+        <rect class="box-accent" x="275" y="44" width="150" height="52" rx="8"/>
+        <text class="lbl" x="350" y="66" text-anchor="middle">Send to Claude</text>
+        <text class="sub" x="350" y="84" text-anchor="middle">API call</text>
+
+        <!-- inspect stop_reason (decision) -->
+        <rect class="box" x="520" y="40" width="150" height="60" rx="8"/>
+        <text class="lbl" x="595" y="64" text-anchor="middle">Inspect</text>
+        <text class="sub" x="595" y="82" text-anchor="middle">stop_reason</text>
+
+        <!-- tool_use branch -->
+        <rect class="box-amber" x="520" y="180" width="150" height="60" rx="8"/>
+        <text class="lbl" x="595" y="204" text-anchor="middle">Run the tool</text>
+        <text class="sub" x="595" y="222" text-anchor="middle">append tool_result</text>
+
+        <!-- end_turn terminal -->
+        <rect class="box-accent" x="30" y="182" width="150" height="56" rx="8"/>
+        <text class="lbl" x="105" y="206" text-anchor="middle">Done &mdash; stop</text>
+        <text class="sub" x="105" y="224" text-anchor="middle">present answer</text>
+
+        <!-- flow: start -> send -->
+        <path class="flowline-accent" d="M180,70 L268,70" marker-end="url(#ah)"/>
+        <!-- send -> inspect -->
+        <path class="flowline-accent" d="M425,70 L513,70" marker-end="url(#ah)"/>
+
+        <!-- inspect -> tool_use (down) -->
+        <path class="flowline-accent" d="M595,100 L595,173" marker-end="url(#ah)"/>
+        <text class="stg" x="605" y="140">"tool_use"</text>
+
+        <!-- tool_use -> back to send (the loop) -->
+        <path class="loopline" d="M520,210 L350,210 L350,100" marker-end="url(#ah)"/>
+        <text class="zonelbl" x="365" y="145">loop again</text>
+
+        <!-- inspect -> end_turn (down the left, clear of the loop) -->
+        <path class="flowline" d="M520,88 L200,88 L200,130 L105,130 L105,176" marker-end="url(#ahg)"/>
+        <text class="stg" x="215" y="80">"end_turn"</text>
+      </svg>
+      <figcaption>One trip round the loop. The dashed line is the repeat &mdash; every <code>tool_use</code> sends you back to &ldquo;Send to Claude&rdquo; with the tool&rsquo;s result added; <code>end_turn</code> is the only exit.</figcaption>
+    </figure>
+
+    <p>Now the same idea, one line at a time.</p>
+
+    <p><strong>&ldquo;The agentic loop is the cycle that lets Claude execute a multi-step task on its own.&rdquo;</strong> &mdash; Think of a support request like &ldquo;where&rsquo;s my refund for order&nbsp;12345?&rdquo; Answering it takes several steps: look up the customer, look up the order, check the refund status, then reply. No single API call does all four &mdash; but a loop does, because it lets Claude take one step, see the result, and choose the next. The cycle in the diagram above is that loop.</p>
+
+    <p><strong>&ldquo;Each turn, you send the conversation to Claude and inspect the response&rsquo;s <code>stop_reason</code>.&rdquo;</strong> &mdash; A <em>turn</em> is one trip round the loop: one API request, one response. The &ldquo;conversation&rdquo; you send is the whole history so far &mdash; the original question plus every tool result gathered up to now &mdash; because Claude has no memory between calls and rebuilds its understanding from that history each time. When the response comes back, the first thing your code looks at is <code>stop_reason</code>: a short string that tells you <em>why</em> Claude stopped talking. It has two values that matter here.</p>
+
+    <p class="code-label">Turn 1 &mdash; you send the opening request</p>
+    <div class="code"><span class="c"># the conversation so far: just the user's question</span>
+messages = [
+  { <span class="k">"role"</span>: <span class="s">"user"</span>, <span class="k">"content"</span>: <span class="s">"Where's my refund for order 12345?"</span> }
+]
+response = client.messages.create(model=<span class="s">"claude-&hellip;"</span>, messages=messages, tools=tools)</div>
+
+    <p><strong>&ldquo;If it&rsquo;s <code>"tool_use"</code>, Claude is asking you to run a tool &mdash; you execute it, append the result to the conversation, and loop again.&rdquo;</strong> &mdash; A <code>stop_reason</code> of <code>"tool_use"</code> means Claude didn&rsquo;t finish &mdash; it stopped to ask for something. The response carries a <code>tool_use</code> block naming the tool and its input. Your harness runs that tool, then adds <em>two</em> things back to the conversation: Claude&rsquo;s request, and a matching <code>tool_result</code> carrying what the tool returned. Then you call the API again &mdash; the next turn &mdash; and Claude reasons about the task with that new fact in hand.</p>
+
+    <p class="code-label">Turn 1 response &mdash; Claude asks for a tool</p>
+    <div class="code"><span class="c"># stop_reason tells you Claude paused to call a tool</span>
+{
+  <span class="k">"stop_reason"</span>: <span class="s">"tool_use"</span>,
+  <span class="k">"content"</span>: [
+    { <span class="k">"type"</span>: <span class="s">"tool_use"</span>, <span class="k">"id"</span>: <span class="s">"toolu_01"</span>,
+      <span class="k">"name"</span>: <span class="s">"lookup_order"</span>, <span class="k">"input"</span>: { <span class="k">"order_id"</span>: <span class="s">"12345"</span> } }
+  ]
+}</div>
+    <p class="code-label">You run <span class="cmd">lookup_order</span> and append its result, then loop</p>
+    <div class="code"><span class="c"># append Claude's request AND the tool's result, then call again</span>
+messages.append({ <span class="k">"role"</span>: <span class="s">"assistant"</span>, <span class="k">"content"</span>: response.content })
+messages.append({
+  <span class="k">"role"</span>: <span class="s">"user"</span>,
+  <span class="k">"content"</span>: [
+    { <span class="k">"type"</span>: <span class="s">"tool_result"</span>, <span class="k">"tool_use_id"</span>: <span class="s">"toolu_01"</span>,
+      <span class="k">"content"</span>: <span class="s">"{ status: 'refunded', amount: 42.00, date: '2026-07-02' }"</span> }
+  ]
+})
+<span class="c"># Turn 2: same call again, now with the order data in context</span>
+response = client.messages.create(model=<span class="s">"claude-&hellip;"</span>, messages=messages, tools=tools)</div>
+
+    <p><strong>&ldquo;If it&rsquo;s <code>"end_turn"</code>, Claude is done &mdash; you stop.&rdquo;</strong> &mdash; On this second turn Claude has the refund data, so it doesn&rsquo;t need another tool. It writes the final answer and the response comes back with <code>stop_reason: "end_turn"</code> &mdash; meaning Claude finished its turn on its own terms, with nothing left to ask for. That&rsquo;s your exit condition: stop looping and present the text to the user.</p>
+
+    <p class="code-label">Turn 2 response &mdash; Claude finishes</p>
+    <div class="code"><span class="c"># no tool_use block this time; just the answer</span>
+{
+  <span class="k">"stop_reason"</span>: <span class="s">"end_turn"</span>,
+  <span class="k">"content"</span>: [
+    { <span class="k">"type"</span>: <span class="s">"text"</span>,
+      <span class="k">"text"</span>: <span class="s">"Your refund of $42.00 for order 12345 was processed on July 2nd."</span> }
+  ]
+}
+<span class="c"># stop_reason == "end_turn" -> break out of the loop, show the text</span></div>
+
+    <p><strong>&ldquo;That single signal, <code>stop_reason</code>, is the correct control-flow mechanism, and building the loop around anything else is where most agent bugs come from.&rdquo;</strong> &mdash; Notice what decided when to loop and when to stop: never the wording of Claude&rsquo;s reply, only the <code>stop_reason</code> field. That matters because a response can hold <em>both</em> text and a tool call &mdash; Claude might say &ldquo;Let me check that order&rdquo; <em>and</em> emit a <code>tool_use</code> in the same turn. If your loop stopped the moment it saw text, it would quit before running the tool. The reliable rule is the mechanical one: <code>while stop_reason == "tool_use"</code>, run the tool and loop; on <code>"end_turn"</code>, stop. Anything cleverer &mdash; scanning for &ldquo;done&rdquo;, capping turns as the main exit, treating any text as completion &mdash; is exactly the failure the exam&rsquo;s distractors are built from.</p>
 
     <div class="kpoints">
       <span class="lbl">Knowledge points</span>
