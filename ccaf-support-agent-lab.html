@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071611 -->
+<!-- build: 2026072010 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -560,6 +560,22 @@
 
 <span class="c"># TypeScript (bundles the Claude Code binary — nothing else to install)</span>
 <span class="cmd">npm install @anthropic-ai/claude-agent-sdk</span></div>
+
+    <span class="code-label">Possible troubleshooting steps</span>
+    <div class="note">
+      If <code>pip install</code> fails with <code>ERROR: No matching distribution found for claude-agent-sdk</code>,
+      the cause is almost always the Python version &mdash; the SDK ships wheels for <strong>Python 3.10 or newer only</strong>,
+      so an older interpreter finds nothing to install. Work through these in order:
+      <ul>
+        <li>Check your version: <code>python3 --version</code>. If it&rsquo;s <strong>3.9 or below</strong>, that&rsquo;s the problem &mdash; the remaining steps fix it.</li>
+        <li>Create an isolated environment on a 3.10+ interpreter rather than touching system Python:
+          <code>python3.12 -m venv .venv</code> &rarr; <code>source .venv/bin/activate</code> &rarr; <code>pip install claude-agent-sdk</code>.
+          (On Windows: <code>.venv\Scripts\activate</code>.)</li>
+        <li>No 3.10+ interpreter yet? Install one first &mdash; macOS: <code>brew install python@3.12</code>; Ubuntu/Debian: <code>sudo apt install python3.12 python3.12-venv</code>.</li>
+        <li>If <code>python --version</code> inside the active venv still reads 3.9, your <code>pip</code> is tied to the old interpreter &mdash; call it explicitly with <code>python3.12 -m pip install claude-agent-sdk</code>.</li>
+      </ul>
+      A <code>Defaulting to user installation because normal site-packages is not writeable</code> line in the error is a sign you&rsquo;re hitting the system Python directly; the venv above sidesteps it.
+    </div>
 
     <span class="code-label">The loop, with a support system prompt (Python)</span>
     <div class="code"><span class="k">import</span> asyncio
