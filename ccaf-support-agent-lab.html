@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026072020 -->
+<!-- build: 2026072030 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -622,6 +622,41 @@ I&#x27;m sorry to hear order 4471 arrived cracked. To process a refund I&#x27;ll
 verify your account and pull up that order first. Could you confirm the email or
 phone number on the account? Once I&#x27;ve checked the order details against our
 returns policy, I can either issue the refund or escalate it to a specialist.</div>
+
+    <div class="note">
+      <span class="lbl">If you run into issues, check these steps</span>
+      A short, no-assumptions walkthrough of where <code>agent.py</code> lives and how to run it &mdash; most first-run problems are the file and the terminal being in different folders.
+      <ol>
+        <li><strong>Pick a folder for the lab</strong>, so everything stays together. In your terminal:
+          <div class="code"><span class="cmd">mkdir ~/ccaf-support-lab</span>
+<span class="cmd">cd ~/ccaf-support-lab</span></div>
+          <code>~</code> is your home folder. After <code>cd</code>, your terminal is now &ldquo;inside&rdquo; that folder &mdash; that&rsquo;s where the file will live and where you&rsquo;ll run it.</li>
+
+        <li><strong>Create the venv here</strong> (if you haven&rsquo;t already), so the environment sits alongside the file:
+          <div class="code"><span class="cmd">python3.12 -m venv .venv</span>
+<span class="cmd">source .venv/bin/activate</span>
+<span class="cmd">pip install claude-agent-sdk</span></div>
+          On Windows the activate line is <code>.venv\Scripts\activate</code>. Your prompt now shows <code>(.venv)</code> &mdash; that&rsquo;s how you know it&rsquo;s active.</li>
+
+        <li><strong>Create <code>agent.py</code> in this folder.</strong> Two ways, pick one:
+          <ul>
+            <li><strong>Editor:</strong> open the folder in VS Code (<code>code .</code> from the terminal) or any editor, make a new file, name it exactly <code>agent.py</code>, save it in this folder. Paste the whole code block into it.</li>
+            <li><strong>Terminal, no editor:</strong> <code>nano agent.py</code> opens a blank editor in the terminal; paste the code, then <code>Ctrl+O</code>, <code>Enter</code> to save, <code>Ctrl+X</code> to exit.</li>
+          </ul>
+          The filename must be exactly <code>agent.py</code> &mdash; not <code>agent.py.txt</code>. Some editors add <code>.txt</code> silently; check the saved name.</li>
+
+        <li><strong>Confirm the file is where you think.</strong> This is the step people skip and then can&rsquo;t find it:
+          <div class="code"><span class="cmd">ls</span></div>
+          You should see <code>agent.py</code> (and <code>.venv</code>) listed. If <code>agent.py</code> isn&rsquo;t there, it got saved somewhere else &mdash; find it and move it here, or re-save.</li>
+
+        <li><strong>Export your key in this same terminal:</strong>
+          <div class="code"><span class="cmd">export ANTHROPIC_API_KEY=sk-ant-...</span></div></li>
+
+        <li><strong>Run it</strong> &mdash; from this folder, with the venv active:
+          <div class="code"><span class="cmd">python agent.py</span></div></li>
+      </ol>
+      The one rule that ties it together: the folder you&rsquo;re <code>cd</code>&rsquo;d into when you run <code>python agent.py</code> must be the folder where <code>agent.py</code> is saved. If Python says <code>can't open file 'agent.py': No such file or directory</code>, your terminal is in a different folder than the file &mdash; <code>cd</code> to the right folder (or run <code>ls</code> to see where you are) and try again.
+    </div>
 
     <p>You did not hand-write the loop. <code>query()</code> runs the full model&ndash;tool&ndash;result cycle and streams every message back, ending with a result message. Right now the agent has no tools &mdash; it can only talk. Stage 2 gives it the four it needs.</p>
 
