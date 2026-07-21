@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026072060 -->
+<!-- build: 2026072070 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -600,6 +600,7 @@
       <ul>
         <li><code>Not logged in &middot; Please run /login</code> &mdash; the SDK found <em>no</em> credential in this shell. Check the key is actually set here: <code>echo $ANTHROPIC_API_KEY</code>. If it prints nothing, you exported it in a different tab or haven&rsquo;t exported it yet &mdash; re-export it in <em>this</em> terminal, then run again. (Alternatively, <code>claude /login</code> signs in interactively instead of using a key.)</li>
         <li><code>Invalid API key &middot; Fix external API key</code> &mdash; a credential is set, but it&rsquo;s not a valid one. The usual cause: <code>echo $ANTHROPIC_API_KEY</code> prints <code>sk-ant-YOUR-KEY-HERE</code> (or <code>sk-ant-...</code>) &mdash; that&rsquo;s the placeholder, not a real key. Export your actual key from the console. If it <em>is</em> your real key, confirm the account has billing set up, since an unbilled key is rejected on calls.</li>
+        <li><code>Credit balance is too low</code> &mdash; the key is valid and authenticating, but the account behind it has no spendable balance. <strong>Creating a key is free; running it is not.</strong> You can create an API key at no cost (if your organization allows key creation), but every call spends credit &mdash; so a key with no balance behind it fails here. Check the account has credit, not just a key: add credit or enable billing at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>, or switch to an account that already has a balance.</li>
       </ul>
       If your key contains special characters, wrap it in quotes: <code>export ANTHROPIC_API_KEY="sk-ant-..."</code>.
     </div>
