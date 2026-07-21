@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026072050 -->
+<!-- build: 2026072060 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -602,6 +602,34 @@
         <li><code>Invalid API key &middot; Fix external API key</code> &mdash; a credential is set, but it&rsquo;s not a valid one. The usual cause: <code>echo $ANTHROPIC_API_KEY</code> prints <code>sk-ant-YOUR-KEY-HERE</code> (or <code>sk-ant-...</code>) &mdash; that&rsquo;s the placeholder, not a real key. Export your actual key from the console. If it <em>is</em> your real key, confirm the account has billing set up, since an unbilled key is rejected on calls.</li>
       </ul>
       If your key contains special characters, wrap it in quotes: <code>export ANTHROPIC_API_KEY="sk-ant-..."</code>.
+    </div>
+
+    <h3>How much credit usage do you need to run the labs</h3>
+    <p><strong>Short answer:</strong> a very small amount &mdash; $5 to $10 of credit covers the labs with wide margin.</p>
+
+    <div class="note">
+      <span class="lbl">Worth knowing</span>
+      <ul>
+        <li>The lab uses a fake in-memory dataset for the tools, so there are no other paid services involved &mdash; the API calls are the only cost. Nothing else bills.</li>
+        <li>The <code>max_turns=10</code> circuit breaker you just documented is also a cost guard: it caps how many model calls a single runaway loop can make, so a bug can&rsquo;t quietly burn your balance.</li>
+      </ul>
+    </div>
+
+    <p class="code-label">What the labs actually consume</p>
+    <p>Lab 1 is a support agent doing a handful of turns per run &mdash; look up a customer, look up an order, decide, reply. Even generously, one full run is a few thousand input tokens (system prompt, tool definitions, accumulated tool results) and a few hundred output tokens. Call it ~5,000 input + ~1,000 output per run, and assume you run it 50&ndash;100 times while developing and debugging.</p>
+
+    <p>At current rates (Sonnet 5 is $3/$15 per million tokens, on introductory pricing of $2/$10 through August 31, 2026; Haiku 4.5 is $1/$5 per million):</p>
+    <ul>
+      <li>100 runs &times; 5,000 input = 500,000 input tokens &rarr; about $1 on Sonnet at intro pricing</li>
+      <li>100 runs &times; 1,000 output = 100,000 output tokens &rarr; about $1</li>
+    </ul>
+
+    <p>So realistically the whole lab costs well under $5, even with heavy re-running. The SDK defaults to a capable model, but the token volumes here are tiny &mdash; this is a learning exercise, not a production workload.</p>
+
+    <p>The $5 minimum most people start with is plenty for Lab 1 alone. $10&ndash;$20 gives comfortable headroom to work through all seven labs &mdash; several of which are heavier (the research-system and dev-productivity labs spawn subagents and run more turns) &mdash; for the full track with room to experiment and make mistakes.</p>
+
+    <div class="note">
+      Prices move &mdash; Sonnet 5&rsquo;s introductory pricing runs through August 31, 2026, after which it returns to $3/$15. Check <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> for current rates and to watch your usage as the labs run.
     </div>
 
     <span class="code-label">The loop, with a support system prompt (Python)</span>
