@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026072040 -->
+<!-- build: 2026072050 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -354,11 +354,14 @@
       <li><strong>Python 3.10+</strong> or <strong>Node 18+</strong> &mdash; the Agent SDK ships for both. Examples lead in Python; the shape is identical in TypeScript.</li>
       <li>An <strong>Anthropic API key</strong> exported as <code>ANTHROPIC_API_KEY</code> &mdash; the SDK reads it from the environment of the shell you run in. Export it in the same terminal session, before running your script:
         <div class="code"><span class="c"># macOS / Linux</span>
-<span class="cmd">export ANTHROPIC_API_KEY=sk-ant-...</span>
+<span class="cmd">export ANTHROPIC_API_KEY=sk-ant-YOUR-KEY-HERE</span>
 
 <span class="c"># Windows (PowerShell)</span>
-<span class="cmd">$env:ANTHROPIC_API_KEY = "sk-ant-..."</span></div>
-        It lasts only for that session &mdash; to avoid re-exporting each time, add the line to your shell profile (<code>~/.zshrc</code>, <code>~/.bashrc</code>). (Bedrock or Vertex auth also works instead of a key.)</li>
+<span class="cmd">$env:ANTHROPIC_API_KEY = "sk-ant-YOUR-KEY-HERE"</span></div>
+        It lasts only for that session &mdash; to avoid re-exporting each time, add the line to your shell profile (<code>~/.zshrc</code>, <code>~/.bashrc</code>). Replace <code>sk-ant-YOUR-KEY-HERE</code> with your actual key &mdash; the placeholder itself is not a valid key.
+        <div class="note" style="margin-top:12px">
+          <strong>No key yet?</strong> Create one at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> &rarr; Settings &rarr; API keys &rarr; Create key. It&rsquo;s shown <strong>once</strong>, so copy it immediately. The account also needs credit or billing set up &mdash; a valid key still fails on calls if there&rsquo;s no balance. (Bedrock or Vertex auth also works instead of a key.)
+        </div></li>
       <li>No real backend needed &mdash; you&rsquo;ll build the four tools against a small <strong>in-memory fake dataset</strong> (a few customers and orders). That&rsquo;s deliberate: it keeps <code>process_refund</code> safe to run while you learn to guard it.</li>
     </ul>
     <div class="verify">
@@ -591,6 +594,16 @@
       A <code>Defaulting to user installation because normal site-packages is not writeable</code> line in the error is a sign you&rsquo;re hitting the system Python directly; the venv above sidesteps it.
     </div>
 
+    <span class="code-label">If the script runs but authentication fails</span>
+    <div class="note">
+      The install worked and <code>agent.py</code> starts, but the run stops with an auth message. Two you might see:
+      <ul>
+        <li><code>Not logged in &middot; Please run /login</code> &mdash; the SDK found <em>no</em> credential in this shell. Check the key is actually set here: <code>echo $ANTHROPIC_API_KEY</code>. If it prints nothing, you exported it in a different tab or haven&rsquo;t exported it yet &mdash; re-export it in <em>this</em> terminal, then run again. (Alternatively, <code>claude /login</code> signs in interactively instead of using a key.)</li>
+        <li><code>Invalid API key &middot; Fix external API key</code> &mdash; a credential is set, but it&rsquo;s not a valid one. The usual cause: <code>echo $ANTHROPIC_API_KEY</code> prints <code>sk-ant-YOUR-KEY-HERE</code> (or <code>sk-ant-...</code>) &mdash; that&rsquo;s the placeholder, not a real key. Export your actual key from the console. If it <em>is</em> your real key, confirm the account has billing set up, since an unbilled key is rejected on calls.</li>
+      </ul>
+      If your key contains special characters, wrap it in quotes: <code>export ANTHROPIC_API_KEY="sk-ant-..."</code>.
+    </div>
+
     <span class="code-label">The loop, with a support system prompt (Python)</span>
     <div class="code py"><span class="k">import</span> asyncio
 <span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
@@ -658,7 +671,7 @@ returns policy, I can either issue the refund or escalate it to a specialist.</d
           You should see <code>agent.py</code> (and <code>.venv</code>) listed. If <code>agent.py</code> isn&rsquo;t there, it got saved somewhere else &mdash; find it and move it here, or re-save.</li>
 
         <li><strong>Export your key in this same terminal:</strong>
-          <div class="code"><span class="cmd">export ANTHROPIC_API_KEY=sk-ant-...</span></div></li>
+          <div class="code"><span class="cmd">export ANTHROPIC_API_KEY=sk-ant-YOUR-KEY-HERE</span></div></li>
 
         <li><strong>Run it</strong> &mdash; from this folder, with the venv active:
           <div class="code"><span class="cmd">python agent.py</span></div></li>
