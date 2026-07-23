@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071612 -->
+<!-- build: 2026072081 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -106,6 +106,14 @@
     background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
     padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
     line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+  }
+  .code.py{position:relative;padding-top:30px}
+  .code.py::before{
+    content:"Python \00b7 4-space indent";
+    position:absolute;top:0;left:0;right:0;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+    color:var(--code-dim);background:#181c16;border-bottom:1px solid #2c322a;
+    padding:5px 20px;border-radius:var(--radius) var(--radius) 0 0;
   }
   .code .k{color:var(--code-key)}
   .code .s{color:var(--code-str)}
@@ -565,7 +573,7 @@
 <span class="cmd">npm install @anthropic-ai/claude-agent-sdk</span></div>
 
     <span class="code-label">The coordinator, with a delegation-first system prompt (Python)</span>
-    <div class="code"><span class="k">import</span> asyncio
+    <div class="code py"><span class="k">import</span> asyncio
 <span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
 
 COORDINATOR = <span class="s">"""You are a research coordinator. You do NOT research directly.</span>
@@ -590,6 +598,52 @@ asyncio.run(main())</div>
 
     <h3>1b &middot; The one rule that trips everyone up</h3>
     <p><strong><code>Agent</code> must be in <code>allowed_tools</code>.</strong> Without it, the coordinator&rsquo;s attempts to delegate fall through to your permission callback or get denied &mdash; and Claude, unable to delegate, just does the work itself in one context. If your &ldquo;multi-agent&rdquo; system is quietly running as a single agent, this is almost always why. You can also nudge delegation by naming a subagent in the prompt (&ldquo;Use the searcher to&hellip;&rdquo;).</p>
+
+    <span class="code-label">delegation_check.py</span>
+    <div class="code py"><span class="c"># delegation_check.py — proves whether delegation is actually happening.</span>
+<span class="c"># Run it twice: once as-is, once with the marked line commented out.</span>
+<span class="k">import</span> asyncio
+<span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
+
+COORDINATOR = <span class="s">"""You are a research coordinator. You do NOT research directly.
+Use the searcher subagent for any web lookup, then summarise what it returns."""</span>
+
+AGENTS = {
+    <span class="s">"searcher"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Searches the web for sources on a topic. Use FIRST, to gather cited web sources."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You find and return web sources with citations. Do not synthesize."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"WebSearch"</span>],
+    },
+}
+
+<span class="k">async def</span> main():
+    delegated = <span class="k">False</span>
+
+    <span class="k">async for</span> message <span class="k">in</span> query(
+        prompt=<span class="s">"Use the searcher to find recent sources on solid-state batteries."</span>,
+        options=ClaudeAgentOptions(
+            system_prompt=COORDINATOR,
+            agents=AGENTS,
+            allowed_tools=[<span class="s">"Agent"</span>],   <span class="c"># &lt;-- COMMENT THIS OUT to see the failure</span>
+            max_turns=<span class="s">20</span>,
+        ),
+    ):
+        <span class="c"># any Agent tool call in the stream means delegation really happened</span>
+        <span class="k">for</span> blk <span class="k">in</span> getattr(message, <span class="s">"content"</span>, []) <span class="k">or</span> []:
+            <span class="k">if</span> getattr(blk, <span class="s">"name"</span>, <span class="k">None</span>) == <span class="s">"Agent"</span>:
+                delegated = <span class="k">True</span>
+                print(<span class="s">"  -&gt; delegated to a subagent"</span>)
+
+        <span class="k">if</span> hasattr(message, <span class="s">"result"</span>):
+            print(<span class="s">"\nRESULT:"</span>, message.result)
+
+    print(<span class="s">"\nDelegation happened:"</span>, delegated)
+    <span class="k">if</span> <span class="k">not</span> delegated:
+        print(<span class="s">"Coordinator did the work itself — 'Agent' is missing from allowed_tools."</span>)
+
+asyncio.run(main())</div>
+    <p class="note" style="margin-top:14px"><strong>A reference construction.</strong> This is one way to write it for this lab&rsquo;s four-subagent design &mdash; not the only way, and not verified against your setup. Treat it as a starting point: change the topic, the roles, the claim fields, and see what breaks. Modifying it as <em>you</em> envision the system is the point of the exercise.</p>
+
 
     <h3>1c &middot; Cap the orchestration</h3>
     <p>The coordinator carries the full conversation plus every subagent&rsquo;s description on every turn, so long runs get progressively more expensive. Set <code>max_turns</code> as a circuit breaker and watch cost &mdash; every <code>ResultMessage</code> carries token usage with a per-model breakdown when subagents run.</p>
@@ -632,7 +686,7 @@ asyncio.run(main())</div>
 
     <h3>2a &middot; The four roles</h3>
     <p>Define them programmatically. Each runs in a fresh context and returns only its final message to the coordinator.</p>
-    <div class="code">options = ClaudeAgentOptions(
+    <div class="code py">options = ClaudeAgentOptions(
     system_prompt=COORDINATOR,
     allowed_tools=[<span class="s">"Agent"</span>],
     agents={
@@ -661,6 +715,64 @@ asyncio.run(main())</div>
 
     <h3>2b &middot; Descriptions are how the coordinator routes</h3>
     <p>The coordinator reads each <code>description</code> exactly the way a model reads a tool description &mdash; to decide when to delegate. So the descriptions must draw sharp boundaries: <em>web</em> vs. <em>local documents</em>, and <em>ordering</em> (searcher first, reporter last). Vague descriptions cause the coordinator to route to the wrong specialist or skip one.</p>
+
+    <span class="code-label">description_test.py</span>
+    <div class="code py"><span class="c"># description_test.py — same question, two description sets. Compare routing.</span>
+<span class="c"># Vague descriptions send the coordinator to the wrong specialist.</span>
+<span class="k">import</span> asyncio
+<span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
+
+COORDINATOR = <span class="s">"""You are a research coordinator. Delegate to the right specialist.
+Do not research directly."""</span>
+
+<span class="c"># --- VAGUE: nothing distinguishes these two. The coordinator guesses. ---</span>
+VAGUE = {
+    <span class="s">"searcher"</span>:  {<span class="s">"description"</span>: <span class="s">"Finds information."</span>,
+                   <span class="s">"prompt"</span>: <span class="s">"Find information."</span>, <span class="s">"tools"</span>: [<span class="s">"WebSearch"</span>]},
+    <span class="s">"analyzer"</span>:  {<span class="s">"description"</span>: <span class="s">"Analyzes information."</span>,
+                   <span class="s">"prompt"</span>: <span class="s">"Analyze information."</span>, <span class="s">"tools"</span>: [<span class="s">"Read"</span>, <span class="s">"Grep"</span>]},
+}
+
+<span class="c"># --- SHARP: boundary (web vs local) and ordering are explicit. ---</span>
+SHARP = {
+    <span class="s">"searcher"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Searches the WEB for sources on a topic. Use FIRST. "</span>
+                       <span class="s">"Use for anything not already on disk. Never reads local files."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You find web sources with citations. Return claims with url + cited_text."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"WebSearch"</span>],
+    },
+    <span class="s">"analyzer"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Reads LOCAL documents (PDFs, markdown) already on disk. "</span>
+                       <span class="s">"Use only for files. Never searches the web."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You read local documents and extract claims tagged with file + location."</span>,
+        <span class="s">"tools"</span>: [<span class="s">"Read"</span>, <span class="s">"Grep"</span>],
+    },
+}
+
+<span class="k">async def</span> run(label, agents, prompt):
+    print(<span class="s">f"\n===== {label} ====="</span>)
+    <span class="k">async for</span> message <span class="k">in</span> query(
+        prompt=prompt,
+        options=ClaudeAgentOptions(
+            system_prompt=COORDINATOR, agents=agents,
+            allowed_tools=[<span class="s">"Agent"</span>], max_turns=<span class="s">20</span>,
+        ),
+    ):
+        <span class="k">for</span> blk <span class="k">in</span> getattr(message, <span class="s">"content"</span>, []) <span class="k">or</span> []:
+            <span class="k">if</span> getattr(blk, <span class="s">"name"</span>, <span class="k">None</span>) == <span class="s">"Agent"</span>:
+                <span class="c"># which specialist did it pick?</span>
+                print(<span class="s">"  routed to:"</span>, getattr(blk, <span class="s">"input"</span>, {}))
+        <span class="k">if</span> hasattr(message, <span class="s">"result"</span>):
+            print(<span class="s">"  result:"</span>, str(message.result)[:<span class="s">160</span>])
+
+<span class="k">async def</span> main():
+    q = <span class="s">"What do our local PDFs say about solid-state battery cost?"</span>
+    <span class="k">await</span> run(<span class="s">"VAGUE descriptions"</span>, VAGUE, q)   <span class="c"># often picks the searcher — wrong</span>
+    <span class="k">await</span> run(<span class="s">"SHARP descriptions"</span>, SHARP, q)   <span class="c"># should pick the analyzer</span>
+
+asyncio.run(main())</div>
+    <p class="note" style="margin-top:14px"><strong>A reference construction.</strong> This is one way to write it for this lab&rsquo;s four-subagent design &mdash; not the only way, and not verified against your setup. Treat it as a starting point: change the topic, the roles, the claim fields, and see what breaks. Modifying it as <em>you</em> envision the system is the point of the exercise.</p>
+
 
     <h3>2c &middot; Scope each subagent&rsquo;s tools to its role</h3>
     <p>Tool boundaries do real work here: the <code>synthesizer</code> has <em>no</em> tools (it only reasons over what it&rsquo;s given), the <code>analyzer</code> reads local files but can&rsquo;t search the web, the <code>searcher</code> searches but doesn&rsquo;t write. A subagent that can only do its job can&rsquo;t wander into another&rsquo;s.</p>
@@ -703,7 +815,7 @@ asyncio.run(main())</div>
 
     <h3>3a &middot; The searcher&rsquo;s web tools cite for free</h3>
     <p>The built-in <code>WebSearch</code> tool is special for this system: <strong>citations are always enabled</strong>. When Claude answers from search results, each supporting passage comes back as a citation with the source <code>url</code>, <code>title</code>, and the exact <code>cited_text</code>. You don&rsquo;t have to ask for citations &mdash; they arrive with the results. That&rsquo;s the foundation the whole &ldquo;every claim is cited&rdquo; guarantee rests on.</p>
-    <div class="code"><span class="c"># The searcher subagent's tools — WebSearch cites automatically.</span>
+    <div class="code py"><span class="c"># The searcher subagent's tools — WebSearch cites automatically.</span>
 <span class="c"># A minimal standalone research agent looks like this:</span>
 <span class="k">async for</span> msg <span class="k">in</span> query(
     prompt=<span class="s">"Find recent sources on solid-state battery energy density."</span>,
@@ -713,7 +825,7 @@ asyncio.run(main())</div>
 
     <h3>3b &middot; Add web_fetch for full-text (search then fetch)</h3>
     <p>Search returns snippets; when the searcher needs the full text of a promising page, <code>web_fetch</code> pulls it. The canonical pattern is <strong>search then fetch</strong> &mdash; search to find candidate URLs, fetch to read the best ones in depth. Unlike WebSearch, <code>web_fetch</code> citations are <em>optional</em>, so enable them:</p>
-    <div class="code"><span class="c"># web_fetch citations are off by default — turn them on:</span>
+    <div class="code py"><span class="c"># web_fetch citations are off by default — turn them on:</span>
 { <span class="k">"type"</span>: <span class="s">"web_fetch_20250910"</span>, <span class="k">"name"</span>: <span class="s">"web_fetch"</span>,
   <span class="k">"max_uses"</span>: <span class="s">5</span>, <span class="k">"citations"</span>: {<span class="k">"enabled"</span>: <span class="k">True</span>} }</div>
     <div class="note">
@@ -772,6 +884,67 @@ asyncio.run(main())</div>
     <h3>4a &middot; Pass context explicitly &mdash; the prompt is the only channel</h3>
     <p>A subagent starts with a fresh context and <em>no</em> access to the coordinator&rsquo;s conversation. The only thing that crosses from parent to child is the <strong>prompt string</strong> the coordinator sends. So whatever a subagent needs &mdash; the topic, the searcher&rsquo;s findings for the synthesizer, the synthesized claims for the reporter &mdash; must be put directly in that prompt. This is the single most common orchestration bug: assuming a subagent &ldquo;knows&rdquo; what the coordinator knows.</p>
 
+    <span class="code-label">explicit_context.py</span>
+    <div class="code py"><span class="c"># explicit_context.py — the prompt is the ONLY channel to a subagent.</span>
+<span class="c"># Shows the bug and the fix side by side.</span>
+<span class="k">import</span> asyncio
+<span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
+
+<span class="c"># Pretend the searcher already ran and returned this. In the real pipeline</span>
+<span class="c"># the coordinator holds it after the searcher's turn.</span>
+SEARCH_FINDINGS = [
+    {<span class="s">"claim"</span>: <span class="s">"Solid-state cells reached ~400 Wh/kg in 2025 lab tests"</span>,
+     <span class="s">"url"</span>: <span class="s">"https://example.org/sse-2025"</span>,
+     <span class="s">"cited_text"</span>: <span class="s">"...achieved 400 Wh/kg in cell-level testing..."</span>},
+    {<span class="s">"claim"</span>: <span class="s">"Manufacturing cost remains 3-5x lithium-ion at pilot scale"</span>,
+     <span class="s">"url"</span>: <span class="s">"https://example.org/cost-analysis"</span>,
+     <span class="s">"cited_text"</span>: <span class="s">"...pilot lines run three to five times the cost..."</span>},
+]
+
+SYNTHESIZER = {
+    <span class="s">"synthesizer"</span>: {
+        <span class="s">"description"</span>: <span class="s">"Combines findings into one coherent claim set. Use AFTER search."</span>,
+        <span class="s">"prompt"</span>: <span class="s">"You merge claims, preserving each claim's url and cited_text."</span>,
+        <span class="s">"tools"</span>: [],
+    },
+}
+
+<span class="k">def</span> format_findings(findings):
+    <span class="c"># put the DATA in the prompt — the subagent cannot see anything else</span>
+    lines = []
+    <span class="k">for</span> f <span class="k">in</span> findings:
+        lines.append(<span class="s">f"- CLAIM: {f['claim']}\n  URL: {f['url']}\n  QUOTE: {f['cited_text']}"</span>)
+    <span class="k">return</span> <span class="s">"\n"</span>.join(lines)
+
+<span class="k">async def</span> ask(prompt):
+    <span class="k">async for</span> message <span class="k">in</span> query(
+        prompt=prompt,
+        options=ClaudeAgentOptions(
+            system_prompt=<span class="s">"You are a research coordinator."</span>,
+            agents=SYNTHESIZER, allowed_tools=[<span class="s">"Agent"</span>], max_turns=<span class="s">15</span>,
+        ),
+    ):
+        <span class="k">if</span> hasattr(message, <span class="s">"result"</span>):
+            <span class="k">return</span> message.result
+
+<span class="k">async def</span> main():
+    <span class="c"># WRONG — refers to findings the subagent has never seen.</span>
+    <span class="c"># It starts with a fresh context: "the findings" means nothing to it.</span>
+    bad = <span class="k">await</span> ask(<span class="s">"Use the synthesizer to merge the search findings."</span>)
+    print(<span class="s">"WITHOUT context:\n"</span>, bad, <span class="s">"\n"</span>)
+
+    <span class="c"># RIGHT — the findings travel INSIDE the prompt string.</span>
+    good = <span class="k">await</span> ask(
+        <span class="s">"Use the synthesizer to merge these findings into one claim set.\n"</span>
+        <span class="s">"Preserve every url and cited_text exactly.\n\n"</span>
+        + format_findings(SEARCH_FINDINGS)
+    )
+    print(<span class="s">"WITH context:\n"</span>, good)
+
+asyncio.run(main())</div>
+    <p class="note" style="margin-top:14px"><strong>A reference construction.</strong> This is one way to write it for this lab&rsquo;s four-subagent design &mdash; not the only way, and not verified against your setup. Treat it as a starting point: change the topic, the roles, the claim fields, and see what breaks. Modifying it as <em>you</em> envision the system is the point of the exercise.</p>
+
+
     <h3>4b &middot; Sequence by data dependency</h3>
     <p>This system is deliberately sequential, because each step feeds the next:</p>
     <ol>
@@ -828,7 +1001,7 @@ asyncio.run(main())</div>
 
     <h3>5a &middot; Summaries in, not raw work</h3>
     <p>This is the core idea, worth stating plainly: a subagent does the noisy work &mdash; the twenty page reads, the document crawl &mdash; <em>entirely inside its own context</em>, and returns <strong>one thing</strong> to the coordinator: a summary. The coordinator pays for the three-line finding, not the twenty pages behind it. That asymmetric information flow is the point of delegation, not a side benefit.</p>
-    <div class="code"><span class="c"># The searcher reads 20 pages in ITS context and returns:</span>
+    <div class="code py"><span class="c"># The searcher reads 20 pages in ITS context and returns:</span>
 { <span class="k">"claims"</span>: [
     {<span class="k">"claim"</span>: <span class="s">"Solid-state cells reached ~400 Wh/kg in 2025 lab tests"</span>,
      <span class="k">"url"</span>: <span class="s">"https://…"</span>, <span class="k">"cited_text"</span>: <span class="s">"…achieved 400 Wh/kg…"</span>},
@@ -876,9 +1049,59 @@ asyncio.run(main())</div>
     <h3>6a &middot; Carry the source with every claim, end to end</h3>
     <p>The guarantee is built by construction, not bolted on at the end. Each claim carries its source from the moment it&rsquo;s found: the searcher attaches <code>url</code> + <code>cited_text</code>, the analyzer attaches file + location, the synthesizer <em>preserves</em> those through the merge, and the reporter is instructed never to state a claim it can&rsquo;t cite. By the time the report exists, every claim already has a source attached &mdash; or it shouldn&rsquo;t be there.</p>
 
+    <span class="code-label">provenance_chain.py</span>
+    <div class="code py"><span class="c"># provenance_chain.py — a claim keeps its source through every hop.</span>
+<span class="c"># searcher -&gt; analyzer -&gt; synthesizer -&gt; reporter, with a check at the end.</span>
+
+<span class="c"># --- hop 1: the searcher attaches url + cited_text ---</span>
+web_claims = [
+    {<span class="s">"claim"</span>: <span class="s">"Solid-state cells reached ~400 Wh/kg in 2025 lab tests"</span>,
+     <span class="s">"source"</span>: {<span class="s">"kind"</span>: <span class="s">"web"</span>, <span class="s">"url"</span>: <span class="s">"https://example.org/sse-2025"</span>,
+                <span class="s">"cited_text"</span>: <span class="s">"...achieved 400 Wh/kg..."</span>}},
+]
+
+<span class="c"># --- hop 2: the analyzer attaches file + location instead ---</span>
+doc_claims = [
+    {<span class="s">"claim"</span>: <span class="s">"Internal pilot targets $95/kWh by 2027"</span>,
+     <span class="s">"source"</span>: {<span class="s">"kind"</span>: <span class="s">"doc"</span>, <span class="s">"file"</span>: <span class="s">"docs/roadmap.pdf"</span>,
+                <span class="s">"location"</span>: <span class="s">"p.12"</span>}},
+]
+
+<span class="c"># --- hop 3: the synthesizer MERGES but never drops the source ---</span>
+<span class="k">def</span> synthesize(*claim_sets):
+    merged = []
+    <span class="k">for</span> cs <span class="k">in</span> claim_sets:
+        <span class="k">for</span> c <span class="k">in</span> cs:
+            <span class="k">if</span> <span class="s">"source"</span> <span class="k">not</span> <span class="k">in</span> c:
+                <span class="k">raise</span> ValueError(<span class="s">f"claim lost its source: {c['claim']}"</span>)
+            merged.append(c)          <span class="c"># carry the whole dict, source included</span>
+    <span class="k">return</span> merged
+
+<span class="c"># --- hop 4: the reporter may only write claims that carry a source ---</span>
+<span class="k">def</span> write_report(claims):
+    body, refs = [], []
+    <span class="k">for</span> c <span class="k">in</span> claims:
+        s = c[<span class="s">"source"</span>]
+        ref = s[<span class="s">"url"</span>] <span class="k">if</span> s[<span class="s">"kind"</span>] == <span class="s">"web"</span> <span class="k">else</span> <span class="s">f"{s['file']} ({s['location']})"</span>
+        body.append(<span class="s">f"{c['claim']} [{len(refs) + 1}]"</span>)
+        refs.append(ref)
+    <span class="k">return</span> <span class="s">"\n"</span>.join(body) + <span class="s">"\n\nREFERENCES\n"</span> + <span class="s">"\n"</span>.join(
+        <span class="s">f"[{i+1}] {r}"</span> <span class="k">for</span> i, r <span class="k">in</span> enumerate(refs))
+
+<span class="c"># --- the guarantee, checked rather than assumed ---</span>
+merged = synthesize(web_claims, doc_claims)
+print(write_report(merged))
+
+<span class="c"># Try it: delete "source" from one claim above and re-run.</span>
+<span class="c"># synthesize() raises immediately — the chain breaks at the hop that dropped it,</span>
+<span class="c"># not silently at the report. That's what "by construction" means.</span>
+print(<span class="s">"\nAll claims sourced:"</span>, all(<span class="s">"source"</span> <span class="k">in</span> c <span class="k">for</span> c <span class="k">in</span> merged))</div>
+    <p class="note" style="margin-top:14px"><strong>A reference construction.</strong> This is one way to write it for this lab&rsquo;s four-subagent design &mdash; not the only way, and not verified against your setup. Treat it as a starting point: change the topic, the roles, the claim fields, and see what breaks. Modifying it as <em>you</em> envision the system is the point of the exercise.</p>
+
+
     <h3>6b &middot; The verification pass</h3>
     <p>Construction isn&rsquo;t enough on its own, because a model can still slip in an unsupported claim. So add a verification step: check the finished report against the set of sources the subagents returned, and flag any claim without a match. This is the difference between &ldquo;asked for citations&rdquo; and &ldquo;guaranteed them.&rdquo;</p>
-    <div class="code"><span class="c"># Verification: every report claim must map to a returned source.</span>
+    <div class="code py"><span class="c"># Verification: every report claim must map to a returned source.</span>
 returned_sources = collect_sources(searcher_out, analyzer_out)   <span class="c"># urls + file refs</span>
 <span class="k">for</span> claim <span class="k">in</span> report_claims:
     <span class="k">if</span> claim.citation <span class="k">not in</span> returned_sources:
