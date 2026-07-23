@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026071613 -->
+<!-- build: 2026072110 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -106,6 +106,15 @@
     background:var(--code-bg);color:var(--code-ink);border-radius:var(--radius);
     padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
     line-height:1.6;margin:16px 0;border:1px solid #2c322a;
+    white-space:pre;tab-size:4;
+  }
+  .code.py{position:relative;padding-top:30px}
+  .code.py::before{
+    content:"Python";
+    position:absolute;top:0;left:0;right:0;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+    color:var(--code-dim);background:#181c16;border-bottom:1px solid #2c322a;
+    padding:5px 20px;border-radius:var(--radius) var(--radius) 0 0;
   }
   .code .k{color:var(--code-key)}
   .code .s{color:var(--code-str)}
@@ -560,7 +569,7 @@
 <span class="cmd">npm install @anthropic-ai/claude-agent-sdk</span></div>
 
     <span class="code-label">A read-only agent, pointed at a repo (Python)</span>
-    <div class="code"><span class="k">import</span> asyncio
+    <div class="code py"><span class="k">import</span> asyncio
 <span class="k">from</span> claude_agent_sdk <span class="k">import</span> query, ClaudeAgentOptions
 
 <span class="k">async def</span> main():
@@ -680,7 +689,7 @@ asyncio.run(main())</div>
 
     <h3>3b &middot; Delegate the crawl to a subagent</h3>
     <p>The cleaner move for a genuinely wide investigation: delegate it. A subagent reads the fifty relevant files <em>in its own context</em> and returns a concise summary &mdash; so the fifty files never land in your main agent&rsquo;s window. The main agent asks the question and gets the answer, not the crawl. This is the same context-isolation benefit subagents give any multi-agent system, applied to legacy exploration.</p>
-    <div class="code">options = ClaudeAgentOptions(
+    <div class="code py">options = ClaudeAgentOptions(
     cwd=repo,
     allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Agent"</span>],   <span class="c"># Agent = can delegate</span>
     agents={
@@ -734,7 +743,7 @@ asyncio.run(main())</div>
 
     <h3>4a &middot; Grant Write and Edit</h3>
     <p>Add the write tools to the list, and switch off pure plan mode so the agent can act. <code>acceptEdits</code> lets it write without prompting on every file &mdash; appropriate once you trust the task and are running in a safe environment.</p>
-    <div class="code">options = ClaudeAgentOptions(
+    <div class="code py">options = ClaudeAgentOptions(
     cwd=repo,
     allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Write"</span>, <span class="s">"Edit"</span>],
     permission_mode=<span class="s">"acceptEdits"</span>,   <span class="c"># write without per-file prompts</span>
@@ -744,7 +753,7 @@ asyncio.run(main())</div>
 
     <h3>4b &middot; Gate where it writes</h3>
     <p>Write access without scope is how an agent edits a file it shouldn&rsquo;t. A <code>can_use_tool</code> gate keeps writes inside the intended area &mdash; deny anything outside the target directory, protect generated files or lockfiles, and let the rest through. The grant is broad (&ldquo;can write&rdquo;); the gate makes it precise (&ldquo;can write <em>here</em>&rdquo;).</p>
-    <div class="code"><span class="k">async def</span> write_gate(tool_name, args, context):
+    <div class="code py"><span class="k">async def</span> write_gate(tool_name, args, context):
     <span class="k">if</span> tool_name <span class="k">in</span> (<span class="s">"Write"</span>, <span class="s">"Edit"</span>):
         path = args.get(<span class="s">"path"</span>, <span class="s">""</span>)
         <span class="k">if not</span> path.startswith(<span class="s">"api/endpoints/"</span>):
@@ -793,7 +802,7 @@ asyncio.run(main())</div>
 
     <h3>5a &middot; Grant Bash, in a sandbox</h3>
     <p>Add <code>Bash</code> to the list &mdash; but this is the point where the <em>environment</em> matters as much as the permission list. Run the agent in a <strong>container or VM</strong>, so even a mistaken command is contained. The sandbox is a safety layer the tool list can&rsquo;t provide on its own.</p>
-    <div class="code">options = ClaudeAgentOptions(
+    <div class="code py">options = ClaudeAgentOptions(
     cwd=repo,
     allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Edit"</span>, <span class="s">"Bash"</span>],
     can_use_tool=bash_gate,   <span class="c"># gate dangerous commands (5b)</span>
@@ -802,7 +811,7 @@ asyncio.run(main())</div>
 
     <h3>5b &middot; Gate dangerous commands</h3>
     <p>Not every shell command should run unquestioned. A gate can allow the safe, expected commands (the test runner, a formatter, git status) and deny or escalate the dangerous ones (anything that deletes broadly, touches credentials, or reaches the network). Scope the grant to intent, the same way you scoped writes in Stage 4.</p>
-    <div class="code"><span class="c"># Allow the task's expected commands; deny the rest.</span>
+    <div class="code py"><span class="c"># Allow the task's expected commands; deny the rest.</span>
 SAFE = (<span class="s">"pytest"</span>, <span class="s">"ruff"</span>, <span class="s">"git status"</span>, <span class="s">"git diff"</span>)
 <span class="k">async def</span> bash_gate(tool_name, args, context):
     <span class="k">if</span> tool_name == <span class="s">"Bash"</span>:
@@ -867,7 +876,7 @@ SAFE = (<span class="s">"pytest"</span>, <span class="s">"ruff"</span>, <span cl
 
     <h3>6b &middot; Connect an external server</h3>
     <p>Pass the server config in <code>mcp_servers</code> and add its tools to <code>allowed_tools</code>. Tool names are fully qualified as <code>mcp__&lt;server&gt;__&lt;tool&gt;</code> &mdash; a common trip-up: that full string is what goes in the allow list.</p>
-    <div class="code">options = ClaudeAgentOptions(
+    <div class="code py">options = ClaudeAgentOptions(
     cwd=repo,
     allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"mcp__github__*"</span>],  <span class="c"># qualified names</span>
     mcp_servers={
@@ -925,7 +934,7 @@ SAFE = (<span class="s">"pytest"</span>, <span class="s">"ruff"</span>, <span cl
 
     <h3>7a &middot; Load project configuration</h3>
     <p>The SDK doesn&rsquo;t read your project&rsquo;s <code>CLAUDE.md</code> and settings by default &mdash; you opt in. Set <code>setting_sources=["project"]</code> and the agent picks up the committed project context: conventions, build commands, path rules. Now &ldquo;follow our conventions&rdquo; is automatic, not something you re-specify each run.</p>
-    <div class="code">options = ClaudeAgentOptions(
+    <div class="code py">options = ClaudeAgentOptions(
     cwd=repo,
     setting_sources=[<span class="s">"project"</span>],   <span class="c"># load committed CLAUDE.md, rules, settings</span>
     allowed_tools=[<span class="s">"Read"</span>, <span class="s">"Glob"</span>, <span class="s">"Grep"</span>, <span class="s">"Edit"</span>],
